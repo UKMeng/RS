@@ -7,9 +7,28 @@ namespace RS.Utils
 {
     public class RsNoise
     {
+        private float[] m_amplitudes;
+        private int m_firstOctave;
+        private float m_gain = 0.5f;
+        private float m_lacunarity = 2.0f;
+        private int m_octaves;
+        private float m_firstFrequency;
+        private float m_firstValueFactor;
+        
+        
         public RsNoise(UInt64 seed)
         {
             Randomize(seed);
+        }
+
+        public RsNoise(UInt64 seed, float[] amplitudes, int firstOctave)
+        {
+            Randomize(seed);
+            m_amplitudes = amplitudes;
+            m_firstOctave = firstOctave;
+            m_octaves = amplitudes.Length;
+            m_firstFrequency = Mathf.Pow(2.0f, firstOctave);
+            m_firstValueFactor = Mathf.Pow(2.0f, m_octaves - 1) / (Mathf.Pow(2.0f, m_octaves) - 1.0f);
         }
         
         public static float[,] GenerateWhiteNoise(int width, int height, Int64 seed)
@@ -89,36 +108,26 @@ namespace RS.Utils
             return data;
         }
         
-        public float SampleFbm3D(Vector3 samplePosition, int firstOctave, float[] amplitudes)
+        public float SampleFbm3D(Vector3 samplePosition)
         {
             var result = 0.0f;
             
-            var octaves = amplitudes.Length;
-            var frequency = Mathf.Pow(2.0f, firstOctave);
-            var valueFactor = Mathf.Pow(2.0f, octaves - 1) / (Mathf.Pow(2.0f, octaves) - 1.0f);
-
-            var gain = 0.5f;
-            var lacunarity = 2.0f;
+            var frequency = m_firstFrequency;
+            var valueFactor = m_firstValueFactor;
             
-            for (var i = 0; i < octaves; i++)
+            for (var i = 0; i < m_octaves; i++)
             {
-                if (amplitudes[i] != 0.0f)
+                if (m_amplitudes[i] != 0.0f)
                 {
                     var value = SimplexNoiseEvaluate(samplePosition, frequency);
-                    result += valueFactor * amplitudes[i] * value;
+                    result += valueFactor * m_amplitudes[i] * value;
                 }
 
-                frequency *= lacunarity;
-                valueFactor *= gain;
+                frequency *= m_lacunarity;
+                valueFactor *= m_gain;
             }
             
             return result;
-        }
-
-        public float ShiftNoise(Vector3 samplePosition, float scaleXZ, float scaleY, int firstOctave, float[] amplitudes)
-        {
-            var scaledPosition = new Vector3(samplePosition.x * scaleXZ, samplePosition.y * scaleY, samplePosition.z  * scaleXZ);
-            return SampleFbm3D(scaledPosition, firstOctave, amplitudes);
         }
         
         public static float Fbm3D(Vector3 samplePosition, int octaves, float frequency, RsNoise noise)
