@@ -6,13 +6,11 @@ namespace RS.Scene.Sampler
 {
     public class RsSampler
     {
-        protected RsRandom m_rng;
         protected RsNoise m_noise;
 
-        public RsSampler(Int64 seed, float[] amplitudes, int firstOctave)
+        public RsSampler(RsNoise noise)
         {
-            m_rng = new RsRandom(seed);
-            m_noise = new RsNoise(m_rng.NextUInt64(), amplitudes, firstOctave);
+            m_noise = noise;
         }
 
         protected RsSampler()

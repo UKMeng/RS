@@ -80,6 +80,8 @@ namespace RS.Scene
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
+                var rng = new RsRandom(m_seed);
+                
                 // TODO: Use Config
             
                 // Temperature
@@ -95,12 +97,24 @@ namespace RS.Scene
                 var firstOctave = -3;
             
                 // ridges
-                // var amplitudes = new float[] { 1.0f, 2.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-                // var firstOctave = -7;
+                var ridgesAmps = new float[] { 1.0f, 2.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+                var ridgesFisrtOctave = -7;
+                var ridgesNoise = new RsNoise(rng.NextUInt64(), ridgesAmps, ridgesFisrtOctave);
 
-                var sampler = new ShiftXZSampler(m_seed, amplitudes, firstOctave);
+                // 组装Sampler
                 
-                m_texture = Sample(new Cache2DSampler(sampler));
+                // shiftX
+                var offsetNoise1 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
+                
+                // shiftX
+                var offsetNoise2 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
+
+                var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgesNoise, shiftXSampler,
+                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+                
+                m_texture = Sample(ridgesSampler);
             }
             
             // 显示Texture2D
