@@ -23,8 +23,8 @@ namespace RS.Utils
             var x = index % width;
             var y = index / width;
             var v = data[x + y * width];
-
-            v = RsMath.ClampGradient(v, minValue, maxValue, 0.0f, 1.0f);
+            
+            v = RsMath.ClampGradient(v, minValue, maxValue,0.0f, 1.0f);
             
             colors[index] = Viridis(v);
         }
@@ -43,17 +43,12 @@ namespace RS.Utils
             var sw = Stopwatch.StartNew();
             
             // 使用JobSystem
-            var maxVal = float.MinValue;
-            var minVal = float.MaxValue;
             var dataArray = new NativeArray<float>(width * height, Allocator.TempJob);
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    var v = data[x, y];
-                    if (v > maxVal) maxVal = v;
-                    if (v < minVal) minVal = v;
-                    dataArray[x + y * width] = v;
+                    dataArray[x + y * width] = data[x, y];
                 }
             }
             
@@ -71,8 +66,8 @@ namespace RS.Utils
                 colors = colorArray,
                 width = width,
                 blockSize = blockSize,
-                maxValue = maxVal,
-                minValue = minVal,
+                maxValue = 1.0f,
+                minValue = -1.0f,
                 viridisLUT = viridisLUT,
             };
             
