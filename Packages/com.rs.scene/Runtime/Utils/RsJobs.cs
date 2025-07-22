@@ -11,16 +11,28 @@ namespace RS.Utils
     public struct GenerateTextureJob : IJobParallelFor
     {
         [ReadOnly] public NativeArray<float> data;
+        [ReadOnly] public NativeArray<Color> viridisLUT;
         [WriteOnly] public NativeArray<Color> colors;
         public int width;
         public int blockSize;
+        public float maxValue;
+        public float minValue;
 
         public void Execute(int index)
         {
             var x = index % width;
             var y = index / width;
             var v = data[x + y * width];
-            colors[index] = new Color(v, v, v);
+
+            v = RsMath.ClampGradient(v, minValue, maxValue, 0.0f, 1.0f);
+            
+            colors[index] = Viridis(v);
+        }
+
+        private Color Viridis(float v)
+        {
+            var index = Mathf.FloorToInt(v * 255.0f);
+            return viridisLUT[index];
         }
     }
 
@@ -31,13 +43,24 @@ namespace RS.Utils
             var sw = Stopwatch.StartNew();
             
             // 使用JobSystem
+            var maxVal = float.MinValue;
+            var minVal = float.MaxValue;
             var dataArray = new NativeArray<float>(width * height, Allocator.TempJob);
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    dataArray[x + y * width] = data[x, y];
+                    var v = data[x, y];
+                    if (v > maxVal) maxVal = v;
+                    if (v < minVal) minVal = v;
+                    dataArray[x + y * width] = v;
                 }
+            }
+            
+            var viridisLUT = new NativeArray<Color>(256, Allocator.TempJob);
+            for (var index = 0; index < 256; index++)
+            {
+                viridisLUT[index] = RsColor.ViridisLUT[index];
             }
             
             var colorArray = new NativeArray<Color>(width * height, Allocator.TempJob);
@@ -47,7 +70,10 @@ namespace RS.Utils
                 data = dataArray,
                 colors = colorArray,
                 width = width,
-                blockSize = blockSize
+                blockSize = blockSize,
+                maxValue = maxVal,
+                minValue = minVal,
+                viridisLUT = viridisLUT,
             };
             
             var handle = job.Schedule(width * height, 32);
