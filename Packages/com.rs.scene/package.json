@@ -1,0 +1,11 @@
+﻿{
+  "name": "com.rs.scene",
+  "version": "1.0.0",
+  "displayName": "RS Scene",
+  "author": {
+    "name": "jerryyjmeng"
+  },
+  "type": "library",
+  "dependencies": {
+  }
+}
