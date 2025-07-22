@@ -92,6 +92,32 @@ namespace RS.Utils
             return data;
         }
         
+        public static float SampleFbm3D(Vector3 samplePosition, int firstOctave, float[] amplitudes, RsNoise noise)
+        {
+            var result = 0.0f;
+            
+            var octaves = amplitudes.Length;
+            var frequency = Mathf.Pow(2.0f, firstOctave);
+            var valueFactor = Mathf.Pow(2.0f, octaves - 1) / (Mathf.Pow(2.0f, octaves) - 1.0f);
+
+            var gain = 0.5f;
+            var lacunarity = 2.0f;
+            
+            for (var i = 0; i < octaves; i++)
+            {
+                if (amplitudes[i] != 0.0f)
+                {
+                    var value = noise.SimplexNoiseEvaluate(samplePosition, frequency);
+                    result += valueFactor * amplitudes[i] * value;
+                }
+
+                frequency *= lacunarity;
+                valueFactor *= gain;
+            }
+            
+            return result;
+        }
+        
         public static float Fbm3D(Vector3 samplePosition, int octaves, float frequency, RsNoise noise)
         {
             var value = 0.0f;

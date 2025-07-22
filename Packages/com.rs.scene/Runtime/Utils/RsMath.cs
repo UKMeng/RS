@@ -53,5 +53,16 @@ namespace RS.Utils
         {
             return (Clamp(value, min, max) - min) / (max - min) * (to - from) + from;
         }
+
+        /// <summary>
+        /// https://minecraft.wiki/w/Density_function#squeeze
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static float Squeeze(float value)
+        {
+            var t = Clamp(value, -1.0f, 1.0f);
+            return t * 0.5f - t * t * t / 24.0f;
+        }
     }
 }

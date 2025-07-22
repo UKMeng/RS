@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using RS.Scene.BiomeMap;
 using RS.Scene.Sampler;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
@@ -24,6 +26,7 @@ namespace RS.Scene
         
         // 预览视角 0 = side, 1 = top
         private byte m_previewMode = 0;
+        private readonly string[] m_previewModeStrs = { "Side", "Top" };
         
         private Texture2D m_texture;
 
@@ -63,11 +66,21 @@ namespace RS.Scene
                 m_seed = RsRandom.GetSeed();
             }
             EditorGUILayout.EndHorizontal();
+            
+            // 调整采样范围
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("采样宽度", labelStyle, GUILayout.Width(60));
+            m_samplerWidth = EditorGUILayout.IntField(m_samplerWidth, filedStyle);
+            EditorGUILayout.LabelField("采样高度", labelStyle, GUILayout.Width(60));
+            m_samplerHeight = EditorGUILayout.IntField(m_samplerHeight, filedStyle);
+            EditorGUILayout.LabelField("预览视角", labelStyle, GUILayout.Width(60));
+            m_previewMode = (byte)GUILayout.Toolbar(m_previewMode, m_previewModeStrs);
+            EditorGUILayout.EndHorizontal();
 
-            // 将数据转换成Texture2D显示
+            // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
-                m_texture = Sample(new RsSampler());
+                m_texture = Sample(new RsSampler(m_seed));
             }
             
             // 显示Texture2D
@@ -88,7 +101,9 @@ namespace RS.Scene
             var startX = m_startPos.x;
             var startY = m_startPos.y;
             var startZ = m_startPos.z;
-            
+
+
+            var sw = Stopwatch.StartNew();
 
             for (int x = 0; x < m_samplerWidth; x++)
             {
@@ -106,9 +121,11 @@ namespace RS.Scene
                         data[x, z] = sampler.Sample(new Vector3(startX + x, startY, startZ + z));
                     }
                 }
-                
-                
             }
+
+            sw.Stop();
+            Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
+            
             return RsJobs.GenerateTexture(data, m_width, m_height);
         }
     }
