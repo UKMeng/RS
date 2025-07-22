@@ -69,11 +69,11 @@ namespace RS.Scene
             }
             
             // 测试3D Simplex Noise
-            if (GUILayout.Button("Test Simplex Noise", buttonStyle))
-            {
-                m_whiteNoise = RsNoise.GenerateSimplexNoise(m_width, m_height, m_seed);
-                m_texture = RsJobs.GenerateTexture(m_whiteNoise, m_width, m_height);
-            }
+            // if (GUILayout.Button("Test Simplex Noise", buttonStyle))
+            // {
+            //     m_whiteNoise = RsNoise.GenerateSimplexNoise(m_width, m_height, m_seed);
+            //     m_texture = RsJobs.GenerateTexture(m_whiteNoise, m_width, m_height);
+            // }
             
             // 测试Perlin Noise
             if (GUILayout.Button("Test Perlin Noise", buttonStyle))

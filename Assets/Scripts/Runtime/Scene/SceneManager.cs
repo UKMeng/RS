@@ -20,6 +20,8 @@ namespace RS.Scene
         
         private RsNoise m_noise;
 
+        private RsRandom m_rng;
+
         
         // 流式加载相关
         private Dictionary<Vector3, GameObject> m_chunks;
@@ -42,7 +44,8 @@ namespace RS.Scene
             Block.Init();
             
             // 初始化噪声
-            m_noise = new RsNoise(seed);
+            m_rng = new RsRandom(seed);
+            m_noise = new RsNoise(m_rng.NextUInt64());
 
             m_chunks = new Dictionary<Vector3, GameObject>();
             m_loadRecord = new Dictionary<Vector2, byte>();

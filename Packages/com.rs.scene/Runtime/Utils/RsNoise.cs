@@ -7,12 +7,9 @@ namespace RS.Utils
 {
     public class RsNoise
     {
-        private RsRandom m_rng;
-        
-        public RsNoise(Int64 seed)
+        public RsNoise(UInt64 seed)
         {
             Randomize(seed);
-            m_rng = new RsRandom(seed);
         }
         
         public static float[,] GenerateWhiteNoise(int width, int height, Int64 seed)
@@ -36,13 +33,13 @@ namespace RS.Utils
             return noise;
         }
 
-        public float PerlinNoiseEvaluate(float x, float z)
-        {
-            var offsetX = m_rng.NextFloat();
-            var offsetZ = m_rng.NextFloat();
-            
-            return Mathf.PerlinNoise(x + 500, z + 500);
-        }
+        // public float PerlinNoiseEvaluate(float x, float z)
+        // {
+        //     var offsetX = m_rng.NextFloat();
+        //     var offsetZ = m_rng.NextFloat();
+        //     
+        //     return Mathf.PerlinNoise(x + 500, z + 500);
+        // }
 
         public static float[,] GeneratePerlinNoise(int width, int height, Int64 seed)
         {
@@ -67,7 +64,7 @@ namespace RS.Utils
             return noise;
         }
 
-        public static float[,] GenerateSimplexNoise(int width, int height, Int64 seed)
+        public static float[,] GenerateSimplexNoise(int width, int height, UInt64 seed)
         {
             var sw = Stopwatch.StartNew();
             
@@ -92,7 +89,7 @@ namespace RS.Utils
             return data;
         }
         
-        public static float SampleFbm3D(Vector3 samplePosition, int firstOctave, float[] amplitudes, RsNoise noise)
+        public float SampleFbm3D(Vector3 samplePosition, int firstOctave, float[] amplitudes)
         {
             var result = 0.0f;
             
@@ -107,7 +104,7 @@ namespace RS.Utils
             {
                 if (amplitudes[i] != 0.0f)
                 {
-                    var value = noise.SimplexNoiseEvaluate(samplePosition, frequency);
+                    var value = SimplexNoiseEvaluate(samplePosition, frequency);
                     result += valueFactor * amplitudes[i] * value;
                 }
 
@@ -116,6 +113,12 @@ namespace RS.Utils
             }
             
             return result;
+        }
+
+        public float ShiftNoise(Vector3 samplePosition, float scaleXZ, float scaleY, int firstOctave, float[] amplitudes)
+        {
+            var scaledPosition = new Vector3(samplePosition.x * scaleXZ, samplePosition.y * scaleY, samplePosition.z  * scaleXZ);
+            return SampleFbm3D(scaledPosition, firstOctave, amplitudes);
         }
         
         public static float Fbm3D(Vector3 samplePosition, int octaves, float frequency, RsNoise noise)
@@ -389,7 +392,7 @@ namespace RS.Utils
         }
 
 
-        void Randomize(Int64 seed)
+        void Randomize(UInt64 seed)
         {
             _random = new int[RandomSize * 2];
 
@@ -399,7 +402,7 @@ namespace RS.Utils
                 // Unpack the seed into 4 bytes then perform a bitwise XOR operation
                 // with each byte
                 var F = new byte[4];
-                UnpackLittleint64(seed, ref F);
+                UnpackLittleUInt64(seed, ref F);
 
                 for (int i = 0; i < Source.Length; i++)
                 {
@@ -445,7 +448,7 @@ namespace RS.Utils
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="buffer">The output buffer.</param>
-        static byte[] UnpackLittleint64(Int64 value, ref byte[] buffer)
+        static byte[] UnpackLittleUInt64(UInt64 value, ref byte[] buffer)
         {
             if (buffer.Length < 4)
                 Array.Resize(ref buffer, 4);

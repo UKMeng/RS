@@ -7,8 +7,6 @@ namespace RS.Utils
 {
     public class RsRandom
     {
-        private Random m_rng;
-        
         private UInt64 m_seed;
         private UInt64 a = 2862933555777941756;
         private UInt64 b = 3037000493;
@@ -29,6 +27,12 @@ namespace RS.Utils
         {
             // 采用二次同余法(quadratic congruential generator)生成随机数
             m_state = (a * m_state * m_state + b * m_state + c) % mod;
+        }
+
+        public UInt64 NextUInt64()
+        {
+            Next();
+            return m_state;
         }
 
         /// <summary>
