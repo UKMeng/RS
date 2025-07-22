@@ -80,7 +80,27 @@ namespace RS.Scene
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
-                m_texture = Sample(new RsSampler(m_seed));
+                // TODO: Use Config
+            
+                // Temperature
+                // var amplitudes = new float[] { 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+                // var firstOctave = -10;
+            
+                // Continentalness
+                // var amplitudes = new float[] { 1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+                // var firstOctave = -9;
+            
+                // offset
+                var amplitudes = new float[] { 1.0f, 1.0f, 1.0f, 0.0f };
+                var firstOctave = -3;
+            
+                // ridges
+                // var amplitudes = new float[] { 1.0f, 2.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+                // var firstOctave = -7;
+
+                var sampler = new ShiftXZSampler(m_seed, amplitudes, firstOctave);
+                
+                m_texture = Sample(new Cache2DSampler(sampler));
             }
             
             // 显示Texture2D
