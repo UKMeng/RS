@@ -85,6 +85,7 @@ namespace RS.Utils
             
             dataArray.Dispose();
             colorArray.Dispose();
+            viridisLUT.Dispose();
 
             sw.Stop();
             Debug.Log($"Texture generated in {sw.ElapsedMilliseconds} ms");
