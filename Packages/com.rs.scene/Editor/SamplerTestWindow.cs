@@ -1,26 +1,36 @@
 ﻿using System;
 using RS.Scene.BiomeMap;
+using RS.Scene.Sampler;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
 
 namespace RS.Scene
 {
-    public class DensitySamplerTestWindow : EditorWindow
+    public class SamplerTestWindow : EditorWindow
     {
         private Int64 m_seed = 20250715;
+        
+        // 采样起始位置
+        private Vector3 m_startPos = new Vector3(0.0f, 0.0f, 0.0f);
+        
+        // 采样范围
+        private int m_samplerWidth = 2048;
+        private int m_samplerHeight = 2048;
+        
+        // 预览纹理分辨率
         private int m_width = 2048;
         private int m_height = 2048;
-
-        private float[,] m_whiteNoise;
-
+        
+        // 预览视角 0 = side, 1 = top
+        private byte m_previewMode = 0;
+        
         private Texture2D m_texture;
-        private BiomeMapGenerator m_bmg;
 
-        [MenuItem("RS/Density Function Test")]
+        [MenuItem("RS/Sampler Test")]
         private static void ShowWindow()
         {
-            GetWindow(typeof(MapWindow), true, "Map");
+            GetWindow(typeof(SamplerTestWindow), true, "Sampler Test");
         }
 
         private void OnGUI()
@@ -55,10 +65,9 @@ namespace RS.Scene
             EditorGUILayout.EndHorizontal();
 
             // 将数据转换成Texture2D显示
-            if (GUILayout.Button("Generate New White Noise", buttonStyle))
+            if (GUILayout.Button("Generate", buttonStyle))
             {
-                m_whiteNoise = RsNoise.GenerateWhiteNoise(m_width, m_height, m_seed);
-                m_texture = RsJobs.GenerateTexture(m_whiteNoise, m_width, m_height);
+                m_texture = Sample(new RsSampler());
             }
             
             // 显示Texture2D
@@ -72,9 +81,35 @@ namespace RS.Scene
         }
         
         // TODO: Sampler抽象
-        // private Texture2D Sample()
-        // {
-        //     
-        // }
+        private Texture2D Sample(RsSampler sampler)
+        {
+            var data = new float[m_samplerWidth, m_samplerHeight];
+
+            var startX = m_startPos.x;
+            var startY = m_startPos.y;
+            var startZ = m_startPos.z;
+            
+
+            for (int x = 0; x < m_samplerWidth; x++)
+            {
+                if (m_previewMode == 0)
+                {
+                    for (int y = 0; y < m_samplerHeight; y++)
+                    {
+                        data[x, y] = sampler.Sample(new Vector3(startX + x, startY + y, startZ));
+                    }
+                }
+                else
+                {
+                    for (int z = 0; z < m_samplerHeight; z++)
+                    {
+                        data[x, z] = sampler.Sample(new Vector3(startX + x, startY, startZ + z));
+                    }
+                }
+                
+                
+            }
+            return RsJobs.GenerateTexture(data, m_width, m_height);
+        }
     }
 }
