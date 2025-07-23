@@ -12,6 +12,20 @@ using RS.GMTool;
 
 namespace RS.Scene
 {
+    public struct MeshData
+    {
+        public Vector3[] vertices;
+        public int[] triangles;
+        public Vector2[] uvs;
+    }
+    
+    public struct ChunkData
+    {
+        public Vector3 chunkPos;
+        public MeshData meshData;
+        public BlockType[] blocks;
+    }
+    
     public class SceneManager: MonoBehaviour
     {
         public GameObject chunkPrefab;
@@ -33,14 +47,7 @@ namespace RS.Scene
         private int m_loadDistance = 3;
         private int m_deactivateDistance = 5;
         private int m_destroyDistance = 10;
-
-        private struct ChunkData
-        {
-            public Vector3 chunkPos;
-            public Mesh mesh;
-            public BlockType[] blocks;
-        }
-
+        
         private ConcurrentQueue<ChunkData> m_chunkDataQueue;
         
         
@@ -61,7 +68,6 @@ namespace RS.Scene
 
             m_chunks = new Dictionary<Vector3, GameObject>();
             m_loadRecord = new Dictionary<Vector2, byte>();
-            // m_chunkLoadQueue = new Queue<Vector3>();
             m_chunkDataQueue = new ConcurrentQueue<ChunkData>();
             
             // 放置Player
@@ -99,11 +105,17 @@ namespace RS.Scene
                 var chunk = chunkGo.GetComponent<Chunk>();
                 chunk.blocks = chunkData.blocks;
 
+                var mesh = new Mesh();
+                mesh.vertices = chunkData.meshData.vertices;
+                mesh.triangles = chunkData.meshData.triangles;
+                mesh.uv = chunkData.meshData.uvs;
+                mesh.RecalculateNormals();
+                
                 var chunkTf = chunk.GetComponent<MeshFilter>();
-                chunkTf.mesh = chunkData.mesh;
+                chunkTf.mesh = mesh;
 
                 var chunkMc = chunk.GetComponent<MeshCollider>();
-                chunkMc.sharedMesh = chunkData.mesh;
+                chunkMc.sharedMesh = mesh;
 
                 m_chunks[chunkData.chunkPos] = chunkGo;
             }
@@ -194,39 +206,13 @@ namespace RS.Scene
                             {
                                 var chunkPos = new Vector3(chunkX, chunkY, chunkZ);
                                 StartChunkGeneration(chunkPos);
-                                // var go = GenerateChunk((int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z);
-                                // m_chunks[chunkPos] = go;
                             }
                             m_loadRecord[chunkPosXZ] = 2;
                         }
                     }
                 }
             }
-
-            // if (!m_isLoadingChunks && m_chunkLoadQueue.Count > 0)
-            // {
-            //     StartCoroutine(LoadChunksCoroutine());
-            // }
         }
-
-        // IEnumerator LoadChunksCoroutine()
-        // {
-        //     m_isLoadingChunks = true;
-        //     // TODO:后续安排成优先队列，距离越近的越先加载
-        //     var chunksPerFrame = 5;
-        //     while (m_chunkLoadQueue.Count > 0)
-        //     {
-        //         for (var i = 0; i < chunksPerFrame && m_chunkLoadQueue.Count > 0; i++)
-        //         {
-        //             var chunkPos = m_chunkLoadQueue.Dequeue();
-        //             var go = GenerateChunk((int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z);
-        //             m_chunks[chunkPos] = go;
-        //         }
-        //         yield return null;
-        //     }
-        //
-        //     m_isLoadingChunks = false;
-        // }
 
         /// <summary>
         /// 后台线程执行Chunk生成，避免卡顿
@@ -236,8 +222,8 @@ namespace RS.Scene
         {
             Task.Run(() =>
             {
-                var mesh = GenerateChunkMesh((int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z, out var blocks);
-                var data = new ChunkData { chunkPos = chunkPos, mesh = mesh, blocks = blocks };
+                var meshData = GenerateChunkMesh((int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z, out var blocks);
+                var data = new ChunkData { chunkPos = chunkPos, meshData = meshData, blocks = blocks };
                 m_chunkDataQueue.Enqueue(data);
             });
         }
@@ -247,7 +233,7 @@ namespace RS.Scene
             return m_chunks[chunkPos].GetComponent<Chunk>();
         }
 
-        private Mesh GenerateChunkMesh(int chunkX, int chunkY, int chunkZ, out BlockType[] blocks)
+        private MeshData GenerateChunkMesh(int chunkX, int chunkY, int chunkZ, out BlockType[] blocks)
         {
             var offsetX = chunkX * 32;
             var offsetZ = chunkZ * 32;
@@ -329,97 +315,6 @@ namespace RS.Scene
             Debug.Log($"[SceneManager] 生成Chunk {chunkX} {chunkY} {chunkZ} 数据耗时 {sw.ElapsedMilliseconds} ms");
 
             return Chunk.BuildMesh(blocks, 32, 32);
-        }
-        
-        private GameObject GenerateChunk(int chunkX, int chunkY, int chunkZ)
-        {
-            var offsetX = chunkX * 32;
-            var offsetZ = chunkZ * 32;
-            var offsetY = chunkY * 32;
-
-            var sampleResX = 8;
-            var sampleResY = 4;
-            var sampleResZ = 8;
-
-            var sampleSizeX = 32 / sampleResX;
-            var sampleSizeY = 32 / sampleResY;
-            var sampleSizeZ = 32 / sampleResZ;
-            
-            var sw = Stopwatch.StartNew();
-            
-            var noiseSamples = new float[sampleSizeX + 1, sampleSizeY + 1, sampleSizeZ + 1];
-
-            for (var sx = 0; sx < sampleSizeX + 1; sx++)
-            {
-                for (var sz = 0; sz < sampleSizeZ + 1; sz++)
-                {
-                    for (var sy = 0; sy < sampleSizeY + 1; sy++)
-                    {
-                        var sampleX = offsetX + sx * sampleResX;
-                        var sampleY = offsetY + sy * sampleResY;
-                        var sampleZ = offsetZ + sz * sampleResZ;
-                        noiseSamples[sx, sy, sz] = SampleNoise(sampleX, sampleY, sampleZ);
-                    }
-                }
-            }
-            
-            var chunkData = new BlockType[32 * 32 * 32];
-            var index = 0;
-            // 线性插值
-            for (var x = 0; x < 32; x++)
-            {
-                var fx = x % sampleResX;
-                var tx = (float)fx / sampleResX;
-                var sx = x / sampleResX;
-                
-                for (var z = 0; z < 32; z++)
-                {
-                    var fz = z % sampleResZ;
-                    var tz = (float)fz / sampleResZ;
-                    var sz = z / sampleResZ;
-                    
-                    for (var y = 0; y < 32; y++)
-                    {
-                        var fy = y % sampleResY;
-                        var ty = (float)fy / sampleResY;
-                        var sy = y / sampleResY;
-                        
-                        // 三线性插值
-                        var c000 = noiseSamples[sx,     sy,     sz    ];
-                        var c100 = noiseSamples[sx + 1, sy,     sz    ];
-                        var c010 = noiseSamples[sx,     sy + 1, sz    ];
-                        var c110 = noiseSamples[sx + 1, sy + 1, sz    ];
-                        var c001 = noiseSamples[sx,     sy,     sz + 1];
-                        var c101 = noiseSamples[sx + 1, sy,     sz + 1];
-                        var c011 = noiseSamples[sx,     sy + 1, sz + 1];
-                        var c111 = noiseSamples[sx + 1, sy + 1, sz + 1];
-                        
-                        var c00 = Mathf.Lerp(c000, c100, tx);
-                        var c01 = Mathf.Lerp(c001, c101, tx);
-                        var c10 = Mathf.Lerp(c010, c110, tx);
-                        var c11 = Mathf.Lerp(c011, c111, tx);
-
-                        var c0 = Mathf.Lerp(c00, c10, ty);
-                        var c1 = Mathf.Lerp(c01, c11, ty);
-
-                        var density = Mathf.Lerp(c0, c1, tz);
-                        
-                        chunkData[index++] = JudgeBlockType(density, x + offsetX, y + offsetY, z + offsetZ);
-                    }
-                }
-            }
-
-            sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunkX} {chunkY} {chunkZ} 数据耗时 {sw.ElapsedMilliseconds} ms");
-
-            var chunkPos = new Vector3(offsetX, offsetY * 0.5f, offsetZ);
-            var chunkGo = Instantiate(chunkPrefab, chunkPos, Quaternion.identity);
-            var chunk = chunkGo.GetComponent<Chunk>();
-            chunk.blocks = chunkData;
-            // chunk.BuildMesh();
-            chunk.BuildMeshUsingJobSystem();
-
-            return chunkGo;
         }
 
         private float SampleNoise(int x, int y, int z)

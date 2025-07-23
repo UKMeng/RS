@@ -22,11 +22,9 @@ namespace RS.Scene
             BuildMeshUsingJobSystem();
         }
 
-        public static Mesh BuildMesh(BlockType[] blocks, int width, int height)
+        public static MeshData BuildMesh(BlockType[] blocks, int width, int height)
         {
             var sw = Stopwatch.StartNew();
-            
-            var mesh = new Mesh();
             
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
@@ -189,16 +187,14 @@ namespace RS.Scene
                     }
                 }
             }
-            
-            mesh.vertices = vertices.ToArray();
-            mesh.triangles = triangles.ToArray();
-            mesh.uv = uvs.ToArray();
-            mesh.RecalculateNormals();
+
+            var meshData = new MeshData
+                { vertices = vertices.ToArray(), triangles = triangles.ToArray(), uvs = uvs.ToArray() };
             
             sw.Stop();
             Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
 
-            return mesh;
+            return meshData;
         }
         
         public void BuildMeshUsingJobSystem()
