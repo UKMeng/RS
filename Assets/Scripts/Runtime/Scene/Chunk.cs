@@ -22,6 +22,185 @@ namespace RS.Scene
             BuildMeshUsingJobSystem();
         }
 
+        public static Mesh BuildMesh(BlockType[] blocks, int width, int height)
+        {
+            var sw = Stopwatch.StartNew();
+            
+            var mesh = new Mesh();
+            
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            var uvs = new List<Vector2>();
+
+            for (var x = 0; x < width; x++)
+            {
+                for (var z = 0; z < width; z++)
+                {
+                    for (var y = 0; y < height; y++)
+                    {
+                        var index = GetArrayIndex(x, y, z);
+
+                        if (blocks[index] == BlockType.Air)
+                        {
+                            continue;
+                        }
+
+                        var elevation = y * 0.5f;
+
+                        var uv = Block.uvTable[(int)blocks[index]];
+                        
+                        // Up
+                        var upIndex = GetArrayIndex(x, y + 1, z);
+                        if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 3);
+                            triangles.Add(vertIndex + 2);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                        
+                        // Bottom
+                        var downIndex = GetArrayIndex(x, y - 1, z);
+                        if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x, elevation, z));
+                            vertices.Add(new Vector3(x + 1, elevation, z));
+                            vertices.Add(new Vector3(x + 1, elevation, z + 1));
+                            vertices.Add(new Vector3(x, elevation, z + 1));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 3);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                        
+                        // Front
+                        var frontIndex = GetArrayIndex(x, y, z - 1);
+                        if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x, elevation, z));
+                            vertices.Add(new Vector3(x + 1, elevation, z));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 3);
+                            triangles.Add(vertIndex + 2);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                        
+                        // Back
+                        var backIndex = GetArrayIndex(x, y, z + 1);
+                        if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x, elevation, z + 1));
+                            vertices.Add(new Vector3(x + 1, elevation, z + 1));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 3);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                        
+                        // Left
+                        var leftIndex = GetArrayIndex(x - 1, y, z);
+                        if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x, elevation, z + 1));
+                            vertices.Add(new Vector3(x, elevation, z));
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z));
+                            vertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 3);
+                            triangles.Add(vertIndex + 2);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                        
+                        // right
+                        var rightIndex = GetArrayIndex(x + 1, y, z);
+                        if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
+                        {
+                            var vertIndex = vertices.Count;
+                            vertices.Add(new Vector3(x + 1, elevation, z));
+                            vertices.Add(new Vector3(x + 1, elevation, z + 1));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                            vertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 2);
+                            triangles.Add(vertIndex + 1);
+                            triangles.Add(vertIndex);
+                            triangles.Add(vertIndex + 3);
+                            triangles.Add(vertIndex + 2);
+                            
+                            uvs.Add(uv[0]);
+                            uvs.Add(uv[1]);
+                            uvs.Add(uv[2]);
+                            uvs.Add(uv[3]);
+                        }
+                    }
+                }
+            }
+            
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+            mesh.uv = uvs.ToArray();
+            mesh.RecalculateNormals();
+            
+            sw.Stop();
+            Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
+
+            return mesh;
+        }
+        
         public void BuildMeshUsingJobSystem()
         {
             var sw = Stopwatch.StartNew();
@@ -464,14 +643,24 @@ namespace RS.Scene
             Debug.Log($"Chunk {transform.position} generated in {sw.ElapsedMilliseconds} ms");
         }
 
-        private int GetArrayIndex(int x, int y, int z)
+        // private int GetArrayIndex(int x, int y, int z)
+        // {
+        //     if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= width)
+        //     {
+        //         return -1;
+        //     }
+        //     
+        //     return x * width * height + z * height + y;
+        // }
+        //
+        private static int GetArrayIndex(int x, int y, int z)
         {
-            if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= width)
+            if (x < 0 || x >= 32 || y < 0 || y >= 32 || z < 0 || z >= 32)
             {
                 return -1;
             }
             
-            return x * width * height + z * height + y;
+            return x * 32 * 32 + z * 32 + y;
         }
         
     }

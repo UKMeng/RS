@@ -31,7 +31,7 @@ namespace RS.Scene
         // 预览噪声 0 = Continentalness, 1 = Erosion, 2 = Peak & Valleys, 3 = Temperature, 4 = Humidity
         private byte m_noiseMode = 0;
         private readonly string[] m_noiseModeStrs =
-            { "Continentalness", "Erosion", "Peak & Valleys", "Temperature", "Humidity" };
+            { "Continentalness", "Erosion", "Peaks & Valleys", "Temperature", "Humidity" };
         
         private Texture2D m_texture;
 
