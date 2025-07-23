@@ -43,12 +43,16 @@ namespace RS.Utils
             var sw = Stopwatch.StartNew();
             
             // 使用JobSystem
+            var dataWidth = data.GetLength(0);
+            var dataHeight = data.GetLength(1);
             var dataArray = new NativeArray<float>(width * height, Allocator.TempJob);
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    dataArray[x + y * width] = data[x, y];
+                    var srcX = Mathf.Clamp(Mathf.RoundToInt((float)x / width * dataWidth), 0, dataWidth - 1);
+                    var srcY = Mathf.Clamp(Mathf.RoundToInt((float)y / height * dataHeight), 0, dataHeight - 1);
+                    dataArray[x + y * width] = data[srcX, srcY];
                 }
             }
             

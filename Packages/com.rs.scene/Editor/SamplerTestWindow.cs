@@ -113,8 +113,21 @@ namespace RS.Scene
 
                 var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgesNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+
+                var ridgesFoldedSampler = new MulSampler(new ConstantSampler(-3.0f),
+                    new AddSampler(new ConstantSampler(-0.33333f),
+                        new AbsSampler(new AddSampler(new ConstantSampler(-0.66666f), new AbsSampler(ridgesSampler)))));
                 
-                m_texture = Sample(ridgesSampler);
+                // erosion
+                var erosionAmps = new float[] { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f };
+                var eroFirstOctave = -9;
+                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionAmps, eroFirstOctave);
+
+                var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
+                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+                
+                
+                m_texture = Sample(erosionSampler);
             }
             
             // 显示Texture2D
