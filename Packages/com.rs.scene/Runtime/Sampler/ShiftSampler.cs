@@ -69,9 +69,9 @@ namespace RS.Scene.Sampler
             var offsetZ = m_samplerZ.Sample(pos);
 
             return m_noise.SampleFbm3D(
-                new Vector3((pos.x + offsetX) * m_xzScale, 
-                            (pos.y + offsetY) * m_yScale,
-                            (pos.z + offsetZ) * m_xzScale));
+                new Vector3(pos.x * m_xzScale + offsetX , 
+                                        pos.y * m_yScale + offsetY,
+                                        pos.z * m_xzScale + offsetZ));
         }
     }
 }
