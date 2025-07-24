@@ -1,18 +1,12 @@
 ﻿{
   "type" : "sampler",
   "arguments" : {
-    "type" : "mul",
+    "type" : "abs",
     "arguments" : {
       "argument1" : {
         "type" : "constant",
         "arguments" : {
-          "value": 2
-        }
-      },
-      "argument2" : {
-        "type" : "constant",
-        "arguments" : {
-          "value": 3
+          "value": -9
         }
       }
     }

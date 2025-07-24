@@ -16,7 +16,7 @@ namespace RS.Scene
             // 测试下Spline
             Debug.Log("Test");
             
-            var samplerConfig = RsConfig.GetConfig("Sampler/AddTest") as RsSamplerConfig;
+            var samplerConfig = RsConfig.GetConfig("Sampler/SingleArg") as RsSamplerConfig;
             var sampler = samplerConfig.BuildRsSampler();
             
             var samplePoint = new Vector3(0, 0, 0);

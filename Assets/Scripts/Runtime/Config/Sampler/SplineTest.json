@@ -1,0 +1,66 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "spline",
+    "arguments" : {
+      "coordinate" : {
+        "type" : "normal",
+        "arguments" : {
+          "noise": "Temperature"
+        }
+      },
+      "points" : [
+        {
+          "location" : -1,
+          "derivative" : 0.5,
+          "value" : {
+            "type" : "constant",
+            "arguments" : {
+              "value" : -0.3
+            }
+          }
+        },
+        {
+          "location" : -0.4,
+          "derivative" : 0,
+          "value" : {
+            "type" : "constant",
+            "arguments" : {
+              "value" : 0.05
+            }
+          }
+        },
+        {
+          "location" : 0,
+          "derivative" : 0,
+          "value" : {
+            "type" : "constant",
+            "arguments" : {
+              "value" : 0.05
+            }
+          }
+        },
+        {
+          "location" : 0.4,
+          "derivative" : 0,
+          "value" : {
+            "type" : "constant",
+            "arguments" : {
+              "value" : 0.05
+            }
+          }
+        },
+        {
+          "location" : 1.0,
+          "derivative" : 0.007,
+          "value" : {
+            "type" : "constant",
+            "arguments" : {
+              "value" : 0.06
+            }
+          }
+        }
+      ]
+    }
+  }
+}

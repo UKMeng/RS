@@ -155,7 +155,7 @@ namespace RS.Scene
                 var spline = new SplineSampler(ridgesFoldedSampler, loc1, der1, val1);
                 
                 // Sampler Json Test
-                var samplerConfig = RsConfig.GetConfig("Sampler/NormalTest") as RsSamplerConfig;
+                var samplerConfig = RsConfig.GetConfig("Sampler/SplineTest") as RsSamplerConfig;
                 var jsonSampler = samplerConfig.BuildRsSampler();
                 
                 switch (m_samplerMode)
