@@ -1,0 +1,9 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "constant",
+    "arguments" : {
+      "value" : 3
+    }
+  }
+}

@@ -1,0 +1,9 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "normal",
+    "arguments" : {
+      "noise" : "Temperature"
+    }
+  }
+}

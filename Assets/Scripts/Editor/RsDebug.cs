@@ -15,21 +15,13 @@ namespace RS.Scene
         {
             // 测试下Spline
             Debug.Log("Test");
+            
+            var samplerConfig = RsConfig.GetConfig("Sampler/AddTest") as RsSamplerConfig;
+            var sampler = samplerConfig.BuildRsSampler();
+            
+            var samplePoint = new Vector3(0, 0, 0);
+            Debug.Log(sampler.Sample(samplePoint));
 
-            // var locations = new float[] { 0, 1, 2 };
-            // var derivatives = new float[] { 0, 2, 4 };
-            // var values = new RsSampler[] { new ConstantSampler(0), new ConstantSampler(1), new ConstantSampler(4) };
-            // var coordinates = new XSampler();
-            //
-            // var spline = new SplineSampler(coordinates, locations, derivatives, values);
-            //
-            // var t = spline.Sample(new Vector3(1.5f, 0, 0));
-            
-            // Debug.Log(t);
-            
-            // 测试下Config
-            // RsConfig.JSONTest();
-            
         }
     }
 }

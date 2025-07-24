@@ -1,0 +1,20 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "add",
+    "arguments" : {
+      "argument1" : {
+        "type" : "constant",
+        "arguments" : {
+          "value": 1
+        }
+      },
+      "argument2" : {
+        "type" : "constant",
+        "arguments" : {
+          "value": 3
+        }
+      }
+    }
+  }
+}

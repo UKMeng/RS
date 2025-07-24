@@ -97,7 +97,7 @@ namespace RS.Scene
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
-                var rng = new RsRandom(m_seed);
+                var rng = RsRandom.Init(m_seed);
                 
                 // offset
                 var offsetNoiseConfig = m_configManager.GetNoiseConfig("Offset");
@@ -153,6 +153,10 @@ namespace RS.Scene
                     new ConstantSampler(0.06f)
                 };
                 var spline = new SplineSampler(ridgesFoldedSampler, loc1, der1, val1);
+                
+                // Sampler Json Test
+                var samplerConfig = RsConfig.GetConfig("Sampler/NormalTest") as RsSamplerConfig;
+                var jsonSampler = samplerConfig.BuildRsSampler();
                 
                 switch (m_samplerMode)
                 {
