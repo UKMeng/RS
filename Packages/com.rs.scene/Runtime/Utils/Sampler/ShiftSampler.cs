@@ -2,7 +2,7 @@
 using UnityEngine;
 using RS.Utils;
 
-namespace RS.Scene.Sampler
+namespace RS.Utils
 {
     /// <summary>
     /// 必须从噪声进行采样

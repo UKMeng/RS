@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 using RS.Scene;
-using RS.Scene.Sampler;
+using RS.Utils;
 
 namespace RS.Scene
 {

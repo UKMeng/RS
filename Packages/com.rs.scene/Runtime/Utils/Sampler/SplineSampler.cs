@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace RS.Scene.Sampler
+namespace RS.Utils
 {
     public class SplineSampler : RsSampler
     {

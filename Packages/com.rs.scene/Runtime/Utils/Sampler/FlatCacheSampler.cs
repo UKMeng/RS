@@ -4,7 +4,7 @@ using UnityEngine;
 
 using RS.Utils;
 
-namespace RS.Scene.Sampler
+namespace RS.Utils
 {
     /// <summary>
     /// 4x4的区域仅采样一次y=0处

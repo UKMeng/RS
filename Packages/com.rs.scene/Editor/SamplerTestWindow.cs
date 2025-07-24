@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using RS.Scene.BiomeMap;
-using RS.Scene.Sampler;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -29,9 +28,9 @@ namespace RS.Scene
         private readonly string[] m_previewModeStrs = { "Side", "Top" };
 
         // 预览噪声 0 = Continentalness, 1 = Erosion, 2 = Peak & Valleys, 3 = Temperature, 4 = Humidity
-        private byte m_noiseMode = 0;
-        private readonly string[] m_noiseModeStrs =
-            { "Continentalness", "Erosion", "Peaks & Valleys", "Temperature", "Humidity" };
+        private byte m_samplerMode = 0;
+        private readonly string[] m_samplerModeStrs =
+            { "Continentalness", "Erosion", "Peaks & Valleys", "Temperature", "Humidity", "Offset" };
         
         private Texture2D m_texture;
 
@@ -85,7 +84,7 @@ namespace RS.Scene
             // 选择生成的噪声
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("预览噪声", labelStyle, GUILayout.Width(60));
-            m_noiseMode = (byte)GUILayout.Toolbar(m_noiseMode, m_noiseModeStrs);
+            m_samplerMode = (byte)GUILayout.Toolbar(m_samplerMode, m_samplerModeStrs);
             EditorGUILayout.EndHorizontal();
 
             // 采样并生成纹理
@@ -147,7 +146,20 @@ namespace RS.Scene
                 var continentsSampler = new FlatCacheSampler(new ShiftedNoiseSampler(continentNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                 
-                switch (m_noiseMode)
+                // Depth Offset
+                var loc1 = new float[] {-1.0f, -0.4f, 0.0f, 0.4f, 1.0f };
+                var der1 = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.007f };
+                var val1 = new RsSampler[]
+                {
+                    new ConstantSampler(-0.3f),
+                    new ConstantSampler(0.05f),
+                    new ConstantSampler(0.05f),
+                    new ConstantSampler(0.05f),
+                    new ConstantSampler(0.06f)
+                };
+                var spline = new SplineSampler(ridgesFoldedSampler, loc1, der1, val1);
+                
+                switch (m_samplerMode)
                 {
                     case 0:
                     {
@@ -174,6 +186,11 @@ namespace RS.Scene
                         m_texture = Sample(humiditySampler);
                         break;
                     }
+                    case 5:
+                    {
+                        m_texture = Sample(spline);
+                        break;
+                    }
                 }
                 // m_texture = Sample(continentsSampler);
             }
@@ -190,7 +207,6 @@ namespace RS.Scene
             EditorGUILayout.EndVertical();
         }
         
-        // TODO: Sampler抽象
         private Texture2D Sample(RsSampler sampler)
         {
             var data = new float[m_samplerWidth, m_samplerHeight];

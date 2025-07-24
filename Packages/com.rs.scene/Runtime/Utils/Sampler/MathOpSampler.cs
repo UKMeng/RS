@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RS.Scene.Sampler
+namespace RS.Utils
 {
     public class AddSampler : RsSampler
     {

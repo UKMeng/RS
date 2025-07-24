@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RS.Scene.Sampler
+namespace RS.Utils
 {
     /// <summary>
     /// 仅采样xz坐标并缓存
