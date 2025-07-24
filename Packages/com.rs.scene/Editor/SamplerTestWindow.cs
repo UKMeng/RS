@@ -34,10 +34,17 @@ namespace RS.Scene
         
         private Texture2D m_texture;
 
+        private RsConfigManager m_configManager;
+
         [MenuItem("RS/Sampler Test")]
         private static void ShowWindow()
         {
             GetWindow(typeof(SamplerTestWindow), true, "Sampler Test");
+        }
+
+        private void OnEnable()
+        {
+            m_configManager = RsConfigManager.Instance;
         }
 
         private void OnGUI()
@@ -92,8 +99,23 @@ namespace RS.Scene
             {
                 var rng = new RsRandom(m_seed);
                 
-                // TODO: Use Config
-            
+                // offset
+                var amplitudes = new float[] { 1.0f, 1.0f, 1.0f, 0.0f };
+                var firstOctave = -3;
+                // shiftX
+                var offsetNoise1 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
+                
+                // shiftX
+                var offsetNoise2 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
+                
+                // erosion
+                var erosionNoiseConfig = m_configManager.GetNoiseConfig("Erosion");
+                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig.amplitudes, erosionNoiseConfig.firstOctave);
+                var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
+                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+                    
                 // Temperature
                 var tempAmps = new float[] { 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f };
                 var tempFirstOctave = -10;
@@ -106,9 +128,7 @@ namespace RS.Scene
                 var humidityNoise = new RsNoise(rng.NextUInt64(), humidityAmps, humidityFirstOctave);
                 var humiditySampler = new RsSampler(humidityNoise);
                 
-                // offset
-                var amplitudes = new float[] { 1.0f, 1.0f, 1.0f, 0.0f };
-                var firstOctave = -3;
+                
             
                 // ridges
                 var ridgesAmps = new float[] { 1.0f, 2.0f, 1.0f, 0.0f, 0.0f, 0.0f };
@@ -116,14 +136,6 @@ namespace RS.Scene
                 var ridgesNoise = new RsNoise(rng.NextUInt64(), ridgesAmps, ridgesFisrtOctave);
 
                 // 组装Sampler
-                
-                // shiftX
-                var offsetNoise1 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
-                var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
-                
-                // shiftX
-                var offsetNoise2 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
-                var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
 
                 // ridges
                 var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgesNoise, shiftXSampler,
@@ -131,13 +143,6 @@ namespace RS.Scene
                 var ridgesFoldedSampler = new MulSampler(new ConstantSampler(-3.0f),
                     new AddSampler(new ConstantSampler(-0.33333f),
                         new AbsSampler(new AddSampler(new ConstantSampler(-0.66666f), new AbsSampler(ridgesSampler)))));
-                
-                // erosion
-                var erosionAmps = new float[] { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f };
-                var eroFirstOctave = -9;
-                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionAmps, eroFirstOctave);
-                var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
-                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                 
                 // Continentalness
                 var continentAmps = new float[] { 1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f };
