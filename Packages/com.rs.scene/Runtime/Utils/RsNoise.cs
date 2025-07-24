@@ -21,6 +21,11 @@ namespace RS.Utils
             Randomize(seed);
         }
 
+        public RsNoise(UInt64 seed, RsNoiseConfig config)
+            : this(seed, config.amplitudes, config.firstOctave)
+        {
+        }
+        
         public RsNoise(UInt64 seed, float[] amplitudes, int firstOctave)
         {
             Randomize(seed);

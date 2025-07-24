@@ -102,32 +102,32 @@ namespace RS.Scene
                 // offset
                 var offsetNoiseConfig = m_configManager.GetNoiseConfig("Offset");
                 // shiftX
-                var offsetNoise1 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig.amplitudes, offsetNoiseConfig.firstOctave);
+                var offsetNoise1 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig);
                 var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
                 
                 // shiftX
-                var offsetNoise2 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig.amplitudes, offsetNoiseConfig.firstOctave);
+                var offsetNoise2 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig);
                 var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
                 
                 // erosion
                 var erosionNoiseConfig = m_configManager.GetNoiseConfig("Erosion");
-                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig.amplitudes, erosionNoiseConfig.firstOctave);
+                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig);
                 var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                     
                 // Temperature
                 var tempConfig = m_configManager.GetNoiseConfig("Temperature");
-                var temperatureNoise = new RsNoise(rng.NextUInt64(), tempConfig.amplitudes, tempConfig.firstOctave);
+                var temperatureNoise = new RsNoise(rng.NextUInt64(), tempConfig);
                 var temperatureSampler = new RsSampler(temperatureNoise);
                 
                 // Humidity
                 var humidityConfig = m_configManager.GetNoiseConfig("Humidity");
-                var humidityNoise = new RsNoise(rng.NextUInt64(), humidityConfig.amplitudes, humidityConfig.firstOctave);
+                var humidityNoise = new RsNoise(rng.NextUInt64(), humidityConfig);
                 var humiditySampler = new RsSampler(humidityNoise);
                 
                 // ridges
                 var ridgeConfig = m_configManager.GetNoiseConfig("Ridge");
-                var ridgeNoise = new RsNoise(rng.NextUInt64(), ridgeConfig.amplitudes, ridgeConfig.firstOctave);
+                var ridgeNoise = new RsNoise(rng.NextUInt64(), ridgeConfig);
 
                 var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgeNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
@@ -137,7 +137,7 @@ namespace RS.Scene
                 
                 // Continentalness
                 var contiConfig = m_configManager.GetNoiseConfig("Continentalness");
-                var continentNoise = new RsNoise(rng.NextUInt64(), contiConfig.amplitudes, contiConfig.firstOctave);
+                var continentNoise = new RsNoise(rng.NextUInt64(), contiConfig);
                 var continentsSampler = new FlatCacheSampler(new ShiftedNoiseSampler(continentNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                 
