@@ -1,43 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
 using Debug = UnityEngine.Debug;
+
 
 namespace RS.Utils
 {
-    public class RsNoiseConfig : RsConfig
-    {
-        public int firstOctave;
-        public float[] amplitudes;
-    }
-    
-    public class RsConfigWrapper
-    {
-        public string type;
-        public JObject arguments;
-    }
-    
-    public class RsConfig
-    {
-        private static string m_configPath = "Assets/Scripts/Runtime/Config/{0}.json";
-
-        public static RsConfig GetConfig(string name)
-        {
-            var json = File.ReadAllText(string.Format(m_configPath, name));
-            var config = JsonConvert.DeserializeObject<RsConfigWrapper>(json);
-            if (config.type == "noise")
-            {
-                return config.arguments.ToObject<RsNoiseConfig>();
-            }
-
-            Debug.LogError($"[RsConfig] Unknown config type: {config.type}");
-            return null;
-        }
-    }
-
     public class RsConfigManager
     {
         private static RsConfigManager m_instance;
@@ -57,7 +24,12 @@ namespace RS.Utils
 
         private static string[] m_presetNoises = new string[]
         {
+            "Continentalness",
             "Erosion",
+            "Humidity",
+            "Offset",
+            "Ridge",
+            "Temperature"
         };
 
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;
@@ -75,12 +47,12 @@ namespace RS.Utils
         private void Init()
         {
             var sw = Stopwatch.StartNew();
-
+            
             m_noiseConfigs = new Dictionary<string, RsNoiseConfig>();
 
             foreach (var preset in m_presetNoises)
             {
-                var config = RsConfig.GetConfig(preset) as RsNoiseConfig;
+                var config = RsConfig.GetConfig("Noise/" + preset) as RsNoiseConfig;
                 m_noiseConfigs.Add(preset, config);
             }
             

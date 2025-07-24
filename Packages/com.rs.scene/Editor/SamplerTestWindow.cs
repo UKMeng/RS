@@ -100,14 +100,13 @@ namespace RS.Scene
                 var rng = new RsRandom(m_seed);
                 
                 // offset
-                var amplitudes = new float[] { 1.0f, 1.0f, 1.0f, 0.0f };
-                var firstOctave = -3;
+                var offsetNoiseConfig = m_configManager.GetNoiseConfig("Offset");
                 // shiftX
-                var offsetNoise1 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var offsetNoise1 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig.amplitudes, offsetNoiseConfig.firstOctave);
                 var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
                 
                 // shiftX
-                var offsetNoise2 = new RsNoise(rng.NextUInt64(), amplitudes, firstOctave);
+                var offsetNoise2 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig.amplitudes, offsetNoiseConfig.firstOctave);
                 var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
                 
                 // erosion
@@ -117,37 +116,28 @@ namespace RS.Scene
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                     
                 // Temperature
-                var tempAmps = new float[] { 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-                var tempFirstOctave = -10;
-                var temperatureNoise = new RsNoise(rng.NextUInt64(), tempAmps, tempFirstOctave);
+                var tempConfig = m_configManager.GetNoiseConfig("Temperature");
+                var temperatureNoise = new RsNoise(rng.NextUInt64(), tempConfig.amplitudes, tempConfig.firstOctave);
                 var temperatureSampler = new RsSampler(temperatureNoise);
                 
                 // Humidity
-                var humidityAmps = new float[] { 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-                var humidityFirstOctave = -8;
-                var humidityNoise = new RsNoise(rng.NextUInt64(), humidityAmps, humidityFirstOctave);
+                var humidityConfig = m_configManager.GetNoiseConfig("Humidity");
+                var humidityNoise = new RsNoise(rng.NextUInt64(), humidityConfig.amplitudes, humidityConfig.firstOctave);
                 var humiditySampler = new RsSampler(humidityNoise);
                 
-                
-            
                 // ridges
-                var ridgesAmps = new float[] { 1.0f, 2.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-                var ridgesFisrtOctave = -7;
-                var ridgesNoise = new RsNoise(rng.NextUInt64(), ridgesAmps, ridgesFisrtOctave);
+                var ridgeConfig = m_configManager.GetNoiseConfig("Ridge");
+                var ridgeNoise = new RsNoise(rng.NextUInt64(), ridgeConfig.amplitudes, ridgeConfig.firstOctave);
 
-                // 组装Sampler
-
-                // ridges
-                var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgesNoise, shiftXSampler,
+                var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgeNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                 var ridgesFoldedSampler = new MulSampler(new ConstantSampler(-3.0f),
                     new AddSampler(new ConstantSampler(-0.33333f),
                         new AbsSampler(new AddSampler(new ConstantSampler(-0.66666f), new AbsSampler(ridgesSampler)))));
                 
                 // Continentalness
-                var continentAmps = new float[] { 1.0f, 1.0f, 2.0f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-                var continentFirstOctave = -9;
-                var continentNoise = new RsNoise(rng.NextUInt64(), continentAmps, continentFirstOctave);
+                var contiConfig = m_configManager.GetNoiseConfig("Continentalness");
+                var continentNoise = new RsNoise(rng.NextUInt64(), contiConfig.amplitudes, contiConfig.firstOctave);
                 var continentsSampler = new FlatCacheSampler(new ShiftedNoiseSampler(continentNoise, shiftXSampler,
                     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
                 
