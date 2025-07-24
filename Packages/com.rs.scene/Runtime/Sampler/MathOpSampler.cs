@@ -50,4 +50,17 @@ namespace RS.Scene.Sampler
             return Mathf.Abs(m_sampler.Sample(pos));
         }
     }
+
+    public class XSampler : RsSampler
+    {
+        public XSampler()
+        {
+            
+        }
+
+        public override float Sample(Vector3 pos)
+        {
+            return pos.x;
+        }
+    }
 }
