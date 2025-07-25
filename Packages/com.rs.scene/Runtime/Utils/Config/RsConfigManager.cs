@@ -42,6 +42,7 @@ namespace RS.Utils
         private static string[] m_presetSamplers = new string[]
         {
             "Continents",
+            "Depth",
             "Erosion",
             "Humidity",
             "Offset",

@@ -20,8 +20,8 @@ namespace RS.Scene
         private int m_samplerHeight = 2048;
         
         // 预览纹理分辨率
-        private int m_width = 2048;
-        private int m_height = 2048;
+        private int m_width = 512;
+        private int m_height = 512;
         
         // 预览视角 0 = side, 1 = top
         private byte m_previewMode = 0;
@@ -32,6 +32,8 @@ namespace RS.Scene
         private string[] m_presetSamplerStrs;
         
         private Texture2D m_texture;
+        private float[,] m_textureData;
+        private Vector3 m_pickData;
 
         private RsConfigManager m_configManager;
 
@@ -126,9 +128,51 @@ namespace RS.Scene
             // 显示Texture2D
             if (m_texture != null)
             {
-                GUILayout.Label(m_texture, GUILayout.Width(512), GUILayout.Height(512));
+                GUILayout.Label(m_texture, GUILayout.Width(1024), GUILayout.Height(1024));
             }
 
+            // 鼠标取值
+            var textureRect = GUILayoutUtility.GetLastRect();
+            var mousePos = Event.current.mousePosition;
+            if (textureRect.Contains(mousePos))
+            {
+                var u = (mousePos.x - textureRect.x) / textureRect.width;
+                var v = (mousePos.y - textureRect.y) / textureRect.height;
+                var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
+                var pv = Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
+
+                var value  = m_textureData[pu, pv];
+
+                m_pickData = new Vector3(pu, pv, value);
+                
+                
+            }
+
+            if (m_pickData != null)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("X:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickData.x.ToString("F1"), labelStyle, GUILayout.Width(60));
+                
+                if (m_previewMode == 0)
+                {
+                    EditorGUILayout.LabelField("Y:", labelStyle, GUILayout.Width(60));
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("Z:", labelStyle, GUILayout.Width(60));
+                }
+                
+                EditorGUILayout.LabelField(m_pickData.y.ToString("F1"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("Value:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickData.z.ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.EndHorizontal();
+                
+                Repaint();
+            }
+            
+            
 
             EditorGUILayout.EndVertical();
         }
@@ -164,6 +208,8 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
+
+            m_textureData = data;
             
             return RsJobs.GenerateTexture(data, m_width, m_height);
         }
