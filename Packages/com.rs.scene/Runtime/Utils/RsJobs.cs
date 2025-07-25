@@ -24,7 +24,7 @@ namespace RS.Utils
             var y = index / width;
             var v = data[x + y * width];
             
-            v = RsMath.ClampGradient(v, minValue, maxValue,1.0f, 0.0f);
+            v = RsMath.ClampedMap(v, minValue, maxValue,1.0f, 0.0f);
             
             colors[index] = Viridis(v);
         }

@@ -52,6 +52,68 @@ namespace RS.Utils
                     
                     break;
                 }
+                case "square":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new SquareSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "halfNegative":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new HalfNegativeSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "quarterNegative":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new QuarterNegativeSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "yClampedGradient":
+                {
+                    if (arguments.TryGetValue("min", out var minToken) &&
+                        arguments.TryGetValue("max", out var maxToken) &&
+                        arguments.TryGetValue("from", out var fromToken) &&
+                        arguments.TryGetValue("to", out var toToken))
+                    {
+                        var min = minToken.ToObject<float>();
+                        var max = maxToken.ToObject<float>();
+                        var from = fromToken.ToObject<float>();
+                        var to = toToken.ToObject<float>();
+                        sampler = new YClampedGradientSampler(min, max, from, to);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
                 case "cache2D":
                 {
                     if (arguments.TryGetValue("value", out var value))
@@ -120,6 +182,28 @@ namespace RS.Utils
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
                         var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
                         sampler = new RsSampler(noise);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "noise":
+                {
+                    if (arguments.TryGetValue("noise", out var noiseToken)
+                        && arguments.TryGetValue("xzScale", out var xzScaleToken)
+                        && arguments.TryGetValue("yScale", out var yScaleToken))
+                    {
+                        var noiseName = noiseToken.Value<string>();
+                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
+                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        
+                        var xzScale = xzScaleToken.Value<float>();
+                        var yScale = yScaleToken.Value<float>();
+                        
+                        sampler = new NoiseSampler(noise, xzScale, yScale);
                     }
                     else
                     {

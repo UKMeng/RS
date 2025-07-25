@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -49,10 +50,11 @@ namespace RS.Utils
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static float ClampGradient(float value, float min, float max, float from, float to)
+        public static float ClampedMap(float value, float min, float max, float from, float to)
         {
             return (Clamp(value, min, max) - min) / (max - min) * (to - from) + from;
         }
+        
 
         /// <summary>
         /// https://minecraft.wiki/w/Density_function#squeeze

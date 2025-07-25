@@ -44,6 +44,7 @@ namespace RS.Utils
             "Continents",
             "Erosion",
             "Humidity",
+            "Offset",
             "Ridges",
             "RidgesFolded",
             "ShiftX",
