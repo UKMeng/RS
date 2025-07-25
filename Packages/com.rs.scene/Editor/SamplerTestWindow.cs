@@ -138,7 +138,7 @@ namespace RS.Scene
                     var u = (mousePos.x - textureRect.x) / textureRect.width;
                     var v = (mousePos.y - textureRect.y) / textureRect.height;
                     var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
-                    var pv = Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
+                    var pv = m_samplerHeight - Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
 
                     var value  = m_textureData[pu, pv];
 
