@@ -81,5 +81,16 @@ namespace RS.Utils
             var t = Clamp(value, -1.0f, 1.0f);
             return t * 0.5f - t * t * t / 24.0f;
         }
+
+        public static float BilLerp(float tx, float ty, float c00, float c10, float c01, float c11)
+        {
+            return Mathf.Lerp(Mathf.Lerp(c00, c10, tx), Mathf.Lerp(c01, c11, tx), ty);
+        }
+
+        public static float TriLerp(float tx, float ty, float tz, float c000, float c100, float c010, float c110,
+            float c001, float c101, float c011, float c111)
+        {
+            return Mathf.Lerp(BilLerp(tx, ty, c000, c100, c010, c110), BilLerp(tx, ty, c001, c101, c011, c111), tz);
+        }
     }
 }

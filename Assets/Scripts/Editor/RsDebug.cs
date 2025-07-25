@@ -24,7 +24,7 @@ namespace RS.Scene
             // var value = sampler.Sample(new Vector3(564.0f, 0, 906.0f));
             var w = 4;
             var x = -1.0f;
-            var value = ((x % w + w) % w) / w;
+            var value = Mathf.Floor(x / w) * w;
             Debug.Log(value);
             
             // var samplerConfig = RsConfig.GetConfig("Sampler/SingleArg") as RsSamplerConfig;

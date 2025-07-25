@@ -67,7 +67,7 @@ namespace RS.Scene
             // 初始化噪声
             m_rng = new RsRandom(seed);
             // m_noise = new RsNoise(m_rng.NextUInt64());
-            m_sampler = RsConfigManager.Instance.GetSamplerConfig("Depth").BuildRsSampler();
+            m_sampler = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler();
 
             m_chunks = new Dictionary<Vector3, GameObject>();
             m_loadRecord = new Dictionary<Vector2, byte>();

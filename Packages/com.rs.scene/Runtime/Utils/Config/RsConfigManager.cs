@@ -45,6 +45,7 @@ namespace RS.Utils
             "Depth",
             "Erosion",
             "Humidity",
+            "InterTest",
             "Offset",
             "Ridges",
             "RidgesFolded",

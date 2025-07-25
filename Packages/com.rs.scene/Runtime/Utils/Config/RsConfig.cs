@@ -114,6 +114,20 @@ namespace RS.Utils
                     
                     break;
                 }
+                case "interpolated":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new InterpolatedSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
                 case "cache2D":
                 {
                     if (arguments.TryGetValue("value", out var value))
