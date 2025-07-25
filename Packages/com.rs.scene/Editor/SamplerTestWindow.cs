@@ -4,6 +4,7 @@ using RS.Scene.BiomeMap;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
@@ -36,6 +37,12 @@ namespace RS.Scene
 
         private RsConfigManager m_configManager;
 
+        [MenuItem("RS/重载Config Manager")]
+        private static void ReloadConfigManager()
+        {
+            RsConfigManager.Reload();
+        }
+        
         [MenuItem("RS/Sampler Test")]
         private static void ShowWindow()
         {
@@ -99,21 +106,21 @@ namespace RS.Scene
             {
                 var rng = RsRandom.Init(m_seed);
                 
-                // offset
-                var offsetNoiseConfig = m_configManager.GetNoiseConfig("Offset");
                 // shiftX
-                var offsetNoise1 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig);
-                var shiftXSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftASampler(offsetNoise1)));
+                var shiftXConfig = m_configManager.GetSamplerConfig("ShiftX");
+                var shiftXSampler = shiftXConfig.BuildRsSampler();
                 
-                // shiftX
-                var offsetNoise2 = new RsNoise(rng.NextUInt64(), offsetNoiseConfig);
-                var shiftZSampler = new FlatCacheSampler(new Cache2DSampler(new ShiftBSampler(offsetNoise2)));
+                // shiftZ
+                var shiftZConfig = m_configManager.GetSamplerConfig("ShiftZ");
+                var shiftZSampler = shiftZConfig.BuildRsSampler();
                 
                 // erosion
-                var erosionNoiseConfig = m_configManager.GetNoiseConfig("Erosion");
-                var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig);
-                var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
-                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+                // var erosionNoiseConfig = m_configManager.GetNoiseConfig("Erosion");
+                // var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig);
+                // var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
+                //     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
+                var erosionConfig = m_configManager.GetSamplerConfig("Erosion");
+                var erosionSampler = erosionConfig.BuildRsSampler();
                     
                 // Temperature
                 var tempConfig = m_configManager.GetNoiseConfig("Temperature");

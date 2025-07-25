@@ -12,7 +12,7 @@ namespace RS.Utils
     {
         public float location;
         public float derivative;
-        public RsSamplerConfig value;
+        public JToken value;
     }
     
     public class RsSamplerConfig : RsConfig
@@ -42,7 +42,7 @@ namespace RS.Utils
                 {
                     if (arguments.TryGetValue("value", out var value))
                     {
-                        var valueSampler = value.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var valueSampler = ParseJTokenToSampler(value);
                         sampler = new AbsSampler(valueSampler);
                     }
                     else
@@ -56,7 +56,7 @@ namespace RS.Utils
                 {
                     if (arguments.TryGetValue("value", out var value))
                     {
-                        var valueSampler = value.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var valueSampler = ParseJTokenToSampler(value);
                         sampler = new Cache2DSampler(valueSampler);
                     }
                     else
@@ -70,7 +70,7 @@ namespace RS.Utils
                 {
                     if (arguments.TryGetValue("value", out var value))
                     {
-                        var valueSampler = value.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var valueSampler = ParseJTokenToSampler(value);
                         sampler = new FlatCacheSampler(valueSampler);
                     }
                     else
@@ -85,8 +85,8 @@ namespace RS.Utils
                     if (arguments.TryGetValue("left", out var left)
                         && arguments.TryGetValue("right", out var right))
                     {
-                        var leftSampler = left.ToObject<RsSamplerConfig>().BuildRsSampler();
-                        var rightSampler = right.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var leftSampler = ParseJTokenToSampler(left);
+                        var rightSampler = ParseJTokenToSampler(right);
                         sampler = new AddSampler(leftSampler, rightSampler);
                     }
                     else
@@ -101,8 +101,8 @@ namespace RS.Utils
                     if (arguments.TryGetValue("left", out var left)
                         && arguments.TryGetValue("right", out var right))
                     {
-                        var leftSampler = left.ToObject<RsSamplerConfig>().BuildRsSampler();
-                        var rightSampler = right.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var leftSampler = ParseJTokenToSampler(left);
+                        var rightSampler = ParseJTokenToSampler(right);
                         sampler = new MulSampler(leftSampler, rightSampler);
                     }
                     else
@@ -173,9 +173,9 @@ namespace RS.Utils
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
                         var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
 
-                        var samplerX = x.ToObject<RsSamplerConfig>().BuildRsSampler();
-                        var samplerY = y.ToObject<RsSamplerConfig>().BuildRsSampler();
-                        var samplerZ = z.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var samplerX = ParseJTokenToSampler(x);
+                        var samplerY = ParseJTokenToSampler(y);
+                        var samplerZ = ParseJTokenToSampler(z);
                         
                         var xzScale = xzScaleValue.ToObject<float>();
                         var yScale = yScaleValue.ToObject<float>();
@@ -205,7 +205,7 @@ namespace RS.Utils
                         {
                             locations[i] = pointList[i].location;
                             derivatives[i] = pointList[i].derivative;
-                            values[i] = pointList[i].value.BuildRsSampler();
+                            values[i] = ParseJTokenToSampler(pointList[i].value);
                         }
                         
                         sampler = new SplineSampler(coordinate, locations, derivatives, values);
@@ -224,6 +224,29 @@ namespace RS.Utils
                 }
             }
             return sampler;
+        }
+
+        private RsSampler ParseJTokenToSampler(JToken token)
+        {
+            if (token.Type == JTokenType.Object)
+            {
+                return token.ToObject<RsSamplerConfig>().BuildRsSampler();
+            }
+            
+            if (token.Type == JTokenType.String)
+            {
+                var config = RsConfigManager.Instance.GetSamplerConfig(token.ToObject<string>());
+                return config.BuildRsSampler();
+            }
+            
+            if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
+            {
+                var value = token.ToObject<float>();
+                return new ConstantSampler(value);
+            }
+            
+            Debug.LogError($"[Config] Unknown token type: {token.Type}");
+            return null;
         }
     }
     

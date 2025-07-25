@@ -1,0 +1,19 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "flatCache",
+    "arguments" : {
+      "value" : {
+        "type": "cache2D",
+        "arguments": {
+          "value" : {
+            "type": "shiftB",
+            "arguments": {
+              "noise": "Offset"
+            }
+          }
+        }
+      }
+    }
+  }
+}
