@@ -86,6 +86,14 @@ namespace RS.Scene
             }
             EditorGUILayout.EndHorizontal();
             
+            // 采样起始点
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("采样起始点", labelStyle, GUILayout.Width(60));
+            m_startPos.x = EditorGUILayout.FloatField(m_startPos.x, filedStyle);
+            m_startPos.y = EditorGUILayout.FloatField(m_startPos.y, filedStyle);
+            m_startPos.z = EditorGUILayout.FloatField(m_startPos.z, filedStyle);
+            EditorGUILayout.EndHorizontal();
+            
             // 调整采样范围
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("采样宽度", labelStyle, GUILayout.Width(60));
@@ -151,18 +159,18 @@ namespace RS.Scene
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("X:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickData.x.ToString("F1"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField((m_pickData.x + m_startPos.x).ToString("F1"), labelStyle, GUILayout.Width(60));
                 
                 if (m_previewMode == 0)
                 {
                     EditorGUILayout.LabelField("Y:", labelStyle, GUILayout.Width(60));
+                    EditorGUILayout.LabelField((m_pickData.y + m_startPos.y).ToString("F1"), labelStyle, GUILayout.Width(60));
                 }
                 else
                 {
                     EditorGUILayout.LabelField("Z:", labelStyle, GUILayout.Width(60));
+                    EditorGUILayout.LabelField((m_pickData.y + m_startPos.z).ToString("F1"), labelStyle, GUILayout.Width(60));
                 }
-                
-                EditorGUILayout.LabelField(m_pickData.y.ToString("F1"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("Value:", labelStyle, GUILayout.Width(60));
                 EditorGUILayout.LabelField(m_pickData.z.ToString("F3"), labelStyle, GUILayout.Width(60));
@@ -209,8 +217,6 @@ namespace RS.Scene
             Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
 
             m_textureData = data;
-            
-            Debug.Log($"x = 564, z = 904, value = {data[564, 904]}");
             
             return RsJobs.GenerateTexture(data, m_width, m_height);
         }
