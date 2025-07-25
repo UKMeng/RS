@@ -1,9 +1,9 @@
 ﻿{
   "type" : "sampler",
   "arguments" : {
-    "type" : "constant",
+    "type" : "normal",
     "arguments" : {
-      "value" : 3
+      "noise" : "Humidity"
     }
   }
 }

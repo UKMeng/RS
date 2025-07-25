@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Debug = UnityEngine.Debug;
 
 
@@ -34,14 +35,21 @@ namespace RS.Utils
             "Erosion",
             "Humidity",
             "Offset",
-            "Ridge",
+            "Ridges",
             "Temperature"
         };
 
         private static string[] m_presetSamplers = new string[]
         {
+            "Continents",
+            "Erosion",
+            "Humidity",
+            "Ridges",
+            "RidgesFolded",
             "ShiftX",
             "ShiftZ",
+            "SplineTest",
+            "Temperature",
         };
 
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;
@@ -72,6 +80,11 @@ namespace RS.Utils
             }
             
             return config;
+        }
+
+        public string[] GetLoadedSamplerConfigName()
+        {
+            return m_samplerConfigs.Keys.ToArray();
         }
 
         private void Init()

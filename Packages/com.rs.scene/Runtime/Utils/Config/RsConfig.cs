@@ -194,7 +194,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("coordinate", out var coordToken)
                         && arguments.TryGetValue("points", out var points))
                     {
-                        var coordinate = coordToken.ToObject<RsSamplerConfig>().BuildRsSampler();
+                        var coordinate = ParseJTokenToSampler(coordToken);
                         var pointList = (points as JArray).ToObject<List<RsSplinePointConfig>>();
                         var pointCount = pointList.Count;
                         var locations = new float[pointCount];

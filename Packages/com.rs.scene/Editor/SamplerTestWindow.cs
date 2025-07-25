@@ -4,7 +4,6 @@ using RS.Scene.BiomeMap;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
@@ -28,10 +27,9 @@ namespace RS.Scene
         private byte m_previewMode = 0;
         private readonly string[] m_previewModeStrs = { "Side", "Top" };
 
-        // 预览噪声 0 = Continentalness, 1 = Erosion, 2 = Peak & Valleys, 3 = Temperature, 4 = Humidity
-        private byte m_samplerMode = 0;
-        private readonly string[] m_samplerModeStrs =
-            { "Continentalness", "Erosion", "Peaks & Valleys", "Temperature", "Humidity", "Offset" };
+        // 预览配置选择
+        private string m_sampler = "Erosion";
+        private string[] m_presetSamplerStrs;
         
         private Texture2D m_texture;
 
@@ -52,6 +50,7 @@ namespace RS.Scene
         private void OnEnable()
         {
             m_configManager = RsConfigManager.Instance;
+            m_presetSamplerStrs = m_configManager.GetLoadedSamplerConfigName();
         }
 
         private void OnGUI()
@@ -97,108 +96,29 @@ namespace RS.Scene
             
             // 选择生成的噪声
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("预览噪声", labelStyle, GUILayout.Width(60));
-            m_samplerMode = (byte)GUILayout.Toolbar(m_samplerMode, m_samplerModeStrs);
+            EditorGUILayout.LabelField("预览选择", labelStyle, GUILayout.Width(60));
+            m_sampler = EditorGUILayout.TextField(m_sampler, filedStyle);
+            if (EditorGUILayout.DropdownButton(new GUIContent("▼"), FocusType.Passive, GUILayout.Width(20)))
+            {
+                var menu = new GenericMenu();
+                foreach (var preset in m_presetSamplerStrs)
+                {
+                    menu.AddItem(new GUIContent(preset), m_sampler == preset, () => m_sampler = preset);
+                }
+                menu.ShowAsContext();
+            }
             EditorGUILayout.EndHorizontal();
 
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
+                // 重置随机数生成器，保持生成结果确定
                 var rng = RsRandom.Init(m_seed);
-                
-                // shiftX
-                var shiftXConfig = m_configManager.GetSamplerConfig("ShiftX");
-                var shiftXSampler = shiftXConfig.BuildRsSampler();
-                
-                // shiftZ
-                var shiftZConfig = m_configManager.GetSamplerConfig("ShiftZ");
-                var shiftZSampler = shiftZConfig.BuildRsSampler();
-                
-                // erosion
-                // var erosionNoiseConfig = m_configManager.GetNoiseConfig("Erosion");
-                // var erosionNoise = new RsNoise(rng.NextUInt64(), erosionNoiseConfig);
-                // var erosionSampler = new FlatCacheSampler(new ShiftedNoiseSampler(erosionNoise, shiftXSampler,
-                //     new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
-                var erosionConfig = m_configManager.GetSamplerConfig("Erosion");
-                var erosionSampler = erosionConfig.BuildRsSampler();
-                    
-                // Temperature
-                var tempConfig = m_configManager.GetNoiseConfig("Temperature");
-                var temperatureNoise = new RsNoise(rng.NextUInt64(), tempConfig);
-                var temperatureSampler = new RsSampler(temperatureNoise);
-                
-                // Humidity
-                var humidityConfig = m_configManager.GetNoiseConfig("Humidity");
-                var humidityNoise = new RsNoise(rng.NextUInt64(), humidityConfig);
-                var humiditySampler = new RsSampler(humidityNoise);
-                
-                // ridges
-                var ridgeConfig = m_configManager.GetNoiseConfig("Ridge");
-                var ridgeNoise = new RsNoise(rng.NextUInt64(), ridgeConfig);
 
-                var ridgesSampler = new FlatCacheSampler(new ShiftedNoiseSampler(ridgeNoise, shiftXSampler,
-                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
-                var ridgesFoldedSampler = new MulSampler(new ConstantSampler(-3.0f),
-                    new AddSampler(new ConstantSampler(-0.33333f),
-                        new AbsSampler(new AddSampler(new ConstantSampler(-0.66666f), new AbsSampler(ridgesSampler)))));
-                
-                // Continentalness
-                var contiConfig = m_configManager.GetNoiseConfig("Continentalness");
-                var continentNoise = new RsNoise(rng.NextUInt64(), contiConfig);
-                var continentsSampler = new FlatCacheSampler(new ShiftedNoiseSampler(continentNoise, shiftXSampler,
-                    new ConstantSampler(0.0f), shiftZSampler, 0.25f, 0.0f));
-                
-                // Depth Offset
-                var loc1 = new float[] {-1.0f, -0.4f, 0.0f, 0.4f, 1.0f };
-                var der1 = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.007f };
-                var val1 = new RsSampler[]
-                {
-                    new ConstantSampler(-0.3f),
-                    new ConstantSampler(0.05f),
-                    new ConstantSampler(0.05f),
-                    new ConstantSampler(0.05f),
-                    new ConstantSampler(0.06f)
-                };
-                var spline = new SplineSampler(ridgesFoldedSampler, loc1, der1, val1);
-                
-                // Sampler Json Test
-                var samplerConfig = RsConfig.GetConfig("Sampler/SplineTest") as RsSamplerConfig;
-                var jsonSampler = samplerConfig.BuildRsSampler();
-                
-                switch (m_samplerMode)
-                {
-                    case 0:
-                    {
-                        m_texture = Sample(continentsSampler);
-                        break;
-                    }
-                    case 1:
-                    {
-                        m_texture = Sample(erosionSampler);
-                        break;
-                    }
-                    case 2:
-                    {
-                        m_texture = Sample(ridgesFoldedSampler);
-                        break;
-                    }
-                    case 3:
-                    {
-                        m_texture = Sample(temperatureSampler);
-                        break;
-                    }
-                    case 4:
-                    {
-                        m_texture = Sample(humiditySampler);
-                        break;
-                    }
-                    case 5:
-                    {
-                        m_texture = Sample(spline);
-                        break;
-                    }
-                }
-                // m_texture = Sample(continentsSampler);
+                var samplerConfig = m_configManager.GetSamplerConfig(m_sampler);
+                var sampler = samplerConfig.BuildRsSampler();
+
+                m_texture = Sample(sampler);
             }
             
             

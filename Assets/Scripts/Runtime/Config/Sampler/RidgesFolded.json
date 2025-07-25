@@ -1,0 +1,32 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "mul",
+    "arguments" : {
+      "left" : -3,
+      "right" : {
+        "type" : "add",
+        "arguments" : {
+          "left": -0.333333,
+          "right": {
+            "type": "abs",
+            "arguments": {
+              "value": {
+                "type": "add",
+                "arguments": {
+                  "left": -0.666666,
+                  "right": {
+                    "type" : "abs",
+                    "arguments": {
+                      "value": "Ridges"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -3,12 +3,7 @@
   "arguments" : {
     "type" : "spline",
     "arguments" : {
-      "coordinate" : {
-        "type" : "normal",
-        "arguments" : {
-          "noise": "Temperature"
-        }
-      },
+      "coordinate" : "RidgesFolded",
       "points" : [
         {
           "location" : -1,
@@ -33,7 +28,7 @@
         {
           "location" : 1.0,
           "derivative" : 0.007,
-          "value" : 0.05
+          "value" : 0.06
         }
       ]
     }
