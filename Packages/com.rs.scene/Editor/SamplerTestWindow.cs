@@ -20,8 +20,8 @@ namespace RS.Scene
         private int m_samplerHeight = 2048;
         
         // 预览纹理分辨率
-        private int m_width = 512;
-        private int m_height = 512;
+        private int m_width = 1024;
+        private int m_height = 1024;
         
         // 预览视角 0 = side, 1 = top
         private byte m_previewMode = 0;
@@ -128,25 +128,24 @@ namespace RS.Scene
             // 显示Texture2D
             if (m_texture != null)
             {
-                GUILayout.Label(m_texture, GUILayout.Width(1024), GUILayout.Height(1024));
-            }
-
-            // 鼠标取值
-            var textureRect = GUILayoutUtility.GetLastRect();
-            var mousePos = Event.current.mousePosition;
-            if (textureRect.Contains(mousePos))
-            {
-                var u = (mousePos.x - textureRect.x) / textureRect.width;
-                var v = (mousePos.y - textureRect.y) / textureRect.height;
-                var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
-                var pv = Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
-
-                var value  = m_textureData[pu, pv];
-
-                m_pickData = new Vector3(pu, pv, value);
+                GUILayout.Label(m_texture, GUILayout.Width(m_width), GUILayout.Height(m_height));
                 
-                
+                // 鼠标取值
+                var textureRect = GUILayoutUtility.GetLastRect();
+                var mousePos = Event.current.mousePosition;
+                if (textureRect.Contains(mousePos))
+                {
+                    var u = (mousePos.x - textureRect.x) / textureRect.width;
+                    var v = (mousePos.y - textureRect.y) / textureRect.height;
+                    var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
+                    var pv = Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
+
+                    var value  = m_textureData[pu, pv];
+
+                    m_pickData = new Vector3(pu, pv, value);
+                }
             }
+            
 
             if (m_pickData != null)
             {

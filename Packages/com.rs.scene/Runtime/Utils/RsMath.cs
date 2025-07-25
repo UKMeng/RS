@@ -40,6 +40,21 @@ namespace RS.Utils
         {
             return Mathf.Clamp(value, min, max);
         }
+
+        public static float ClampedLerp(float min, float max, float t)
+        {
+            if (t < 0.0f)
+            {
+                return min;
+            }
+
+            if (t > 1.0f)
+            {
+                return max;
+            }
+
+            return Mathf.Lerp(min, max, t);
+        }
         
         /// <summary>
         /// 将值钳制到[min, max]的区间，然后再映射到[from, to]的范围
@@ -52,7 +67,7 @@ namespace RS.Utils
         /// <returns></returns>
         public static float ClampedMap(float value, float min, float max, float from, float to)
         {
-            return (Clamp(value, min, max) - min) / (max - min) * (to - from) + from;
+            return ClampedLerp(from, to, Mathf.InverseLerp(min, max, value));
         }
         
 

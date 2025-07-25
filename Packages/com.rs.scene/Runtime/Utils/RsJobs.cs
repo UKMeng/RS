@@ -25,7 +25,7 @@ namespace RS.Utils
             var y = index / width;
             var v = data[x + y * width];
             
-            v = RsMath.ClampedMap(v, minValue, maxValue,1.0f, 0.0f);
+            v = RsMath.ClampedMap(v, minValue, maxValue,0.0f, 1.0f);
             
             colors[index] = Viridis(v);
         }
@@ -52,7 +52,7 @@ namespace RS.Utils
                 for (var y = 0; y < height; y++)
                 {
                     var srcX = Mathf.Clamp(Mathf.RoundToInt((float)x / width * dataWidth), 0, dataWidth - 1);
-                    var srcY = Mathf.Clamp(Mathf.RoundToInt((float)y / height * dataHeight), 0, dataHeight - 1);
+                    var srcY = Mathf.Clamp(Mathf.RoundToInt((float)(height - 1 - y) / height * dataHeight), 0, dataHeight - 1);
                     dataArray[x + y * width] = data[srcX, srcY];
                 }
             }
