@@ -16,32 +16,32 @@
                   "coordinate": "Continents",
                   "points": [
                     {
-                      "locations": -1.1,
+                      "location": -1.1,
                       "derivative": 0,
                       "value": 0.044
                     },
                     {
-                      "locations": -1.02,
+                      "location": -1.02,
                       "derivative": 0,
                       "value": -0.2222
                     },
                     {
-                      "locations": -0.51,
+                      "location": -0.51,
                       "derivative": 0,
                       "value": -0.2222
                     },
                     {
-                      "locations": -0.44,
+                      "location": -0.44,
                       "derivative": 0,
                       "value": -0.12
                     },
                     {
-                      "locations": -0.18,
+                      "location": -0.18,
                       "derivative": 0,
                       "value": -0.12
                     },
                     {
-                      "locations": -0.16,
+                      "location": -0.16,
                       "derivative": 0,
                       "value": {
                         "type": "spline",
@@ -49,7 +49,7 @@
                           "coordinate": "Erosion",
                           "points": [
                             {
-                              "locations": -0.85,
+                              "location": -0.85,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -57,12 +57,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.38940096,
                                       "value": -0.08880186
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.38940096,
                                       "value": 0.69000006
                                     }
@@ -71,7 +71,7 @@
                               }
                             },
                             {
-                              "locations": -0.7,
+                              "location": -0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -79,12 +79,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.37788022,
                                       "value": -0.115760356
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.37788022,
                                       "value": 0.6400001
                                     }
@@ -93,7 +93,7 @@
                               }
                             },
                             {
-                              "locations": -0.4,
+                              "location": -0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -101,32 +101,32 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.75,
+                                      "location": -0.75,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.65,
+                                      "location": -0.65,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.5954547,
+                                      "location": 0.5954547,
                                       "derivative": 0,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 0.6054547,
+                                      "location": 0.6054547,
                                       "derivative": 0.2534563,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.2534563,
                                       "value": 0.1
                                     }
@@ -135,7 +135,7 @@
                               }
                             },
                             {
-                              "locations": -0.35,
+                              "location": -0.35,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -143,27 +143,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.3
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -172,7 +172,7 @@
                               }
                             },
                             {
-                              "locations": -0.1,
+                              "location": -0.1,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -180,27 +180,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.1,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -209,7 +209,7 @@
                               }
                             },
                             {
-                              "locations": 0.2,
+                              "location": 0.2,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -217,27 +217,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -246,7 +246,7 @@
                               }
                             },
                             {
-                              "locations": 0.7,
+                              "location": 0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -254,27 +254,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.02
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.06,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -287,7 +287,7 @@
                       }
                     },
                     {
-                      "locations": -0.15,
+                      "location": -0.15,
                       "derivative": 0,
                       "value": {
                         "type": "spline",
@@ -295,7 +295,7 @@
                           "coordinate": "Erosion",
                           "points": [
                             {
-                              "locations": -0.85,
+                              "location": -0.85,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -303,12 +303,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.38940096,
                                       "value": -0.08880186
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.38940096,
                                       "value": 0.69000006
                                     }
@@ -317,7 +317,7 @@
                               }
                             },
                             {
-                              "locations": -0.7,
+                              "location": -0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -325,12 +325,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.37788022,
                                       "value": -0.115760356
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.37788022,
                                       "value": 0.6400001
                                     }
@@ -339,7 +339,7 @@
                               }
                             },
                             {
-                              "locations": -0.4,
+                              "location": -0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -347,32 +347,32 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.75,
+                                      "location": -0.75,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.65,
+                                      "location": -0.65,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.5954547,
+                                      "location": 0.5954547,
                                       "derivative": 0,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 0.6054547,
+                                      "location": 0.6054547,
                                       "derivative": 0.2534563,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.2534563,
                                       "value": 0.1
                                     }
@@ -381,7 +381,7 @@
                               }
                             },
                             {
-                              "locations": -0.35,
+                              "location": -0.35,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -389,27 +389,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.3
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -418,7 +418,7 @@
                               }
                             },
                             {
-                              "locations": -0.1,
+                              "location": -0.1,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -426,27 +426,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.1,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -455,7 +455,7 @@
                               }
                             },
                             {
-                              "locations": 0.2,
+                              "location": 0.2,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -463,27 +463,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -492,7 +492,7 @@
                               }
                             },
                             {
-                              "locations": 0.7,
+                              "location": 0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -500,27 +500,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.02
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.06,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -533,7 +533,7 @@
                       }
                     },
                     {
-                      "locations": -0.1,
+                      "location": -0.1,
                       "derivative": 0,
                       "value": {
                         "type": "spline",
@@ -541,7 +541,7 @@
                           "coordinate": "Erosion",
                           "points": [
                             {
-                              "locations": -0.85,
+                              "location": -0.85,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -549,12 +549,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.38940096,
                                       "value": -0.08880186
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.38940096,
                                       "value": 0.69000006
                                     }
@@ -563,7 +563,7 @@
                               }
                             },
                             {
-                              "locations": -0.7,
+                              "location": -0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -571,12 +571,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.37788022,
                                       "value": -0.115760356
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.37788022,
                                       "value": 0.6400001
                                     }
@@ -585,7 +585,7 @@
                               }
                             },
                             {
-                              "locations": -0.4,
+                              "location": -0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -593,32 +593,32 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.75,
+                                      "location": -0.75,
                                       "derivative": 0,
                                       "value": -0.2222
                                     },
                                     {
-                                      "locations": -0.65,
+                                      "location": -0.65,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.5954547,
+                                      "location": 0.5954547,
                                       "derivative": 0,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 0.6054547,
+                                      "location": 0.6054547,
                                       "derivative": 0.2534563,
                                       "value": 2.9802322e-8
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.2534563,
                                       "value": 0.1
                                     }
@@ -627,7 +627,7 @@
                               }
                             },
                             {
-                              "locations": -0.35,
+                              "location": -0.35,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -635,27 +635,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.3
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -664,7 +664,7 @@
                               }
                             },
                             {
-                              "locations": -0.1,
+                              "location": -0.1,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -672,27 +672,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.1,
                                       "value": 0.05
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.007,
                                       "value": 0.06
                                     }
@@ -701,7 +701,7 @@
                               }
                             },
                             {
-                              "locations": 0.2,
+                              "location": 0.2,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -709,27 +709,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.15
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -738,7 +738,7 @@
                               }
                             },
                             {
-                              "locations": 0.7,
+                              "location": 0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -746,27 +746,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.02
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.06,
                                       "value": 0
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0,
                                       "value": 0
                                     }
@@ -779,7 +779,7 @@
                       }
                     },
                     {
-                      "locations": 0.25,
+                      "location": 0.25,
                       "derivative": 0,
                       "value": {
                         "type": "spline",
@@ -787,7 +787,7 @@
                           "coordinate": "Erosion",
                           "points": [
                             {
-                              "locations": -0.85,
+                              "location": -0.85,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -795,17 +795,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": 0.202350
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.5138249,
                                       "value": 0.7161751
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.5138249,
                                       "value": 1.23
                                     }
@@ -814,7 +814,7 @@
                               }
                             },
                             {
-                              "locations": -0.7,
+                              "location": -0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -822,17 +822,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": 0.2
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.43317974,
                                       "value": 0.44682026
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.43317974,
                                       "value": 0.88
                                     }
@@ -841,7 +841,7 @@
                               }
                             },
                             {
-                              "locations": -0.4,
+                              "location": -0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -849,17 +849,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.2
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.3917051,
                                       "value": 0.30829495
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.3917051,
                                       "value": 0.70000005
                                     }
@@ -868,7 +868,7 @@
                               }
                             },
                             {
-                              "locations": -0.35,
+                              "location": -0.35,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -876,27 +876,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.25
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.42
                                     }
@@ -905,7 +905,7 @@
                               }
                             },
                             {
-                              "locations": -0.1,
+                              "location": -0.1,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -913,27 +913,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0.07,
                                       "value": 0.006999
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.07,
                                       "value": 0.021
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.658,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049000014,
                                       "value": 0.42000002
                                     }
@@ -942,7 +942,7 @@
                               }
                             },
                             {
-                              "locations": 0.2,
+                              "location": 0.2,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -950,27 +950,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -979,7 +979,7 @@
                               }
                             },
                             {
-                              "locations": 0.4,
+                              "location": 0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -987,27 +987,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1016,7 +1016,7 @@
                               }
                             },
                             {
-                              "locations": 0.45,
+                              "location": 0.45,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1024,12 +1024,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": {
                                         "type": "spline",
@@ -1037,27 +1037,27 @@
                                           "coordinate": "RidgesFolded",
                                           "points": [
                                             {
-                                              "locations": -1,
+                                              "location": -1,
                                               "derivative": 0.5,
                                               "value": -0.1
                                             },
                                             {
-                                              "locations": -0.4,
+                                              "location": -0.4,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0,
+                                              "location": 0,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0.4,
+                                              "location": 0.4,
                                               "derivative": 0.04,
                                               "value": 0.03
                                             },
                                             {
-                                              "locations": 1,
+                                              "location": 1,
                                               "derivative": 0.049,
                                               "value": 0.1
                                             }
@@ -1066,7 +1066,7 @@
                                       }
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.17
                                     }
@@ -1075,7 +1075,7 @@
                               }
                             },
                             {
-                              "locations": 0.55,
+                              "location": 0.55,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1083,12 +1083,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": {
                                         "type": "spline",
@@ -1096,27 +1096,27 @@
                                           "coordinate": "RidgesFolded",
                                           "points": [
                                             {
-                                              "locations": -1,
+                                              "location": -1,
                                               "derivative": 0.5,
                                               "value": -0.1
                                             },
                                             {
-                                              "locations": -0.4,
+                                              "location": -0.4,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0,
+                                              "location": 0,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0.4,
+                                              "location": 0.4,
                                               "derivative": 0.04,
                                               "value": 0.03
                                             },
                                             {
-                                              "locations": 1,
+                                              "location": 1,
                                               "derivative": 0.049,
                                               "value": 0.1
                                             }
@@ -1125,7 +1125,7 @@
                                       }
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.17
                                     }
@@ -1134,7 +1134,7 @@
                               }
                             },
                             {
-                              "locations": 0.58,
+                              "location": 0.58,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1142,27 +1142,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1171,7 +1171,7 @@
                               }
                             },
                             {
-                              "locations": 0.7,
+                              "location": 0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1179,27 +1179,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.02
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.12,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1212,7 +1212,7 @@
                       }
                     },
                     {
-                      "locations": 1,
+                      "location": 1,
                       "derivative": 0,
                       "value": {
                         "type": "spline",
@@ -1220,7 +1220,7 @@
                           "coordinate": "Erosion",
                           "points": [
                             {
-                              "locations": -0.85,
+                              "location": -0.85,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1228,17 +1228,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": 0.202350
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.5138249,
                                       "value": 0.7161751
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.5138249,
                                       "value": 1.23
                                     }
@@ -1247,7 +1247,7 @@
                               }
                             },
                             {
-                              "locations": -0.7,
+                              "location": -0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1255,17 +1255,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": 0.2
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.43317974,
                                       "value": 0.44682026
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.43317974,
                                       "value": 0.88
                                     }
@@ -1274,7 +1274,7 @@
                               }
                             },
                             {
-                              "locations": -0.4,
+                              "location": -0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1282,17 +1282,17 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.2
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.3917051,
                                       "value": 0.30829495
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.3917051,
                                       "value": 0.70000005
                                     }
@@ -1301,7 +1301,7 @@
                               }
                             },
                             {
-                              "locations": -0.35,
+                              "location": -0.35,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1309,27 +1309,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.25
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.42
                                     }
@@ -1338,7 +1338,7 @@
                               }
                             },
                             {
-                              "locations": -0.1,
+                              "location": -0.1,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1346,27 +1346,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0.07,
                                       "value": 0.006999
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0.07,
                                       "value": 0.021
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.658,
                                       "value": 0.35
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049000014,
                                       "value": 0.42000002
                                     }
@@ -1375,7 +1375,7 @@
                               }
                             },
                             {
-                              "locations": 0.2,
+                              "location": 0.2,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1383,27 +1383,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1412,7 +1412,7 @@
                               }
                             },
                             {
-                              "locations": 0.4,
+                              "location": 0.4,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1420,27 +1420,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1449,7 +1449,7 @@
                               }
                             },
                             {
-                              "locations": 0.45,
+                              "location": 0.45,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1457,12 +1457,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": {
                                         "type": "spline",
@@ -1470,27 +1470,27 @@
                                           "coordinate": "RidgesFolded",
                                           "points": [
                                             {
-                                              "locations": -1,
+                                              "location": -1,
                                               "derivative": 0.5,
                                               "value": -0.1
                                             },
                                             {
-                                              "locations": -0.4,
+                                              "location": -0.4,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0,
+                                              "location": 0,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0.4,
+                                              "location": 0.4,
                                               "derivative": 0.04,
                                               "value": 0.03
                                             },
                                             {
-                                              "locations": 1,
+                                              "location": 1,
                                               "derivative": 0.049,
                                               "value": 0.1
                                             }
@@ -1499,7 +1499,7 @@
                                       }
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.17
                                     }
@@ -1508,7 +1508,7 @@
                               }
                             },
                             {
-                              "locations": 0.55,
+                              "location": 0.55,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1516,12 +1516,12 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": {
                                         "type": "spline",
@@ -1529,27 +1529,27 @@
                                           "coordinate": "RidgesFolded",
                                           "points": [
                                             {
-                                              "locations": -1,
+                                              "location": -1,
                                               "derivative": 0.5,
                                               "value": -0.1
                                             },
                                             {
-                                              "locations": -0.4,
+                                              "location": -0.4,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0,
+                                              "location": 0,
                                               "derivative": 0,
                                               "value": 0.01
                                             },
                                             {
-                                              "locations": 0.4,
+                                              "location": 0.4,
                                               "derivative": 0.04,
                                               "value": 0.03
                                             },
                                             {
-                                              "locations": 1,
+                                              "location": 1,
                                               "derivative": 0.049,
                                               "value": 0.1
                                             }
@@ -1558,7 +1558,7 @@
                                       }
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.17
                                     }
@@ -1567,7 +1567,7 @@
                               }
                             },
                             {
-                              "locations": 0.58,
+                              "location": 0.58,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1575,27 +1575,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0.5,
                                       "value": -0.1
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": 0.01
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.04,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }
@@ -1604,7 +1604,7 @@
                               }
                             },
                             {
-                              "locations": 0.7,
+                              "location": 0.7,
                               "derivative": 0,
                               "value": {
                                 "type": "spline",
@@ -1612,27 +1612,27 @@
                                   "coordinate": "RidgesFolded",
                                   "points": [
                                     {
-                                      "locations": -1,
+                                      "location": -1,
                                       "derivative": 0,
                                       "value": -0.02
                                     },
                                     {
-                                      "locations": -0.4,
+                                      "location": -0.4,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0,
+                                      "location": 0,
                                       "derivative": 0,
                                       "value": -0.03
                                     },
                                     {
-                                      "locations": 0.4,
+                                      "location": 0.4,
                                       "derivative": 0.12,
                                       "value": 0.03
                                     },
                                     {
-                                      "locations": 1,
+                                      "location": 1,
                                       "derivative": 0.049,
                                       "value": 0.1
                                     }

@@ -119,7 +119,7 @@ namespace RS.Scene
 
                 var samplerConfig = m_configManager.GetSamplerConfig(m_sampler);
                 var sampler = samplerConfig.BuildRsSampler();
-
+                
                 m_texture = Sample(sampler);
             }
             
@@ -209,6 +209,8 @@ namespace RS.Scene
             Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
 
             m_textureData = data;
+            
+            Debug.Log($"x = 564, z = 904, value = {data[564, 904]}");
             
             return RsJobs.GenerateTexture(data, m_width, m_height);
         }

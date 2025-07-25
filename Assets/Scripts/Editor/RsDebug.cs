@@ -15,9 +15,13 @@ namespace RS.Scene
         {
             // 测试下Spline
             Debug.Log("Test");
+            var rng = RsRandom.Init(20250715);
+            
+            var samplerConfig = RsConfigManager.Instance.GetSamplerConfig("Offset");
+            var sampler = samplerConfig.BuildRsSampler();
 
 
-            var value = RsMath.ClampedMap(0f, -1, 1, 1, 0);
+            var value = sampler.Sample(new Vector3(564.0f, 0, 906.0f));
             Debug.Log(value);
             
             // var samplerConfig = RsConfig.GetConfig("Sampler/SingleArg") as RsSamplerConfig;
