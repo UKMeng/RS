@@ -43,7 +43,7 @@ namespace RS.Scene
         
         // 流式加载相关
         private Dictionary<Vector3, GameObject> m_chunks;
-        private Dictionary<Vector2, byte> m_loadRecord; // 0:未生成 1:未加载 2:已加载
+        private Dictionary<Vector3, byte> m_loadRecord; // 0:未生成 1:未加载 2:已加载
         // private Queue<Vector3> m_chunkLoadQueue;
         private bool m_isLoadingChunks = false;
         private int m_loadDistance = 3;
@@ -70,7 +70,7 @@ namespace RS.Scene
             m_sampler = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler();
 
             m_chunks = new Dictionary<Vector3, GameObject>();
-            m_loadRecord = new Dictionary<Vector2, byte>();
+            m_loadRecord = new Dictionary<Vector3, byte>();
             m_chunkDataQueue = new ConcurrentQueue<ChunkData>();
             
             
@@ -96,8 +96,8 @@ namespace RS.Scene
             var x = Mathf.FloorToInt(pos.x / 32.0f);
             var z = Mathf.FloorToInt(pos.z / 32.0f);
             
-            var toDeactivate = new List<Vector2>();
-            var toDestroy = new List<Vector2>();
+            var toDeactivate = new List<Vector3>();
+            var toDestroy = new List<Vector3>();
             
             // 优先加载后台生成好的Chunk
             while (m_chunkDataQueue.TryDequeue(out var chunkData))
@@ -122,61 +122,54 @@ namespace RS.Scene
                 chunkMc.sharedMesh = mesh;
 
                 m_chunks[chunkData.chunkPos] = chunkGo;
+                m_loadRecord[chunkData.chunkPos] = 2;
             }
             
             // 遍历已有的chunk, 根据距离判断是否需要卸载或删除
-            foreach (var chunkPosXZ in m_loadRecord.Keys)
+            // foreach (var chunkPos in m_loadRecord.Keys)
+            // {
+            //     var chunkX = chunkPos.x;
+            //     var chunkZ = chunkPos.y;
+            //     
+            //     if (m_loadRecord[chunkPos] == 2)
+            //     {
+            //         if (Mathf.Abs(chunkX - x) > m_deactivateDistance || Mathf.Abs(chunkZ - z) > m_deactivateDistance)
+            //         {
+            //             // 超出距离, 卸载
+            //             var chunkGo = m_chunks[chunkPos];
+            //             chunkGo.SetActive(false);
+            //         
+            //             toDeactivate.Add(chunkPos);
+            //         
+            //             Debug.Log($"[SceneManager] 触发卸载 {chunkPos}");
+            //         }
+            //     }
+            //
+            //     if (m_loadRecord[chunkPos] == 1)
+            //     {
+            //         if (Mathf.Abs(chunkX - x) > m_destroyDistance || Mathf.Abs(chunkZ - z) > m_destroyDistance)
+            //         {
+            //             // 超出距离, 删除
+            //             var chunkGo = m_chunks[chunkPos];
+            //             chunkGo.SetActive(false);
+            //             Destroy(chunkGo);
+            //             m_chunks.Remove(chunkPos);
+            //             
+            //         
+            //             toDestroy.Add(chunkPos);
+            //             Debug.Log($"[SceneManager] 触发删除 {chunkPos}");
+            //         }
+            //     }
+            // }
+            
+            foreach (var chunkPos in toDeactivate)
             {
-                var chunkX = chunkPosXZ.x;
-                var chunkZ = chunkPosXZ.y;
-
-                var chunkPos = new Vector3(chunkX, 0, chunkZ);
-                if (m_loadRecord[chunkPosXZ] == 2)
-                {
-                    
-                    if (Mathf.Abs(chunkX - x) > m_deactivateDistance || Mathf.Abs(chunkZ - z) > m_deactivateDistance)
-                    {
-                        // 超出距离, 卸载
-                        for (var y = 0; y < 7; y++)
-                        {
-                            chunkPos.y = y;
-                            var chunkGo = m_chunks[chunkPos];
-                            chunkGo.SetActive(false);
-                        }
-                    
-                        toDeactivate.Add(chunkPosXZ);
-                    
-                        Debug.Log($"[SceneManager] 触发卸载 {chunkPosXZ}");
-                    }
-                }
-
-                if (m_loadRecord[chunkPosXZ] == 1)
-                {
-                    if (Mathf.Abs(chunkX - x) > m_destroyDistance || Mathf.Abs(chunkZ - z) > m_destroyDistance)
-                    {
-                        // 超出距离, 删除
-                        for (var y = 0; y < 7; y++)
-                        {
-                            chunkPos.y = y;
-                            var chunkGo = m_chunks[chunkPos];
-                            Destroy(chunkGo);
-                            m_chunks.Remove(chunkPos);
-                        }
-                    
-                        toDestroy.Add(chunkPosXZ);
-                        Debug.Log($"[SceneManager] 触发删除 {chunkPosXZ}");
-                    }
-                }
+                m_loadRecord[chunkPos] = 1;
             }
             
-            foreach (var chunkPosXZ in toDeactivate)
+            foreach (var chunkPos in toDestroy)
             {
-                m_loadRecord[chunkPosXZ] = 1;
-            }
-            
-            foreach (var chunkPosXZ in toDestroy)
-            {
-                m_loadRecord[chunkPosXZ] = 0;
+                m_loadRecord[chunkPos] = 0;
             }
             
             // 先测试九个位置的加载
@@ -211,7 +204,6 @@ namespace RS.Scene
                                 var chunkPos = new Vector3(chunkX, chunkY, chunkZ);
                                 StartChunkGeneration(chunkPos);
                             }
-                            m_loadRecord[chunkPosXZ] = 2;
                         }
                     }
                 }
