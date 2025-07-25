@@ -38,6 +38,8 @@ namespace RS.Scene
 
         private RsRandom m_rng;
 
+        private RsSampler m_sampler;
+
         
         // 流式加载相关
         private Dictionary<Vector3, GameObject> m_chunks;
@@ -64,15 +66,17 @@ namespace RS.Scene
             
             // 初始化噪声
             m_rng = new RsRandom(seed);
-            m_noise = new RsNoise(m_rng.NextUInt64());
+            // m_noise = new RsNoise(m_rng.NextUInt64());
+            m_sampler = RsConfigManager.Instance.GetSamplerConfig("Depth").BuildRsSampler();
 
             m_chunks = new Dictionary<Vector3, GameObject>();
             m_loadRecord = new Dictionary<Vector2, byte>();
             m_chunkDataQueue = new ConcurrentQueue<ChunkData>();
             
+            
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(30, 128, 30);
+            var pos = new Vector3(0, 128, 0);
             player.transform.position = pos;
         }
 
@@ -238,78 +242,85 @@ namespace RS.Scene
             var offsetX = chunkX * 32;
             var offsetZ = chunkZ * 32;
             var offsetY = chunkY * 32;
-
-            var sampleResX = 8;
-            var sampleResY = 4;
-            var sampleResZ = 8;
-
-            var sampleSizeX = 32 / sampleResX;
-            var sampleSizeY = 32 / sampleResY;
-            var sampleSizeZ = 32 / sampleResZ;
+            //
+            // var sampleResX = 8;
+            // var sampleResY = 4;
+            // var sampleResZ = 8;
+            //
+            // var sampleSizeX = 32 / sampleResX;
+            // var sampleSizeY = 32 / sampleResY;
+            // var sampleSizeZ = 32 / sampleResZ;
             
             var sw = Stopwatch.StartNew();
             
-            var noiseSamples = new float[sampleSizeX + 1, sampleSizeY + 1, sampleSizeZ + 1];
+            // var noiseSamples = new float[sampleSizeX + 1, sampleSizeY + 1, sampleSizeZ + 1];
 
-            for (var sx = 0; sx < sampleSizeX + 1; sx++)
+            
+            
+            blocks = new BlockType[32 * 32 * 32];
+            var index = 0;
+            
+            for (var sx = 0; sx < 32; sx++)
             {
-                for (var sz = 0; sz < sampleSizeZ + 1; sz++)
+                for (var sz = 0; sz < 32; sz++)
                 {
-                    for (var sy = 0; sy < sampleSizeY + 1; sy++)
+                    for (var sy = 0; sy < 32; sy++)
                     {
-                        var sampleX = offsetX + sx * sampleResX;
-                        var sampleY = offsetY + sy * sampleResY;
-                        var sampleZ = offsetZ + sz * sampleResZ;
-                        noiseSamples[sx, sy, sz] = SampleNoise(sampleX, sampleY, sampleZ);
+                        var sampleX = offsetX + sx;
+                        var sampleY = offsetY + sy;
+                        var sampleZ = offsetZ + sz;
+                        var density = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
+                        blocks[index++] = JudgeBlockType(density, sx + offsetX, sy + offsetY, sz + offsetZ);
+                        
+                        // noiseSamples[sx, sy, sz] = SampleNoise(sampleX, sampleY, sampleZ);
+                        // noiseSamples[sx, sy, sz] = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
                     }
                 }
             }
             
-            blocks = new BlockType[32 * 32 * 32];
-            var index = 0;
             // 线性插值
-            for (var x = 0; x < 32; x++)
-            {
-                var fx = x % sampleResX;
-                var tx = (float)fx / sampleResX;
-                var sx = x / sampleResX;
-                
-                for (var z = 0; z < 32; z++)
-                {
-                    var fz = z % sampleResZ;
-                    var tz = (float)fz / sampleResZ;
-                    var sz = z / sampleResZ;
-                    
-                    for (var y = 0; y < 32; y++)
-                    {
-                        var fy = y % sampleResY;
-                        var ty = (float)fy / sampleResY;
-                        var sy = y / sampleResY;
-                        
-                        // 三线性插值
-                        var c000 = noiseSamples[sx,     sy,     sz    ];
-                        var c100 = noiseSamples[sx + 1, sy,     sz    ];
-                        var c010 = noiseSamples[sx,     sy + 1, sz    ];
-                        var c110 = noiseSamples[sx + 1, sy + 1, sz    ];
-                        var c001 = noiseSamples[sx,     sy,     sz + 1];
-                        var c101 = noiseSamples[sx + 1, sy,     sz + 1];
-                        var c011 = noiseSamples[sx,     sy + 1, sz + 1];
-                        var c111 = noiseSamples[sx + 1, sy + 1, sz + 1];
-                        
-                        var c00 = Mathf.Lerp(c000, c100, tx);
-                        var c01 = Mathf.Lerp(c001, c101, tx);
-                        var c10 = Mathf.Lerp(c010, c110, tx);
-                        var c11 = Mathf.Lerp(c011, c111, tx);
-
-                        var c0 = Mathf.Lerp(c00, c10, ty);
-                        var c1 = Mathf.Lerp(c01, c11, ty);
-
-                        var density = Mathf.Lerp(c0, c1, tz);
-                        
-                        blocks[index++] = JudgeBlockType(density, x + offsetX, y + offsetY, z + offsetZ);
-                    }
-                }
-            }
+            // for (var x = 0; x < 32; x++)
+            // {
+            //     var fx = x % sampleResX;
+            //     var tx = (float)fx / sampleResX;
+            //     var sx = x / sampleResX;
+            //     
+            //     for (var z = 0; z < 32; z++)
+            //     {
+            //         var fz = z % sampleResZ;
+            //         var tz = (float)fz / sampleResZ;
+            //         var sz = z / sampleResZ;
+            //         
+            //         for (var y = 0; y < 32; y++)
+            //         {
+            //             var fy = y % sampleResY;
+            //             var ty = (float)fy / sampleResY;
+            //             var sy = y / sampleResY;
+            //             
+            //             // 三线性插值
+            //             var c000 = noiseSamples[sx,     sy,     sz    ];
+            //             var c100 = noiseSamples[sx + 1, sy,     sz    ];
+            //             var c010 = noiseSamples[sx,     sy + 1, sz    ];
+            //             var c110 = noiseSamples[sx + 1, sy + 1, sz    ];
+            //             var c001 = noiseSamples[sx,     sy,     sz + 1];
+            //             var c101 = noiseSamples[sx + 1, sy,     sz + 1];
+            //             var c011 = noiseSamples[sx,     sy + 1, sz + 1];
+            //             var c111 = noiseSamples[sx + 1, sy + 1, sz + 1];
+            //             
+            //             var c00 = Mathf.Lerp(c000, c100, tx);
+            //             var c01 = Mathf.Lerp(c001, c101, tx);
+            //             var c10 = Mathf.Lerp(c010, c110, tx);
+            //             var c11 = Mathf.Lerp(c011, c111, tx);
+            //
+            //             var c0 = Mathf.Lerp(c00, c10, ty);
+            //             var c1 = Mathf.Lerp(c01, c11, ty);
+            //
+            //             var density = Mathf.Lerp(c0, c1, tz);
+            //             
+            //             blocks[index++] = JudgeBlockType(density, x + offsetX, y + offsetY, z + offsetZ);
+            //         }
+            //     }
+            // }
 
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunkX} {chunkY} {chunkZ} 数据耗时 {sw.ElapsedMilliseconds} ms");
@@ -344,11 +355,11 @@ namespace RS.Scene
             // }
             
             // 高度修正
-            var yCorrection = (heightOffset - y) / heightOffset;
-
-            var density = baseDensity + yCorrection * squashFactor;
+            // var yCorrection = (heightOffset - y) / heightOffset;
+            //
+            // var density = baseDensity + yCorrection * squashFactor;
             
-            if (density > 0)
+            if (baseDensity > 0)
             {
                 return BlockType.Stone;
             }
