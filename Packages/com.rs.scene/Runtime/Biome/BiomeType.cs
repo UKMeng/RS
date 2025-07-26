@@ -7,8 +7,8 @@ namespace RS.Scene.Biome
     public enum BiomeType
     {
         Ocean,
-        River,
-        Plains,
-        Beach,
+        Coast,
+        Nearland,
+        Inland
     }
 }

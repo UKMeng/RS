@@ -40,7 +40,7 @@ namespace RS.Utils
 
         public BiomeType Sample(Vector3 pos)
         {
-            var values = new float[6];
+            var values = new float[7];
             for (var i = 0; i < 6; i++)
             {
                 // 跳过深度采样
@@ -51,9 +51,12 @@ namespace RS.Utils
                 
                 values[i] = m_samplers[i].Sample(pos);
             }
+            
+            // PV
+            values[6] = RsMath.RidgesFolded(values[5]);
 
             var minDis = float.MaxValue;
-            BiomeType minType = BiomeType.River;
+            BiomeType minType = BiomeType.Ocean;
 
             foreach (var biome in m_source.biomes)
             {

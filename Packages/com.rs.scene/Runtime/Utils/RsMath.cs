@@ -92,5 +92,10 @@ namespace RS.Utils
         {
             return Mathf.Lerp(BilLerp(tx, ty, c000, c100, c010, c110), BilLerp(tx, ty, c001, c101, c011, c111), tz);
         }
+
+        public static float RidgesFolded(float ridges)
+        {
+            return 1.0f - Mathf.Abs(Mathf.Abs(ridges) * 3.0f - 2.0f);
+        }
     }
 }

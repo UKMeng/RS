@@ -3,10 +3,10 @@
   "arguments" : {
     "biomes" : [
       {
-        "type": "plains",
+        "type": "Inland",
         "arguments": {
           "continentalness": [
-            -0.11,
+            0.03,
             1.0
           ],
           "depth": 0.0,
@@ -30,7 +30,34 @@
         }
       },
       {
-        "type": "beach",
+        "type": "Nearland",
+        "arguments": {
+          "continentalness": [
+            -0.11,
+            0.03
+          ],
+          "depth": 0.0,
+          "erosion": [
+            -1.0,
+            1.0
+          ],
+          "humidity": [
+            -1.0,
+            1.0
+          ],
+          "offset": 0.0,
+          "temperature": [
+            -1.0,
+            1.0
+          ],
+          "ridges": [
+            -1.0,
+            1.0
+          ]
+        }
+      },
+      {
+        "type": "Coast",
         "arguments": {
           "continentalness": [
             -0.19,
@@ -57,7 +84,7 @@
         }
       },
       {
-        "type": "ocean",
+        "type": "Ocean",
         "arguments": {
           "continentalness": [
             -1.0,

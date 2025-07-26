@@ -16,9 +16,9 @@ namespace RS.Scene
         private static readonly Color[] BiomeColors =
         {
             RsColor.Ocean,
-            RsColor.River,
-            RsColor.Plains,
-            RsColor.Beach
+            RsColor.Coast,
+            RsColor.Nearland,
+            RsColor.Inland,
         };
         
         // 采样起始位置

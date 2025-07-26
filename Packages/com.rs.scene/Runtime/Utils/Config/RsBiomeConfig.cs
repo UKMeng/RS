@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using RS.Scene.Biome;
 using Unity.Plastic.Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -10,6 +11,11 @@ namespace RS.Utils
         public float min;
         public float max;
 
+        public RsBiomeInterval(float val)
+        {
+            min = max = val;
+        }
+        
         public RsBiomeInterval(JToken intervalToken)
         {
             if (intervalToken.Type == JTokenType.Float || intervalToken.Type == JTokenType.Integer)
@@ -49,9 +55,9 @@ namespace RS.Utils
         public RsBiomeConfig(JObject biomeToken)
         {
             var typeStr = biomeToken["type"].ToString();
-            type = (BiomeType)Enum.Parse(typeof(BiomeType), typeStr, true);
+            type = (BiomeType)Enum.Parse(typeof(BiomeType), typeStr);
 
-            m_intervals = new RsBiomeInterval[6];
+            m_intervals = new RsBiomeInterval[7];
             
             var args = biomeToken["arguments"].ToObject<JObject>();
 
@@ -84,6 +90,9 @@ namespace RS.Utils
             {
                 m_intervals[5] = new RsBiomeInterval(ridgesToken);
             }
+            
+            // peak & valley
+            m_intervals[6] = new RsBiomeInterval(RsMath.RidgesFolded(m_intervals[5].min));
 
             if (args.TryGetValue("offset", out var offsetToken))
             {
@@ -97,7 +106,7 @@ namespace RS.Utils
         public float GetDistance(float[] values)
         {
             var result = m_offset;
-            for (var i = 0; i < 6; i++)
+            for (var i = 0; i < 7; i++)
             {
                 // 跳过深度采样
                 if (i == 1)
