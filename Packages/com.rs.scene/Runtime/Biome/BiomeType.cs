@@ -8,6 +8,7 @@ namespace RS.Scene.Biome
     {
         Ocean,
         River,
-        Plains
+        Plains,
+        Beach,
     }
 }

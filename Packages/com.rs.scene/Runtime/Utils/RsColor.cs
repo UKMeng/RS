@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Security.Cryptography;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -7,6 +8,7 @@ namespace RS.Utils
         public static Color Ocean = new Color(0.0f, 0.0f, 0.6f);
         public static Color River = new Color(0.0f, 0.0f, 1.0f);
         public static Color Plains = Color.green;
+        public static Color Beach = new Color(0.8f, 0.8f, 0.6f);
         
         // https://github.com/BIDS/colormap/blob/master/colormaps.py
         public static Color[] ViridisLUT = new Color[]

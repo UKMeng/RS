@@ -17,15 +17,16 @@ namespace RS.Scene
         {
             RsColor.Ocean,
             RsColor.River,
-            RsColor.Plains
+            RsColor.Plains,
+            RsColor.Beach
         };
         
         // 采样起始位置
         private Vector3 m_startPos = new Vector3(0.0f, 100.0f, 0.0f);
         
         // 采样范围
-        private int m_samplerWidth = 512;
-        private int m_samplerHeight = 512;
+        private int m_samplerWidth = 1024;
+        private int m_samplerHeight = 1024;
         
         // 预览纹理分辨率
         private int m_width = 1024;

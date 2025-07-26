@@ -99,6 +99,12 @@ namespace RS.Utils
             var result = m_offset;
             for (var i = 0; i < 6; i++)
             {
+                // 跳过深度采样
+                if (i == 1)
+                {
+                    continue;
+                }
+                
                 var v = values[i];
                 var interval = m_intervals[i];
                 var dis = interval.GetDistance(v);

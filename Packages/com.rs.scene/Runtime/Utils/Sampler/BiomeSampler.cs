@@ -16,7 +16,7 @@ namespace RS.Utils
 
             m_samplers = new RsSampler[6];
             m_samplers[0] = configManager.GetSamplerConfig("Continents").BuildRsSampler();
-            m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
+            // m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
             m_samplers[2] = configManager.GetSamplerConfig("Erosion").BuildRsSampler();
             m_samplers[3] = configManager.GetSamplerConfig("BiomeHumidity").BuildRsSampler();
             m_samplers[4] = configManager.GetSamplerConfig("BiomeTemperature").BuildRsSampler();
@@ -43,6 +43,12 @@ namespace RS.Utils
             var values = new float[6];
             for (var i = 0; i < 6; i++)
             {
+                // 跳过深度采样
+                if (i == 1)
+                {
+                    continue;
+                }
+                
                 values[i] = m_samplers[i].Sample(pos);
             }
 
