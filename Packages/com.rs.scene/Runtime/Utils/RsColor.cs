@@ -4,12 +4,9 @@ namespace RS.Utils
 {
     public class RsColor
     {
-        public static Color Ocean = Color.darkBlue;
-        public static Color Land = Color.green;
-        public static Color Warm = Color.brown;
-        public static Color Temperate = Color.lightGreen;
-        public static Color Cold = Color.darkOliveGreen;
-        public static Color Freezing = Color.white;
+        public static Color Ocean = new Color(0.0f, 0.0f, 0.6f);
+        public static Color River = new Color(0.0f, 0.0f, 1.0f);
+        public static Color Plains = Color.green;
         
         // https://github.com/BIDS/colormap/blob/master/colormaps.py
         public static Color[] ViridisLUT = new Color[]

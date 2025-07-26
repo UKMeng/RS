@@ -6,6 +6,8 @@ using Unity.Collections;
 using Unity.Jobs;
 using Debug = UnityEngine.Debug;
 
+using RS.Scene.Biome;
+
 namespace RS.Utils
 {
     [BurstCompile]
@@ -84,7 +86,7 @@ namespace RS.Utils
             var handle = job.Schedule(width * height, 32);
             handle.Complete();
             
-            Texture2D texture = new Texture2D(width, height);
+            var texture = new Texture2D(width, height);
             texture.SetPixels(colorArray.ToArray());
             texture.Apply();
             

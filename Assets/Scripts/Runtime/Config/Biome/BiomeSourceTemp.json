@@ -3,29 +3,56 @@
   "arguments" : {
     "biomes" : [
       {
-        "type": "plains",
-        "arguments": {
-          "continentalness": [
+        "type" : "river",
+        "arguments" : {
+          "continentalness" : [
             -0.19,
-            1.0
+            -0.11
           ],
           "depth": 0.0,
           "erosion": [
             -1.0,
-            1.0
+            -0.375
           ],
           "humidity": [
             -1.0,
             1.0
           ],
           "offset": 0.0,
-          "temperature": [
-            -1.0,
+          "temperature" : [
+            -0.45,
             1.0
           ],
           "ridges": [
-            -1.0,
+            -0.05,
+            0.05
+          ]
+        }
+      },
+      {
+        "type": "plains",
+        "arguments": {
+          "continentalness": [
+            0.03,
             1.0
+          ],
+          "depth": 0.0,
+          "erosion": [
+            -1.0,
+            -0.375
+          ],
+          "humidity": [
+            -1.0,
+            -0.35
+          ],
+          "offset": 0.0,
+          "temperature": [
+            -0.45,
+            -0.15
+          ],
+          "ridges": [
+            -0.05,
+            0.05
           ]
         }
       },
@@ -33,7 +60,7 @@
         "type": "ocean",
         "arguments": {
           "continentalness": [
-            -1.0,
+            -0.455,
             -0.19
           ],
           "depth": 0.0,
@@ -47,8 +74,8 @@
           ],
           "offset": 0.0,
           "temperature": [
-            -1.0,
-            1.0
+            -0.15,
+            0.2
           ],
           "ridges": [
             -1.0,

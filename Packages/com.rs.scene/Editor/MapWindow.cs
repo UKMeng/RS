@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using RS.Scene.BiomeMap;
+using RS.Scene;
 using UnityEditor;
 using UnityEngine;
 using Unity.Collections;
@@ -21,7 +21,7 @@ namespace RS.Scene
         private float[,] m_whiteNoise;
 
         private Texture2D m_texture;
-        private BiomeMapGenerator m_bmg;
+        // private BiomeMapGenerator m_bmg;
 
         [MenuItem("RS/Map")]
         private static void ShowWindow()
@@ -82,83 +82,83 @@ namespace RS.Scene
                 m_texture = RsJobs.GenerateTexture(m_whiteNoise, m_width, m_height);
             }
 
-            if (GUILayout.Button("Generate Biome Map", buttonStyle))
-            {
-                m_bmg = new BiomeMapGenerator(m_seed);
-                m_texture = m_bmg.Generate();
-            }
-            
-            // 各阶段BiomeMap显示按钮
-            if (m_bmg != null)
-            {
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Init Island", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(0);
-                }
-                
-                if (GUILayout.Button("Zoom 1024->512", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(1);
-                }
-                
-                if (GUILayout.Button("Add Island 1", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(2);
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Zoom 512->256", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(3);
-                }
-                
-                if (GUILayout.Button("Add Island 2", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(4);
-                }
-                
-                if (GUILayout.Button("Add Island 3", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(5);
-                }
-                
-                if (GUILayout.Button("Add Island 4", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(6);
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Temperature", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(7);
-                }
-                
-                if (GUILayout.Button("Add Island 5", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(8);
-                }
-                
-                if (GUILayout.Button("Warm To Temperate", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(9);
-                }
-                
-                if (GUILayout.Button("Freezing To Cold", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(10);
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("256->128", buttonStyle))
-                {
-                    m_texture = m_bmg.ShowStageMap(11);
-                }
-                EditorGUILayout.EndHorizontal();
-            }
+            // if (GUILayout.Button("Generate Biome Map", buttonStyle))
+            // {
+            //     m_bmg = new BiomeMapGenerator(m_seed);
+            //     m_texture = m_bmg.Generate();
+            // }
+            //
+            // // 各阶段BiomeMap显示按钮
+            // if (m_bmg != null)
+            // {
+            //     EditorGUILayout.BeginHorizontal();
+            //     if (GUILayout.Button("Init Island", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(0);
+            //     }
+            //     
+            //     if (GUILayout.Button("Zoom 1024->512", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(1);
+            //     }
+            //     
+            //     if (GUILayout.Button("Add Island 1", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(2);
+            //     }
+            //     EditorGUILayout.EndHorizontal();
+            //     
+            //     EditorGUILayout.BeginHorizontal();
+            //     if (GUILayout.Button("Zoom 512->256", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(3);
+            //     }
+            //     
+            //     if (GUILayout.Button("Add Island 2", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(4);
+            //     }
+            //     
+            //     if (GUILayout.Button("Add Island 3", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(5);
+            //     }
+            //     
+            //     if (GUILayout.Button("Add Island 4", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(6);
+            //     }
+            //     EditorGUILayout.EndHorizontal();
+            //     
+            //     EditorGUILayout.BeginHorizontal();
+            //     if (GUILayout.Button("Temperature", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(7);
+            //     }
+            //     
+            //     if (GUILayout.Button("Add Island 5", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(8);
+            //     }
+            //     
+            //     if (GUILayout.Button("Warm To Temperate", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(9);
+            //     }
+            //     
+            //     if (GUILayout.Button("Freezing To Cold", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(10);
+            //     }
+            //     EditorGUILayout.EndHorizontal();
+            //     
+            //     EditorGUILayout.BeginHorizontal();
+            //     if (GUILayout.Button("256->128", buttonStyle))
+            //     {
+            //         m_texture = m_bmg.ShowStageMap(11);
+            //     }
+            //     EditorGUILayout.EndHorizontal();
+            // }
 
             // 显示Texture2D
             if (m_texture != null)

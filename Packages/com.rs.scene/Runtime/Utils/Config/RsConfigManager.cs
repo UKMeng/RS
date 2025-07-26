@@ -41,6 +41,8 @@ namespace RS.Utils
 
         private static string[] m_presetSamplers = new string[]
         {
+            "BiomeHumidity",
+            "BiomeTemperature",
             "Continents",
             "Depth",
             "Erosion",
@@ -57,6 +59,7 @@ namespace RS.Utils
 
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;
         private Dictionary<string, RsSamplerConfig> m_samplerConfigs;
+        private RsBiomeSourceConfig m_biomeSource;
 
         public RsConfigManager()
         {
@@ -85,6 +88,17 @@ namespace RS.Utils
             return config;
         }
 
+        public RsBiomeSourceConfig GetBiomeSource()
+        {
+            if (m_biomeSource == null)
+            {
+                m_biomeSource = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
+            }
+
+            return m_biomeSource;
+        }
+        
+
         public string[] GetLoadedSamplerConfigName()
         {
             return m_samplerConfigs.Keys.ToArray();
@@ -109,6 +123,7 @@ namespace RS.Utils
                 m_samplerConfigs.Add(preset, config);
             }
             
+            m_biomeSource = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
             
             sw.Stop();
             Debug.Log($"[RsConfigManager] Init ConfigManager Cost: {sw.ElapsedMilliseconds} ms");

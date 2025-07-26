@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using RS.Scene.BiomeMap;
+using RS.Scene.Biome;
 using RS.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -10,14 +10,22 @@ namespace RS.Scene
 {
     public class SamplerTestWindow : EditorWindow
     {
-        private Int64 m_seed = 20250715;
+        private Int64 m_seed = 1882775509054175955;
+        
+        // Biome类型对应颜色数组
+        private static readonly Color[] BiomeColors =
+        {
+            RsColor.Ocean,
+            RsColor.River,
+            RsColor.Plains
+        };
         
         // 采样起始位置
-        private Vector3 m_startPos = new Vector3(0.0f, 0.0f, 0.0f);
+        private Vector3 m_startPos = new Vector3(0.0f, 100.0f, 0.0f);
         
         // 采样范围
-        private int m_samplerWidth = 2048;
-        private int m_samplerHeight = 2048;
+        private int m_samplerWidth = 512;
+        private int m_samplerHeight = 512;
         
         // 预览纹理分辨率
         private int m_width = 1024;
@@ -34,6 +42,8 @@ namespace RS.Scene
         private Texture2D m_texture;
         private float[,] m_textureData;
         private Vector3 m_pickData;
+
+        private Texture2D m_biomeMap;
 
         private RsConfigManager m_configManager;
 
@@ -129,8 +139,26 @@ namespace RS.Scene
                 var sampler = samplerConfig.BuildRsSampler();
                 
                 m_texture = Sample(sampler);
+                m_biomeMap = null;
             }
             
+            // 采样并生成Biome Map
+            if (GUILayout.Button("Generate Biome Map", buttonStyle))
+            {
+                // 重置随机数生成器，保持生成结果确定
+                var rng = RsRandom.Init(m_seed);
+
+                var biomeSampler = new BiomeSampler();
+
+                m_biomeMap = BiomeMapSample(biomeSampler);
+                m_texture = null;
+            }
+            
+            // 显示BiomeMap
+            if (m_biomeMap != null)
+            {
+                GUILayout.Label(m_biomeMap, GUILayout.Width(m_width), GUILayout.Height(m_height));
+            }
             
             
             // 显示Texture2D
@@ -219,6 +247,59 @@ namespace RS.Scene
             m_textureData = data;
             
             return RsJobs.GenerateTexture(data, m_width, m_height);
+        }
+        
+        private Texture2D BiomeMapSample(BiomeSampler sampler)
+        {
+            var data = new BiomeType[m_samplerWidth, m_samplerHeight];
+
+            var startX = m_startPos.x;
+            var startY = m_startPos.y;
+            var startZ = m_startPos.z;
+
+
+            var sw = Stopwatch.StartNew();
+
+            for (int x = 0; x < m_samplerWidth; x++)
+            {
+                for (int z = 0; z < m_samplerHeight; z++)
+                {
+                    data[x, z] = sampler.Sample(new Vector3(startX + x, startY, startZ + z));
+                }
+            }
+
+            sw.Stop();
+            Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
+
+            // m_textureData = data;
+            
+            return GenerateBiomeMap(data, m_width, m_height);
+        }
+        
+        private static Texture2D GenerateBiomeMap(BiomeType[,] data, int width, int height)
+        {
+            var sw = Stopwatch.StartNew();
+
+            var dataWidth = data.GetLength(0);
+            var dataHeight = data.GetLength(1);
+            var colorArray = new Color[width * height];
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    var srcX = Mathf.Clamp(Mathf.RoundToInt((float)x / width * dataWidth), 0, dataWidth - 1);
+                    var srcY = Mathf.Clamp(Mathf.RoundToInt((float)y / height * dataHeight), 0, dataHeight - 1);
+                    colorArray[x + y * width] = BiomeColors[(int)data[srcX, srcY]];
+                }
+            }
+            
+            var texture = new Texture2D(width, height);
+            texture.SetPixels(colorArray);
+            texture.Apply();
+
+            sw.Stop();
+            Debug.Log($"Texture generated in {sw.ElapsedMilliseconds} ms");
+            return texture;
         }
     }
 }

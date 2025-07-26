@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using RS.Scene.Biome;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace RS.Utils
@@ -21,58 +23,88 @@ namespace RS.Utils
                 max = intervalArray[1];
             }
         }
+
+        public float GetDistance(float val)
+        {
+            if (val < min)
+            {
+                return min - val;
+            }
+
+            if (val > max)
+            {
+                return val - max;
+            }
+            
+            return 0.0f;
+        }
     }
 
     public class RsBiomeConfig : RsConfig
     {
-        public string type;
-        public RsBiomeInterval continentalness;
-        public RsBiomeInterval depth;
-        public RsBiomeInterval erosion;
-        public RsBiomeInterval humidity;
-        public RsBiomeInterval offset;
-        public RsBiomeInterval temperature;
-        public RsBiomeInterval ridges;
+        public BiomeType type;
+        private RsBiomeInterval[] m_intervals;
+        private float m_offset;
 
         public RsBiomeConfig(JObject biomeToken)
         {
-            type = biomeToken["type"].ToString();
+            var typeStr = biomeToken["type"].ToString();
+            type = (BiomeType)Enum.Parse(typeof(BiomeType), typeStr, true);
+
+            m_intervals = new RsBiomeInterval[6];
+            
             var args = biomeToken["arguments"].ToObject<JObject>();
 
             if (args.TryGetValue("continentalness", out var contiToken))
             {
-                continentalness = new RsBiomeInterval(contiToken);
+                m_intervals[0] = new RsBiomeInterval(contiToken);
             }
 
             if (args.TryGetValue("depth", out var depthToken))
             {
-                depth = new RsBiomeInterval(depthToken);
+                m_intervals[1] = new RsBiomeInterval(depthToken);
             }
 
             if (args.TryGetValue("erosion", out var erosionToken))
             {
-                erosion = new RsBiomeInterval(erosionToken);
+                m_intervals[2] = new RsBiomeInterval(erosionToken);
             }
 
             if (args.TryGetValue("humidity", out var humidityToken))
             {
-                humidity = new RsBiomeInterval(humidityToken);
+                m_intervals[3] = new RsBiomeInterval(humidityToken);
             }
-
-            if (args.TryGetValue("offset", out var offsetToken))
-            {
-                offset = new RsBiomeInterval(offsetToken);
-            }
-
+            
             if (args.TryGetValue("temperature", out var temperatureToken))
             {
-                temperature = new RsBiomeInterval(temperatureToken);
+                m_intervals[4] = new RsBiomeInterval(temperatureToken);
             }
 
             if (args.TryGetValue("ridges", out var ridgesToken))
             {
-                ridges = new RsBiomeInterval(ridgesToken);
+                m_intervals[5] = new RsBiomeInterval(ridgesToken);
             }
+
+            if (args.TryGetValue("offset", out var offsetToken))
+            {
+                var offset = offsetToken.ToObject<float>();
+                m_offset = offset * offset;
+            }
+
+            
+        }
+
+        public float GetDistance(float[] values)
+        {
+            var result = m_offset;
+            for (var i = 0; i < 6; i++)
+            {
+                var v = values[i];
+                var interval = m_intervals[i];
+                var dis = interval.GetDistance(v);
+                result += dis * dis;
+            }
+            return result;
         }
     }
     
