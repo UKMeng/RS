@@ -16,7 +16,7 @@ namespace RS.Utils
         {
             var configManager = RsConfigManager.Instance;
             // m_source = configManager.GetBiomeSource();
-            m_sourceTree = new BiomeSourceTree();
+            m_sourceTree = new BiomeSourceTree(configManager.GetBiomeSource("BiomeSource"));
 
             m_samplers = new RsSampler[6];
             m_samplers[0] = configManager.GetSamplerConfig("Continents").BuildRsSampler();

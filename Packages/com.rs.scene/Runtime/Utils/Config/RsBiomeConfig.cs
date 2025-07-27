@@ -8,78 +8,81 @@ namespace RS.Utils
 {
     public class RsBiomeConfig : RsConfig
     {
-        public BiomeType type;
-        private BiomeInterval[] m_intervals;
-        private float m_offset;
-
+        public string type;
+        public string configName;
+        public int[] continentalness;
+        public int[] erosion;
+        public int[] humidity;
+        public int[] temperature;
+        public int[] pv;
+        public int[] ridges;
+        public int[] depth;
+        public float offset;
+        
         public RsBiomeConfig(JObject biomeToken)
         {
-            var typeStr = biomeToken["type"].ToString();
-            type = (BiomeType)Enum.Parse(typeof(BiomeType), typeStr);
-
-            m_intervals = new BiomeInterval[7];
-            
+            type = biomeToken["type"].ToString();
             var args = biomeToken["arguments"].ToObject<JObject>();
+
+            if (args.TryGetValue("name", out var nameToken))
+            {
+                configName = nameToken.ToString();
+            }
 
             if (args.TryGetValue("continentalness", out var contiToken))
             {
-                m_intervals[0] = new BiomeInterval(contiToken);
+                continentalness = GetInterval(contiToken);
             }
 
             if (args.TryGetValue("depth", out var depthToken))
             {
-                m_intervals[1] = new BiomeInterval(depthToken);
+                depth = GetInterval(depthToken);
             }
 
             if (args.TryGetValue("erosion", out var erosionToken))
             {
-                m_intervals[2] = new BiomeInterval(erosionToken);
+                erosion = GetInterval(erosionToken);
             }
 
             if (args.TryGetValue("humidity", out var humidityToken))
             {
-                m_intervals[3] = new BiomeInterval(humidityToken);
+                humidity = GetInterval(humidityToken);
             }
             
             if (args.TryGetValue("temperature", out var temperatureToken))
             {
-                m_intervals[4] = new BiomeInterval(temperatureToken);
+                temperature = GetInterval(temperatureToken);
+            }
+
+            if (args.TryGetValue("pv", out var pvToken))
+            {
+                pv = GetInterval(pvToken);
             }
 
             if (args.TryGetValue("ridges", out var ridgesToken))
             {
-                m_intervals[5] = new BiomeInterval(ridgesToken);
+                ridges = GetInterval(ridgesToken);
             }
-            
-            // peak & valley
-            m_intervals[6] = new BiomeInterval(RsMath.RidgesFolded(m_intervals[5].min));
-
-            if (args.TryGetValue("offset", out var offsetToken))
-            {
-                var offset = offsetToken.ToObject<float>();
-                m_offset = offset * offset;
-            }
-
-            
         }
 
-        public float GetDistance(float[] values)
+        public BiomeType Type
         {
-            var result = m_offset;
-            for (var i = 0; i < 7; i++)
+            get { return (BiomeType)Enum.Parse(typeof(BiomeType), type); }
+        }
+
+        private int[] GetInterval(JToken intervalToken)
+        {
+            if (intervalToken.Type == JTokenType.Integer)
             {
-                // 跳过深度采样
-                if (i == 1)
-                {
-                    continue;
-                }
-                
-                var v = values[i];
-                var interval = m_intervals[i];
-                var dis = interval.GetDistance(v);
-                result += dis * dis;
+                return new int[] {intervalToken.ToObject<int>()};
             }
-            return result;
+            
+            if (intervalToken.Type == JTokenType.Array)
+            {
+                return intervalToken.ToObject<int[]>();
+            }
+
+            return new int[] { };
         }
     }
     
@@ -95,6 +98,60 @@ namespace RS.Utils
             {
                 biomes.Add(new RsBiomeConfig(biomeToken as JObject));
             }
+        }
+        
+        public static List<RsBiomeConfig> ParseSourceConfig(RsBiomeSourceConfig config)
+        {
+            var result = new List<RsBiomeConfig>();
+
+            foreach (var biome in config.biomes)
+            {
+                if (biome.type == "Derive")
+                {
+                    var deriveConfig = RsConfigManager.Instance.GetBiomeSource(biome.configName);
+                    var deriveBiomes = ParseSourceConfig(deriveConfig);
+                    foreach (var deriveBiome in deriveBiomes)
+                    {
+                        if (deriveBiome.continentalness[0] == -1)
+                        {
+                            deriveBiome.continentalness = biome.continentalness;
+                        }
+
+                        if (deriveBiome.erosion[0] == -1)
+                        {
+                            deriveBiome.erosion = biome.erosion;
+                        }
+
+                        if (deriveBiome.humidity[0] == -1)
+                        {
+                            deriveBiome.humidity = biome.humidity;
+                        }
+
+                        if (deriveBiome.temperature[0] == -1)
+                        {
+                            deriveBiome.temperature = biome.temperature;
+                        }
+
+                        if (deriveBiome.pv[0] == -1)
+                        {
+                            deriveBiome.pv = biome.pv;
+                        }
+
+                        if (deriveBiome.ridges[0] == -1)
+                        {
+                            deriveBiome.ridges = biome.ridges;
+                        }
+                    }
+
+                    result.AddRange(deriveBiomes);
+                }
+                else
+                {
+                    result.Add(biome);
+                }
+            }
+
+            return result;
         }
     }
 }

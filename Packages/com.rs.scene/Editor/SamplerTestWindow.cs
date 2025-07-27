@@ -12,15 +12,6 @@ namespace RS.Scene
     {
         private Int64 m_seed = 1882775509054175955;
         
-        // Biome类型对应颜色数组
-        private static readonly Color[] BiomeColors =
-        {
-            RsColor.Ocean,
-            RsColor.Coast,
-            RsColor.Nearland,
-            RsColor.Inland,
-        };
-        
         // 采样起始位置
         private Vector3 m_startPos = new Vector3(0.0f, 100.0f, 0.0f);
         
@@ -290,7 +281,7 @@ namespace RS.Scene
                 {
                     var srcX = Mathf.Clamp(Mathf.RoundToInt((float)x / width * dataWidth), 0, dataWidth - 1);
                     var srcY = Mathf.Clamp(Mathf.RoundToInt((float)y / height * dataHeight), 0, dataHeight - 1);
-                    colorArray[x + y * width] = BiomeColors[(int)data[srcX, srcY]];
+                    colorArray[x + y * width] = BiomeColor.Colors[(int)data[srcX, srcY]];
                 }
             }
             

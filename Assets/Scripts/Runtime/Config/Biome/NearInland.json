@@ -1,0 +1,20 @@
+﻿{
+  "type": "biome",
+  "arguments": {
+    "biomes": [
+      {
+        "type": "Nearland",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": [0,1,2,3,4],
+          "ridges": [0,1]
+        }
+      }
+    ]
+  }
+}

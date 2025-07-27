@@ -18,7 +18,9 @@ namespace RS.Scene
 
             var biomeTest = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
             
-            Debug.Log(biomeTest.biomes.Count);
+            var biomes = RsBiomeSourceConfig.ParseSourceConfig(biomeTest);
+            
+            Debug.Log(biomes.Count);
         }
     }
 }

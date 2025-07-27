@@ -1,0 +1,267 @@
+﻿{
+  "type" : "biome",
+  "arguments" : {
+    "biomes" : [
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [2],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": 0,
+          "ridges": [0]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [2],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": 0,
+          "ridges": [1]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [3,4],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Plain",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [1,2,3],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Plain",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [2],
+          "offset": 0.0,
+          "temperature": [3],
+          "pv": 0,
+          "ridges": [0]
+        }
+      },
+      {
+        "type": "Forest",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [2,3,4],
+          "offset": 0.0,
+          "temperature": [1,2],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Forest",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [2],
+          "offset": 0.0,
+          "temperature": [3],
+          "pv": 0,
+          "ridges": [1]
+        }
+      },
+      {
+        "type": "Forest",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [3,4],
+          "offset": 0.0,
+          "temperature": [3],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Desert",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [0,1],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [4],
+          "pv": 0,
+          "ridges": [0]
+        }
+      },
+      {
+        "type": "River",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0,
+          "erosion": [2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "River",
+        "arguments": {
+          "continentalness": 2,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "River",
+        "arguments": {
+          "continentalness": 1,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": 0,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "StoneShore",
+        "arguments": {
+          "continentalness": 1,
+          "depth": 0,
+          "erosion": [0,1,2],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": 1,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Beach",
+        "arguments": {
+          "continentalness": 1,
+          "depth": 0,
+          "erosion": [3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3],
+          "pv": 1,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Desert",
+        "arguments": {
+          "continentalness": 1,
+          "depth": 0,
+          "erosion": [3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": 4,
+          "pv": 1,
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Nearland",
+        "arguments": {
+          "continentalness": 2,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": [1,2,3,4],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Inland",
+        "arguments": {
+          "continentalness": 3,
+          "depth": 0.0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": [1,2,3,4],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Coast",
+        "arguments": {
+          "continentalness": 1,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": [2,3,4],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Ocean",
+        "arguments": {
+          "continentalness": 0,
+          "depth": 0,
+          "erosion": [0,1,2,3,4,5,6],
+          "humidity": [0,1,2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2,3,4],
+          "pv": [0,1,2,3,4],
+          "ridges": [0,1]
+        }
+      }
+    ]
+  }
+}

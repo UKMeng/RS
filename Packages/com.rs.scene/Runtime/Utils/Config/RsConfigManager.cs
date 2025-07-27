@@ -57,10 +57,18 @@ namespace RS.Utils
             "Temperature",
         };
 
+        private static string[] m_presetBiomeSources = new string[]
+        {
+            "BiomeSource",
+            "Coast",
+            "NearInland",
+            "Inland",
+        };
+
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;
         private Dictionary<string, RsSamplerConfig> m_samplerConfigs;
-        private RsBiomeSourceConfig m_biomeSource;
-
+        private Dictionary<string, RsBiomeSourceConfig> m_biomeSourceConfigs;
+        
         public RsConfigManager()
         {
             Init();
@@ -88,14 +96,15 @@ namespace RS.Utils
             return config;
         }
 
-        public RsBiomeSourceConfig GetBiomeSource()
+        public RsBiomeSourceConfig GetBiomeSource(string name)
         {
-            if (m_biomeSource == null)
+            if (!m_biomeSourceConfigs.TryGetValue(name, out var config))
             {
-                m_biomeSource = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
+                config = RsConfig.GetConfig("Biome/" + name) as RsBiomeSourceConfig;
+                m_biomeSourceConfigs.Add(name, config);
             }
 
-            return m_biomeSource;
+            return config;
         }
         
 
@@ -110,6 +119,7 @@ namespace RS.Utils
             
             m_noiseConfigs = new Dictionary<string, RsNoiseConfig>();
             m_samplerConfigs = new Dictionary<string, RsSamplerConfig>();
+            m_biomeSourceConfigs = new Dictionary<string, RsBiomeSourceConfig>();
 
             foreach (var preset in m_presetNoises)
             {
@@ -122,8 +132,12 @@ namespace RS.Utils
                 var config = RsConfig.GetConfig("Sampler/" + preset) as RsSamplerConfig;
                 m_samplerConfigs.Add(preset, config);
             }
-            
-            m_biomeSource = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
+
+            foreach (var preset in m_presetBiomeSources)
+            {
+                var config = RsConfig.GetConfig("Biome/" + preset) as RsBiomeSourceConfig;
+                m_biomeSourceConfigs.Add(preset, config);
+            }
             
             sw.Stop();
             Debug.Log($"[RsConfigManager] Init ConfigManager Cost: {sw.ElapsedMilliseconds} ms");
