@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RS.Scene.Biome;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -127,35 +128,101 @@ namespace RS.Utils
                     foreach (var tempBiome in deriveBiomes)
                     {
                         var deriveBiome = new RsBiomeConfig(tempBiome);
-                        
+
                         if (deriveBiome.continentalness[0] == -1)
                         {
                             deriveBiome.continentalness = biome.continentalness;
+                        }
+                        else if (biome.continentalness[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.continentalness, biome.continentalness, out var intersection))
+                            {
+                                deriveBiome.continentalness = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
                         }
 
                         if (deriveBiome.erosion[0] == -1)
                         {
                             deriveBiome.erosion = biome.erosion;
                         }
+                        else if (biome.erosion[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.erosion, biome.erosion, out var intersection))
+                            {
+                                deriveBiome.erosion = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
 
                         if (deriveBiome.humidity[0] == -1)
                         {
                             deriveBiome.humidity = biome.humidity;
+                        }
+                        else if (biome.humidity[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.humidity, biome.humidity, out var intersection))
+                            {
+                                deriveBiome.humidity = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
                         }
 
                         if (deriveBiome.temperature[0] == -1)
                         {
                             deriveBiome.temperature = biome.temperature;
                         }
+                        else if (biome.temperature[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.temperature, biome.temperature, out var intersection))
+                            {
+                                deriveBiome.temperature = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
 
                         if (deriveBiome.pv[0] == -1)
                         {
                             deriveBiome.pv = biome.pv;
                         }
+                        else if (biome.pv[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.pv, biome.pv, out var intersection))
+                            {
+                                deriveBiome.pv = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
 
                         if (deriveBiome.ridges[0] == -1)
                         {
                             deriveBiome.ridges = biome.ridges;
+                        }
+                        else if (biome.ridges[0] != -2)
+                        {
+                            if (Intersect(deriveBiome.ridges, biome.ridges, out var intersection))
+                            {
+                                deriveBiome.ridges = intersection;
+                            }
+                            else
+                            {
+                                continue;
+                            }
                         }
                         
                         result.Add(deriveBiome);
@@ -168,6 +235,22 @@ namespace RS.Utils
             }
 
             return result;
+        }
+
+        private static bool Intersect(int[] derive, int[] origin, out int[] intersection)
+        {
+            var res = new List<int>();
+
+            for (var i = 0; i < origin.Length; i++)
+            {
+                if (derive.Contains(origin[i]))
+                {
+                    res.Add(origin[i]);
+                }
+            }
+            
+            intersection = res.ToArray();
+            return res.Count != 0;
         }
     }
 }

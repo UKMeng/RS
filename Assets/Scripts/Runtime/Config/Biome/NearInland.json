@@ -3,19 +3,6 @@
   "arguments": {
     "biomes": [
       {
-        "type": "Nearland",
-        "arguments": {
-          "continentalness": -1,
-          "depth": 0,
-          "erosion": [0,1,2,3,4,5,6],
-          "humidity": [0,1,2,3,4],
-          "offset": 0.0,
-          "temperature": [0,1,2,3,4],
-          "pv": [2,3,4],
-          "ridges": [0,1]
-        }
-      },
-      {
         "type": "Derive",
         "arguments": {
           "name": "Valley",
@@ -40,6 +27,222 @@
           "offset": 0.0,
           "temperature": -2,
           "pv": [1],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [0,1,2],
+          "pv": [2],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": [2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2],
+          "pv": [2],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "HighLand",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": [3,4],
+          "pv": [2],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": [2],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": [2,3,4],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": [2],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "LowMountain",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": [1,2,3,4],
+          "pv": [2],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "LowMountain",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [2,3,4,5,6],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": -2,
+          "pv": [2],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [0,1,2],
+          "pv": [3],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": [2,3,4],
+          "offset": 0.0,
+          "temperature": [0,1,2],
+          "pv": [3],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "HighLand",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": [3,4],
+          "pv": [3],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "SnowPlain",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": [0,1],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": [3],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "SnowForest",
+        "arguments": {
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": [2,3,4],
+          "offset": 0.0,
+          "temperature": [0],
+          "pv": [3],
+          "ridges": [0,1]
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "LowMountain",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": [1,2,3,4],
+          "pv": [3],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "LowMountain",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [2,3,4,5,6],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": -2,
+          "pv": [3],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "HighLand",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [0],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": -2,
+          "pv": [4],
+          "ridges": -2
+        }
+      },
+      {
+        "type": "Derive",
+        "arguments": {
+          "name": "LowMountain",
+          "continentalness": -1,
+          "depth": 0,
+          "erosion": [1,2,3,4,5,6],
+          "humidity": -2,
+          "offset": 0.0,
+          "temperature": -2,
+          "pv": [4],
           "ridges": -2
         }
       }

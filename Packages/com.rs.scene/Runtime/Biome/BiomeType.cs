@@ -14,10 +14,9 @@ namespace RS.Scene.Biome
         SnowForest,
         Forest,
         Desert,
+        BadLand,
         StoneShore,
         Beach,
-        Nearland,
-        Inland
     }
 
     public class BiomeColor
@@ -33,10 +32,9 @@ namespace RS.Scene.Biome
             RsColor.SnowForest,
             RsColor.Forest,
             RsColor.Desert,
+            RsColor.BadLand,
             RsColor.StoneShore,
             RsColor.Beach,
-            RsColor.Nearland,
-            RsColor.Inland,
         };
     }
 }
