@@ -5,18 +5,18 @@ namespace RS.Utils
 {
     public class RsColor
     {
+        public static Color Unknown = Color.black;
         public static Color Ocean = new Color(0.0f, 0.0f, 0.6f);
         public static Color River = new Color(0.0f, 0.0f, 1.0f);
         public static Color SnowPlain = new Color(1.0f, 1.0f, 1.0f);
-        public static Color Plain = new Color(0.0f, 0.5f, 0.0f);
-        public static Color SnowForest = GetColorFromString("#85f5a4");
-        public static Color Forest = new Color(0.0f, 0.7f, 0.0f);
-        public static Color Desert = GetColorFromString("#DAA520");
+        public static Color Plain = new Color(0.0f, 0.7f, 0.0f);
+        public static Color SnowForest = new Color(0.6f, 1.0f, 0.7f);
+        public static Color Forest = new Color(0.0f, 0.5f, 0.0f);
+        public static Color Desert = Color.yellow;
         public static Color StoneShore = Color.grey;
         public static Color Beach = new Color(0.8f, 0.8f, 0.6f);
         public static Color Inland = Color.pink;
-        public static Color Nearland = new Color(0.0f, 0.8f, 0.0f);
-        public static Color Coast = Color.deepPink;
+        public static Color Nearland = Color.deepPink;
 
         public static Color GetColorFromString(string s)
         {

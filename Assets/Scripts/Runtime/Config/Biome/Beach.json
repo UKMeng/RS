@@ -3,30 +3,29 @@
   "arguments": {
     "biomes": [
       {
-        "type": "River",
+        "type": "Beach",
         "arguments": {
           "continentalness": -1,
           "depth": 0,
-          "erosion": [2,3,4,5,6],
-          "humidity": [0,1,2,3,4],
+          "erosion": -1,
+          "humidity": -1,
           "offset": 0.0,
-          "temperature": [0,1,2,3,4],
+          "temperature": [0,1,2,3],
           "pv": -1,
-          "ridges": [0,1]
+          "ridges": -1
         }
       },
       {
-        "type": "Derive",
+        "type": "Desert",
         "arguments": {
-          "name": "LowMountain",
           "continentalness": -1,
           "depth": 0,
-          "erosion": [0,1],
-          "humidity": -2,
+          "erosion": -1,
+          "humidity": -1,
           "offset": 0.0,
-          "temperature": -2,
+          "temperature": [4],
           "pv": -1,
-          "ridges": -2
+          "ridges": -1
         }
       }
     ]

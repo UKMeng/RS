@@ -6,6 +6,7 @@ namespace RS.Scene.Biome
 {
     public enum BiomeType
     {
+        Unknown,
         Ocean,
         River,
         SnowPlain,
@@ -15,7 +16,6 @@ namespace RS.Scene.Biome
         Desert,
         StoneShore,
         Beach,
-        Coast,
         Nearland,
         Inland
     }
@@ -25,6 +25,7 @@ namespace RS.Scene.Biome
         // Biome类型对应颜色数组
         public static readonly Color[] Colors =
         {
+            RsColor.Unknown,
             RsColor.Ocean,
             RsColor.River,
             RsColor.SnowPlain,
@@ -34,7 +35,6 @@ namespace RS.Scene.Biome
             RsColor.Desert,
             RsColor.StoneShore,
             RsColor.Beach,
-            RsColor.Coast,
             RsColor.Nearland,
             RsColor.Inland,
         };

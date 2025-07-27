@@ -59,12 +59,14 @@ namespace RS.Utils
 
         private static string[] m_presetBiomeSources = new string[]
         {
+            "Beach",
             "BiomeSource",
             "Coast",
-            "NearInland",
             "Inland",
+            "InlandValley",
+            "LowMountain",
+            "NearInland",
             "Valley",
-            "InlandValley"
         };
 
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;

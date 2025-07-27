@@ -78,7 +78,7 @@ namespace RS.Scene.Biome
             m_children = new List<BiomeSourceNode>(intervals.Count);
             for (var i = 0; i < intervals.Count; i++)
             {
-                m_children.Add(new BiomeSourceNode("biome", BiomeType.Ocean));
+                m_children.Add(new BiomeSourceNode("biome", BiomeType.Unknown));
             }
             m_intervals = intervals;
         }
