@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using UnityEngine;
 using RS.Scene;
 using RS.Scene.Biome;
+using Debug = UnityEngine.Debug;
 
 namespace RS.Utils
 {
@@ -8,11 +10,13 @@ namespace RS.Utils
     {
         private RsSampler[] m_samplers;
         private RsBiomeSourceConfig m_source;
+        private BiomeSourceTree m_sourceTree;
 
         public BiomeSampler()
         {
             var configManager = RsConfigManager.Instance;
-            m_source = configManager.GetBiomeSource();
+            // m_source = configManager.GetBiomeSource();
+            m_sourceTree = new BiomeSourceTree();
 
             m_samplers = new RsSampler[6];
             m_samplers[0] = configManager.GetSamplerConfig("Continents").BuildRsSampler();
@@ -55,20 +59,27 @@ namespace RS.Utils
             // PV
             values[6] = RsMath.RidgesFolded(values[5]);
 
-            var minDis = float.MaxValue;
-            BiomeType minType = BiomeType.Ocean;
+            return m_sourceTree.GetBiomeType(values);
 
-            foreach (var biome in m_source.biomes)
-            {
-                var dis = biome.GetDistance(values);
-                if (dis < minDis)
-                {
-                    minDis = dis;
-                    minType = biome.type;
-                }
-            }
+            // var minDis = float.MaxValue;
+            // BiomeType minType = BiomeType.Ocean;
 
-            return minType;
+            // var sw = Stopwatch.StartNew();
+
+            // foreach (var biome in m_source.biomes)
+            // {
+            //     var dis = biome.GetDistance(values);
+            //     if (dis < minDis)
+            //     {
+            //         minDis = dis;
+            //         minType = biome.type;
+            //     }
+            // }
+
+            // sw.Stop();
+            // Debug.Log($"获取一次类型耗费时间{sw.ElapsedMilliseconds} ms");
+
+            // return minType;
         }
     }
 }
