@@ -21,7 +21,7 @@ namespace RS.Scene
         private Int64 m_seed = 1882775509054175955;
         
         // 采样起始位置
-        private Vector3 m_startPos = new Vector3(0.0f, 100.0f, 0.0f);
+        private Vector3Int m_startPos = new Vector3Int(0, 100, 0);
         
         // 采样范围
         private int m_samplerWidth = 1024;
@@ -109,9 +109,9 @@ namespace RS.Scene
             // 采样起始点
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("采样起始点", labelStyle, GUILayout.Width(60));
-            m_startPos.x = EditorGUILayout.FloatField(m_startPos.x, filedStyle);
-            m_startPos.y = EditorGUILayout.FloatField(m_startPos.y, filedStyle);
-            m_startPos.z = EditorGUILayout.FloatField(m_startPos.z, filedStyle);
+            m_startPos.x = EditorGUILayout.IntField(m_startPos.x, filedStyle);
+            m_startPos.y = EditorGUILayout.IntField(m_startPos.y, filedStyle);
+            m_startPos.z = EditorGUILayout.IntField(m_startPos.z, filedStyle);
             EditorGUILayout.EndHorizontal();
             
             // 调整采样范围
@@ -357,8 +357,8 @@ namespace RS.Scene
 
                     vals[6] = RsMath.RidgesFolded(vals[5]);
 
-                    data[x, z].x = x;
-                    data[x, z].z = z;
+                    data[x, z].x = startX + x;
+                    data[x, z].z = startZ + z;
                     data[x, z].values = vals;
                     data[x, z].biome = sampler.Sample(vals);
                 }
