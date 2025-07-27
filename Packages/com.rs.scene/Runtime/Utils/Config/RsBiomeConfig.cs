@@ -18,6 +18,20 @@ namespace RS.Utils
         public int[] ridges;
         public int[] depth;
         public float offset;
+
+        public RsBiomeConfig(RsBiomeConfig other)
+        {
+            type = other.type;
+            configName = other.configName;
+            continentalness = other.continentalness;
+            erosion = other.erosion;
+            humidity = other.humidity;
+            temperature = other.temperature;
+            pv = other.pv;
+            ridges = other.ridges;
+            depth = other.depth;
+            offset = other.offset;
+        }
         
         public RsBiomeConfig(JObject biomeToken)
         {
@@ -110,8 +124,10 @@ namespace RS.Utils
                 {
                     var deriveConfig = RsConfigManager.Instance.GetBiomeSource(biome.configName);
                     var deriveBiomes = ParseSourceConfig(deriveConfig);
-                    foreach (var deriveBiome in deriveBiomes)
+                    foreach (var tempBiome in deriveBiomes)
                     {
+                        var deriveBiome = new RsBiomeConfig(tempBiome);
+                        
                         if (deriveBiome.continentalness[0] == -1)
                         {
                             deriveBiome.continentalness = biome.continentalness;
@@ -141,9 +157,9 @@ namespace RS.Utils
                         {
                             deriveBiome.ridges = biome.ridges;
                         }
+                        
+                        result.Add(deriveBiome);
                     }
-
-                    result.AddRange(deriveBiomes);
                 }
                 else
                 {

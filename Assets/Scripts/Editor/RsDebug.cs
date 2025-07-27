@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 using RS.Scene;
+using RS.Scene.Biome;
 using RS.Utils;
 
 namespace RS.Scene
@@ -17,10 +18,11 @@ namespace RS.Scene
             Debug.Log("Test");
 
             var biomeTest = RsConfig.GetConfig("Biome/BiomeSource") as RsBiomeSourceConfig;
-            
+
             var biomes = RsBiomeSourceConfig.ParseSourceConfig(biomeTest);
+            // var tree = new BiomeSourceTree(biomeTest);
             
-            Debug.Log(biomes.Count);
+            Debug.Log("test");
         }
     }
 }

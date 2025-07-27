@@ -63,6 +63,8 @@ namespace RS.Utils
             "Coast",
             "NearInland",
             "Inland",
+            "Valley",
+            "InlandValley"
         };
 
         private Dictionary<string, RsNoiseConfig> m_noiseConfigs;
