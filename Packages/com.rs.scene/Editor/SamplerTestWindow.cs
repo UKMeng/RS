@@ -8,6 +8,14 @@ using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
+    public struct BiomeData
+    {
+        public BiomeType biome;
+        public float[] values;
+        public int x;
+        public int z;
+    }
+    
     public class SamplerTestWindow : EditorWindow
     {
         private Int64 m_seed = 1882775509054175955;
@@ -35,7 +43,11 @@ namespace RS.Scene
         private float[,] m_textureData;
         private Vector3 m_pickData;
 
+        private RsSampler[] m_samplers;
         private Texture2D m_biomeMap;
+        private BiomeData[,] m_biomeData;
+        private BiomeData m_pickBiomeData;
+        private bool m_showBiomeMap = false;
 
         private RsConfigManager m_configManager;
 
@@ -55,6 +67,7 @@ namespace RS.Scene
         {
             m_configManager = RsConfigManager.Instance;
             m_presetSamplerStrs = m_configManager.GetLoadedSamplerConfigName();
+            m_showBiomeMap = false;
         }
 
         private void OnGUI()
@@ -85,6 +98,11 @@ namespace RS.Scene
             if (GUILayout.Button("Generate New Seed", buttonStyle))
             {
                 m_seed = RsRandom.GetSeed();
+            }
+
+            if (GUILayout.Button("Refresh Configs", buttonStyle))
+            {
+                m_configManager = RsConfigManager.Reload();
             }
             EditorGUILayout.EndHorizontal();
             
@@ -141,6 +159,13 @@ namespace RS.Scene
                 var rng = RsRandom.Init(m_seed);
 
                 var biomeSampler = new BiomeSampler();
+                m_samplers = new RsSampler[6];
+                m_samplers[0] = m_configManager.GetSamplerConfig("Continents").BuildRsSampler();
+                // m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
+                m_samplers[2] = m_configManager.GetSamplerConfig("Erosion").BuildRsSampler();
+                m_samplers[3] = m_configManager.GetSamplerConfig("BiomeHumidity").BuildRsSampler();
+                m_samplers[4] = m_configManager.GetSamplerConfig("BiomeTemperature").BuildRsSampler();
+                m_samplers[5] = m_configManager.GetSamplerConfig("Ridges").BuildRsSampler();
 
                 m_biomeMap = BiomeMapSample(biomeSampler);
                 m_texture = null;
@@ -149,7 +174,61 @@ namespace RS.Scene
             // 显示BiomeMap
             if (m_biomeMap != null)
             {
+                if (m_showBiomeMap == false)
+                {
+                    m_showBiomeMap = true;
+                    m_pickBiomeData = m_biomeData[0, 0];
+                }
+                
                 GUILayout.Label(m_biomeMap, GUILayout.Width(m_width), GUILayout.Height(m_height));
+                
+                // 鼠标取值
+                var textureRect = GUILayoutUtility.GetLastRect();
+                var mousePos = Event.current.mousePosition;
+                if (textureRect.Contains(mousePos))
+                {
+                    var u = (mousePos.x - textureRect.x) / textureRect.width;
+                    var v = (mousePos.y - textureRect.y) / textureRect.height;
+                    var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
+                    var pv = m_samplerHeight - Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
+
+                    m_pickBiomeData = m_biomeData[pu, pv];
+                }
+            }
+
+            if (m_showBiomeMap)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("X:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField((m_pickBiomeData.x).ToString("F1"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("Z:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField((m_pickBiomeData.z).ToString("F1"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("c:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[0].ToString("F3"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("e:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[2].ToString("F3"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("h:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[3].ToString("F3"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("t:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[4].ToString("F3"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("r:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[5].ToString("F3"), labelStyle, GUILayout.Width(60));
+
+                EditorGUILayout.LabelField("pv:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.values[6].ToString("F3"), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.LabelField("biome:", labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_pickBiomeData.biome.ToString(), labelStyle, GUILayout.Width(60));
+                
+                EditorGUILayout.EndHorizontal();
+                
+                Repaint();
             }
             
             
@@ -212,6 +291,12 @@ namespace RS.Scene
             var startY = m_startPos.y;
             var startZ = m_startPos.z;
 
+            m_samplers[0] = m_configManager.GetSamplerConfig("Continents").BuildRsSampler();
+            // m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
+            m_samplers[2] = m_configManager.GetSamplerConfig("Erosion").BuildRsSampler();
+            m_samplers[3] = m_configManager.GetSamplerConfig("BiomeHumidity").BuildRsSampler();
+            m_samplers[4] = m_configManager.GetSamplerConfig("BiomeTemperature").BuildRsSampler();
+            m_samplers[5] = m_configManager.GetSamplerConfig("Ridges").BuildRsSampler();
 
             var sw = Stopwatch.StartNew();
 
@@ -243,7 +328,7 @@ namespace RS.Scene
         
         private Texture2D BiomeMapSample(BiomeSampler sampler)
         {
-            var data = new BiomeType[m_samplerWidth, m_samplerHeight];
+            var data = new BiomeData[m_samplerWidth, m_samplerHeight];
 
             var startX = m_startPos.x;
             var startY = m_startPos.y;
@@ -251,24 +336,43 @@ namespace RS.Scene
 
 
             var sw = Stopwatch.StartNew();
-
+            
             for (int x = 0; x < m_samplerWidth; x++)
             {
                 for (int z = 0; z < m_samplerHeight; z++)
                 {
-                    data[x, z] = sampler.Sample(new Vector3(startX + x, startY, startZ + z));
+                    var pos = new Vector3(startX + x, startY, startZ + z);
+                    var vals = new float[7];
+
+                    for (var i = 0; i < 6; i++)
+                    {
+                        // 跳过深度采样
+                        if (i == 1)
+                        {
+                            continue;
+                        }
+
+                        vals[i] = m_samplers[i].Sample(pos);
+                    }
+
+                    vals[6] = RsMath.RidgesFolded(vals[5]);
+
+                    data[x, z].x = x;
+                    data[x, z].z = z;
+                    data[x, z].values = vals;
+                    data[x, z].biome = sampler.Sample(vals);
                 }
             }
 
             sw.Stop();
             Debug.Log($"Sample Total Time {sw.ElapsedMilliseconds} ms");
 
-            // m_textureData = data;
+            m_biomeData = data;
             
             return GenerateBiomeMap(data, m_width, m_height);
         }
         
-        private static Texture2D GenerateBiomeMap(BiomeType[,] data, int width, int height)
+        private static Texture2D GenerateBiomeMap(BiomeData[,] data, int width, int height)
         {
             var sw = Stopwatch.StartNew();
 
@@ -281,7 +385,7 @@ namespace RS.Scene
                 {
                     var srcX = Mathf.Clamp(Mathf.RoundToInt((float)x / width * dataWidth), 0, dataWidth - 1);
                     var srcY = Mathf.Clamp(Mathf.RoundToInt((float)y / height * dataHeight), 0, dataHeight - 1);
-                    colorArray[x + y * width] = BiomeColor.Colors[(int)data[srcX, srcY]];
+                    colorArray[x + y * width] = BiomeColor.Colors[(int)data[srcX, srcY].biome];
                 }
             }
             
