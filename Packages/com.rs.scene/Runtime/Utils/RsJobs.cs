@@ -34,10 +34,10 @@ namespace RS.Utils
 
         private Color Viridis(float v)
         {
-            if (Mathf.Abs(v - 0.5f) < 0.01f)
-            {
-                return Color.red;
-            }
+            // if (Mathf.Abs(v - 0.5f) < 0.01f)
+            // {
+            //     return Color.red;
+            // }
             
             var index = Mathf.FloorToInt(v * 255.0f);
             return viridisLUT[index];

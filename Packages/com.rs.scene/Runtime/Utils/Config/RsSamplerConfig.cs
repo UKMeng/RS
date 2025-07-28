@@ -66,6 +66,20 @@ namespace RS.Utils
                     
                     break;
                 }
+                case "cube":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new CubeSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
                 case "halfNegative":
                 {
                     if (arguments.TryGetValue("value", out var value))
@@ -94,6 +108,24 @@ namespace RS.Utils
                     
                     break;
                 }
+                case "clamp":
+                {
+                    if (arguments.TryGetValue("value", out var valueToken) &&
+                        arguments.TryGetValue("min", out var minToken) &&
+                        arguments.TryGetValue("max", out var maxToken))
+                    {
+                        var value = ParseJTokenToSampler(valueToken);
+                        var min = minToken.ToObject<float>();
+                        var max = maxToken.ToObject<float>();
+                        sampler = new ClampSampler(value, min, max);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
                 case "yClampedGradient":
                 {
                     if (arguments.TryGetValue("min", out var minToken) &&
@@ -106,6 +138,20 @@ namespace RS.Utils
                         var from = fromToken.ToObject<float>();
                         var to = toToken.ToObject<float>();
                         sampler = new YClampedGradientSampler(min, max, from, to);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "squeeze":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new SqueezeSampler(valueSampler);
                     }
                     else
                     {
@@ -134,6 +180,20 @@ namespace RS.Utils
                     {
                         var valueSampler = ParseJTokenToSampler(value);
                         sampler = new Cache2DSampler(valueSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
+                case "cacheOnce":
+                {
+                    if (arguments.TryGetValue("value", out var value))
+                    {
+                        var valueSampler = ParseJTokenToSampler(value);
+                        sampler = new CacheOnceSampler(valueSampler);
                     }
                     else
                     {
@@ -180,6 +240,38 @@ namespace RS.Utils
                         var leftSampler = ParseJTokenToSampler(left);
                         var rightSampler = ParseJTokenToSampler(right);
                         sampler = new MulSampler(leftSampler, rightSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+
+                    break;
+                }
+                case "max":
+                {
+                    if (arguments.TryGetValue("left", out var left)
+                        && arguments.TryGetValue("right", out var right))
+                    {
+                        var leftSampler = ParseJTokenToSampler(left);
+                        var rightSampler = ParseJTokenToSampler(right);
+                        sampler = new MaxSampler(leftSampler, rightSampler);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+
+                    break;
+                }
+                case "min":
+                {
+                    if (arguments.TryGetValue("left", out var left)
+                        && arguments.TryGetValue("right", out var right))
+                    {
+                        var leftSampler = ParseJTokenToSampler(left);
+                        var rightSampler = ParseJTokenToSampler(right);
+                        sampler = new MinSampler(leftSampler, rightSampler);
                     }
                     else
                     {
@@ -279,6 +371,29 @@ namespace RS.Utils
                         var yScale = yScaleValue.ToObject<float>();
 
                         sampler = new ShiftedNoiseSampler(noise, samplerX, samplerY, samplerZ, xzScale, yScale);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+
+                    break;
+                }
+                case "rangeChoice":
+                {
+                    if (arguments.TryGetValue("input", out var inputToken)
+                        && arguments.TryGetValue("inRange", out var inRangeToken)
+                        && arguments.TryGetValue("outRange", out var outRangeToken)
+                        && arguments.TryGetValue("min", out var minToken)
+                        && arguments.TryGetValue("max", out var maxToken))
+                    {
+                        var input = ParseJTokenToSampler(inputToken);
+                        var inRange = ParseJTokenToSampler(inRangeToken);
+                        var outRange = ParseJTokenToSampler(outRangeToken);
+                        var min = minToken.ToObject<float>();
+                        var max = maxToken.ToObject<float>();
+                        
+                        sampler = new RangeChoiceSampler(input, inRange, outRange, min, max);
                     }
                     else
                     {

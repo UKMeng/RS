@@ -1,0 +1,12 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type": "yClampedGradient",
+    "arguments": {
+      "min": -4064,
+      "max": 4062,
+      "from": -4064,
+      "to": 4062
+    }
+  }
+}

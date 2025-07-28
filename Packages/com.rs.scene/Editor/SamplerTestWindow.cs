@@ -291,13 +291,6 @@ namespace RS.Scene
             var startY = m_startPos.y;
             var startZ = m_startPos.z;
 
-            m_samplers[0] = m_configManager.GetSamplerConfig("Continents").BuildRsSampler();
-            // m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
-            m_samplers[2] = m_configManager.GetSamplerConfig("Erosion").BuildRsSampler();
-            m_samplers[3] = m_configManager.GetSamplerConfig("BiomeHumidity").BuildRsSampler();
-            m_samplers[4] = m_configManager.GetSamplerConfig("BiomeTemperature").BuildRsSampler();
-            m_samplers[5] = m_configManager.GetSamplerConfig("Ridges").BuildRsSampler();
-
             var sw = Stopwatch.StartNew();
 
             for (int x = 0; x < m_samplerWidth; x++)

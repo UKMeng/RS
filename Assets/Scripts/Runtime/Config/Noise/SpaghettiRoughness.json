@@ -1,0 +1,9 @@
+﻿{
+  "type" : "noise",
+  "arguments": {
+    "amplitudes": [
+      1
+    ],
+    "firstOctave": -5
+  }
+}

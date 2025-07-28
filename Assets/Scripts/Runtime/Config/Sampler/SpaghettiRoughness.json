@@ -1,0 +1,52 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "cacheOnce",
+    "arguments": {
+      "value": {
+        "type": "mul",
+        "arguments": {
+          "left": {
+            "type": "add",
+            "arguments": {
+              "left": -0.05,
+              "right": {
+                "type": "mul",
+                "arguments": {
+                  "left": -0.05,
+                  "right": {
+                    "type": "noise",
+                    "arguments": {
+                      "noise": "SpaghettiRoughnessModulator",
+                      "xzScale": 1,
+                      "yScale": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "right": {
+            "type": "add",
+            "arguments": {
+              "left": -0.4,
+              "right": {
+                "type": "abs",
+                "arguments": {
+                  "value": {
+                    "type": "noise",
+                    "arguments": {
+                      "noise": "SpaghettiRoughness",
+                      "xzScale": 1,
+                      "yScale": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -83,7 +83,7 @@ namespace RS.Scene
             
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(0, 64, 0);
+            var pos = new Vector3(0, 90, 0);
             player.transform.position = pos;
         }
 

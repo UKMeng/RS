@@ -1,0 +1,137 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "rangeChoice",
+    "arguments": {
+      "input": {
+        "type": "interpolated",
+        "arguments": {
+          "value": {
+            "type": "rangeChoice",
+            "arguments": {
+              "input": "YLimit",
+              "inRange": {
+                "type": "noise",
+                "arguments": {
+                  "noise": "Noodle",
+                  "xzScale": 1,
+                  "yScale": 1
+                }
+              },
+              "outRange": -1,
+              "min": -60,
+              "max": 321
+            }
+          }
+        }
+      },
+      "min": -100000,
+      "max": 0,
+      "inRange": 64,
+      "outRange": {
+        "type": "add",
+        "arguments": {
+          "left": {
+            "type": "interpolated",
+            "arguments": {
+              "value": {
+                "type": "rangeChoice",
+                "arguments": {
+                  "input": "YLimit",
+                  "inRange": {
+                    "type": "add",
+                    "arguments": {
+                      "left": -0.075,
+                      "right": {
+                        "type": "mul",
+                        "arguments": {
+                          "left": -0.025,
+                          "right": {
+                            "type": "noise",
+                            "arguments": {
+                              "noise": "NoodleThickness",
+                              "xzScale": 1,
+                              "yScale": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "outRange": 0,
+                  "min": -60,
+                  "max": 321
+                }
+              }
+            }
+          },
+          "right": {
+            "type": "mul",
+            "arguments": {
+              "left": 1.5,
+              "right": {
+                "type": "max",
+                "arguments": {
+                  "left": {
+                    "type": "abs",
+                    "arguments": {
+                      "value": {
+                        "type": "interpolated",
+                        "arguments": {
+                          "value": {
+                            "type": "rangeChoice",
+                            "arguments": {
+                              "input": "YLimit",
+                              "inRange": {
+                                "type": "noise",
+                                "arguments": {
+                                  "noise": "NoodleRidgeA",
+                                  "xzScale": 2.66666,
+                                  "yScale": 2.66666
+                                }
+                              },
+                              "outRange": 0,
+                              "min": -60,
+                              "max": 321
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right": {
+                    "type": "abs",
+                    "arguments": {
+                      "value": {
+                        "type": "interpolated",
+                        "arguments": {
+                          "value": {
+                            "type": "rangeChoice",
+                            "arguments": {
+                              "input": "YLimit",
+                              "inRange": {
+                                "type": "noise",
+                                "arguments": {
+                                  "noise": "NoodleRidgeB",
+                                  "xzScale": 2.66666,
+                                  "yScale": 2.66666
+                                }
+                              },
+                              "outRange": 0,
+                              "min": -60,
+                              "max": 321
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

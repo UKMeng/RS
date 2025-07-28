@@ -1,0 +1,27 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "add",
+    "arguments" : {
+      "left" : {
+        "type": "mul",
+        "arguments": {
+          "left": 4,
+          "right": {
+            "type": "quarterNegative",
+            "arguments": {
+              "value": {
+                "type": "mul",
+                "arguments": {
+                  "left": "Depth",
+                  "right": "Factor"
+                }
+              }
+            }
+          }
+        }
+      },
+      "right" : "Base3D"
+    }
+  }
+}

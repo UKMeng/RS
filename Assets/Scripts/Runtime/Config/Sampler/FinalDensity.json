@@ -1,9 +1,8 @@
 ﻿{
   "type": "sampler",
   "arguments": {
-    "type" : "interpolated",
+    "type": "min",
     "arguments": {
-      "value": "SurfaceHeight"
     }
   }
 }

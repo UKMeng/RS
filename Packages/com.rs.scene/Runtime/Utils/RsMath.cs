@@ -69,18 +69,6 @@ namespace RS.Utils
         {
             return ClampedLerp(from, to, Mathf.InverseLerp(min, max, value));
         }
-        
-
-        /// <summary>
-        /// https://minecraft.wiki/w/Density_function#squeeze
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static float Squeeze(float value)
-        {
-            var t = Clamp(value, -1.0f, 1.0f);
-            return t * 0.5f - t * t * t / 24.0f;
-        }
 
         public static float BilLerp(float tx, float ty, float c00, float c10, float c01, float c11)
         {

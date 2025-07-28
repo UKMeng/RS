@@ -1,0 +1,11 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "noise",
+    "arguments": {
+      "noise": "MainNoise",
+      "xzScale": 0.25,
+      "yScale": 0.125
+    }
+  }
+}

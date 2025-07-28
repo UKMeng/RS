@@ -34,18 +34,25 @@ namespace RS.Utils
             "Continentalness",
             "Erosion",
             "Humidity",
+            "Jagged",
             "Offset",
+            "Pillar",
+            "PillarRareness",
+            "PillarThickness",
             "Ridges",
             "Temperature"
         };
 
         private static string[] m_presetSamplers = new string[]
         {
+            "Base3D",
             "BiomeHumidity",
             "BiomeTemperature",
+            "CavePillars",
             "Continents",
             "Depth",
             "Erosion",
+            "Factor",
             "Humidity",
             "InterTest",
             "Offset",
@@ -53,8 +60,9 @@ namespace RS.Utils
             "RidgesFolded",
             "ShiftX",
             "ShiftZ",
-            "SplineTest",
+            "SurfaceHeight",
             "Temperature",
+            "YLimit",
         };
 
         private static string[] m_presetBiomeSources = new string[]

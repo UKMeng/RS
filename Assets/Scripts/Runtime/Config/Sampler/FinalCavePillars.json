@@ -1,0 +1,14 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "rangeChoice",
+    "arguments": {
+      "input": "CavePillars",
+      "inRange": -100000,
+      "outRange": "CavePillars",
+      "min": -100000,
+      "max": 0.03
+    }
+  }
+}
+    
