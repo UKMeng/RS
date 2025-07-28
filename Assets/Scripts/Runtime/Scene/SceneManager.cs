@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using UnityEngine.Profiling;
 
 using RS.Utils;
 using RS.GMTool;
@@ -425,7 +426,6 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunkX} {chunkY} {chunkZ} 数据耗时 {sw.ElapsedMilliseconds} ms");
-
             return Chunk.BuildMesh(blocks, 32, 32);
         }
 
