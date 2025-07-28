@@ -448,8 +448,11 @@ namespace RS.Utils
             
             if (token.Type == JTokenType.String)
             {
-                var config = RsConfigManager.Instance.GetSamplerConfig(token.ToObject<string>());
-                return config.BuildRsSampler();
+                var samplerName = token.Value<string>();
+                return RsSamplerManager.Instance.GetOrCreateSampler(samplerName);
+                //
+                // var config = RsConfigManager.Instance.GetSamplerConfig(token.ToObject<string>());
+                // return config.BuildRsSampler();
             }
             
             if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)

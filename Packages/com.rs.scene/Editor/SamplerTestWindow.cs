@@ -55,6 +55,7 @@ namespace RS.Scene
         private static void ReloadConfigManager()
         {
             RsConfigManager.Reload();
+            RsSamplerManager.Reload();
         }
         
         [MenuItem("RS/Sampler Test")]
@@ -65,6 +66,7 @@ namespace RS.Scene
 
         private void OnEnable()
         {
+            RsSamplerManager.Reload();
             m_configManager = RsConfigManager.Instance;
             m_presetSamplerStrs = m_configManager.GetLoadedSamplerConfigName();
             m_showBiomeMap = false;
