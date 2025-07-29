@@ -5,23 +5,23 @@ namespace RS.Utils
 {
     public class RsSamplerManager
     {
-        private static RsSamplerManager m_instance;
+        private static RsSamplerManager s_instance;
 
         public static RsSamplerManager Instance
         {
             get
             {
-                if (m_instance == null)
+                if (s_instance == null)
                 {
-                    m_instance = new RsSamplerManager();
+                    s_instance = new RsSamplerManager();
                 }
-                return m_instance;
+                return s_instance;
             }
         }
 
         public static void Reload()
         {
-            m_instance = new RsSamplerManager();
+            s_instance = new RsSamplerManager();
         }
 
         private Dictionary<string, RsSampler> m_samplers;
@@ -36,8 +36,7 @@ namespace RS.Utils
         {
             if (!m_samplers.TryGetValue(samplerName, out var sampler))
             {
-                Debug.Log($"[RsSamplerManager]实例化{samplerName}");
-                
+                // Debug.Log($"[RsSamplerManager]实例化{samplerName}");
                 var config = RsConfigManager.Instance.GetSamplerConfig(samplerName);
                 sampler = config.BuildRsSampler();
                 m_samplers.Add(samplerName, sampler);

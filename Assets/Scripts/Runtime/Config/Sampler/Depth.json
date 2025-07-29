@@ -7,7 +7,7 @@
         "type" : "yClampedGradient",
         "arguments" : {
           "min": 0,
-          "max": 512,
+          "max": 384,
           "from": 1.5,
           "to": -1.5
         }

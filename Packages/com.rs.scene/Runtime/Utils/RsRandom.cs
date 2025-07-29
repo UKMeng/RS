@@ -7,28 +7,28 @@ namespace RS.Utils
 {
     public class RsRandom
     {
-        private static RsRandom m_instance;
+        private static RsRandom s_instance;
 
         public static RsRandom Instance
         {
             get
             {
-                if (m_instance == null)
+                if (s_instance == null)
                 {
                     var seed = GetSeed();
                     Debug.Log($"[Random] RsRandom Instance Init with Seed {seed}");
-                    m_instance = new RsRandom(seed);
+                    s_instance = new RsRandom(seed);
                 }
 
-                return m_instance;
+                return s_instance;
             }
         }
 
         public static RsRandom Init(Int64 seed)
         {
             Debug.Log($"[Random] RsRandom Instance Init with Seed {seed}");
-            m_instance = new RsRandom(seed);
-            return m_instance;
+            s_instance = new RsRandom(seed);
+            return s_instance;
         }
         
         private UInt64 m_seed;

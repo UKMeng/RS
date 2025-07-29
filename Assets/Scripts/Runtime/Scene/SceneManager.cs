@@ -10,6 +10,7 @@ using UnityEngine.Profiling;
 
 using RS.Utils;
 using RS.GMTool;
+using RS.Scene.Biome;
 
 namespace RS.Scene
 {
@@ -25,6 +26,20 @@ namespace RS.Scene
         public Vector3Int chunkPos;
         public MeshData meshData;
         public BlockType[] blocks;
+    }
+
+    /// <summary>
+    /// 用于判断地表方块的数据上下文
+    /// </summary>
+    public struct SurfaceContext
+    {
+        public BiomeType biome;
+        public float surfaceNoise;
+        public float surfaceDepth;
+        public int waterHeight;
+        public int stoneDepthAbove;
+        public int stoneDepthBelow;
+        public int minSurfaceLevel;
     }
 
     public enum ChunkStatus
@@ -202,8 +217,8 @@ namespace RS.Scene
                     var chunkX = px + offsetX;
                     var chunkZ = pz + offsetZ;
 
-                    // 目前先假定y轴上能有128m 8个chunk
-                    for (var chunkY = 7; chunkY > -1; chunkY--)
+                    // 目前先假定y轴上能有192m 12个chunk
+                    for (var chunkY = 11; chunkY > -1; chunkY--)
                     {
                         var chunkPos = new Vector3Int(chunkX, chunkY, chunkZ);
                         
@@ -366,7 +381,7 @@ namespace RS.Scene
                         var sampleY = offsetY + sy;
                         var sampleZ = offsetZ + sz;
                         var density = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
-                        blocks[index++] = JudgeBlockType(density, sx + offsetX, sy + offsetY, sz + offsetZ);
+                        blocks[index++] = JudgeBlockType(density);
                     }
                 }
             }
@@ -420,7 +435,7 @@ namespace RS.Scene
                         // var sampleZ = offsetZ + sz;
                         // var density = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
                         var density = batchSampleResult[sx, sy, sz];
-                        blocks[index++] = JudgeBlockType(density, sx + offsetX, sy + offsetY, sz + offsetZ);
+                        blocks[index++] = JudgeBlockType(density);
                         
                         // noiseSamples[sx, sy, sz] = SampleNoise(sampleX, sampleY, sampleZ);
                         // noiseSamples[sx, sy, sz] = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
@@ -433,7 +448,7 @@ namespace RS.Scene
             return Chunk.BuildMesh(blocks, 32, 32);
         }
         
-        private BlockType JudgeBlockType(float density, int x, int y, int z)
+        private BlockType JudgeBlockType(float density)
         {
             if (density > 0)
             {

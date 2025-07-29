@@ -14,8 +14,7 @@ namespace RS.Utils
 
         public BiomeSampler()
         {
-            var configManager = RsConfigManager.Instance;
-            m_sourceTree = new BiomeSourceTree(configManager.GetBiomeSource("BiomeSource"));
+            m_sourceTree = new BiomeSourceTree(RsConfigManager.Instance.GetBiomeSource("BiomeSource"));
         }
 
         public BiomeType Sample(float[] vals)

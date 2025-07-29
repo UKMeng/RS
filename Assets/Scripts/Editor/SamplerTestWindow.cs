@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using RS.Scene.Biome;
 using RS.Utils;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -42,8 +43,7 @@ namespace RS.Scene
         private Texture2D m_texture;
         private float[,] m_textureData;
         private Vector3 m_pickData;
-
-        private RsSampler[] m_samplers;
+        
         private Texture2D m_biomeMap;
         private BiomeData[,] m_biomeData;
         private BiomeData m_pickBiomeData;
@@ -51,11 +51,10 @@ namespace RS.Scene
 
         private RsConfigManager m_configManager;
 
-        [MenuItem("RS/重载Config Manager")]
-        private static void ReloadConfigManager()
+        [MenuItem("RS/重载Noise Manager")]
+        private static void ReloadNoiseManager()
         {
-            RsConfigManager.Reload();
-            RsSamplerManager.Reload();
+            NoiseManager.Init(20250715);
         }
         
         [MenuItem("RS/Sampler Test")]
@@ -66,9 +65,9 @@ namespace RS.Scene
 
         private void OnEnable()
         {
-            RsSamplerManager.Reload();
-            m_configManager = RsConfigManager.Instance;
-            m_presetSamplerStrs = m_configManager.GetLoadedSamplerConfigName();
+            NoiseManager.Init(m_seed);
+            
+            m_presetSamplerStrs = RsConfigManager.Instance.GetLoadedSamplerConfigName();
             m_showBiomeMap = false;
         }
 
@@ -100,12 +99,12 @@ namespace RS.Scene
             if (GUILayout.Button("Generate New Seed", buttonStyle))
             {
                 m_seed = RsRandom.GetSeed();
-                RsSamplerManager.Reload();
+                NoiseManager.Init(m_seed);
             }
 
-            if (GUILayout.Button("Refresh Configs", buttonStyle))
+            if (GUILayout.Button("Noise Manager Reload", buttonStyle))
             {
-                m_configManager = RsConfigManager.Reload();
+                NoiseManager.Init(m_seed);
             }
             EditorGUILayout.EndHorizontal();
             
@@ -145,11 +144,7 @@ namespace RS.Scene
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
-                // 重置随机数生成器，保持生成结果确定
-                var rng = RsRandom.Init(m_seed);
-
-                var samplerConfig = m_configManager.GetSamplerConfig(m_sampler);
-                var sampler = samplerConfig.BuildRsSampler();
+                var sampler = RsSamplerManager.Instance.GetOrCreateSampler(m_sampler);
                 
                 m_texture = Sample(sampler);
                 m_biomeMap = null;
@@ -158,19 +153,7 @@ namespace RS.Scene
             // 采样并生成Biome Map
             if (GUILayout.Button("Generate Biome Map", buttonStyle))
             {
-                // 重置随机数生成器，保持生成结果确定
-                var rng = RsRandom.Init(m_seed);
-
-                var biomeSampler = new BiomeSampler();
-                m_samplers = new RsSampler[6];
-                m_samplers[0] = m_configManager.GetSamplerConfig("Continents").BuildRsSampler();
-                // m_samplers[1] = configManager.GetSamplerConfig("Depth").BuildRsSampler();
-                m_samplers[2] = m_configManager.GetSamplerConfig("Erosion").BuildRsSampler();
-                m_samplers[3] = m_configManager.GetSamplerConfig("BiomeHumidity").BuildRsSampler();
-                m_samplers[4] = m_configManager.GetSamplerConfig("BiomeTemperature").BuildRsSampler();
-                m_samplers[5] = m_configManager.GetSamplerConfig("Ridges").BuildRsSampler();
-
-                m_biomeMap = BiomeMapSample(biomeSampler);
+                m_biomeMap = BiomeMapSample();
                 m_texture = null;
             }
             
@@ -322,7 +305,7 @@ namespace RS.Scene
             return RsJobs.GenerateTexture(data, m_width, m_height);
         }
         
-        private Texture2D BiomeMapSample(BiomeSampler sampler)
+        private Texture2D BiomeMapSample()
         {
             var data = new BiomeData[m_samplerWidth, m_samplerHeight];
 
@@ -338,25 +321,13 @@ namespace RS.Scene
                 for (int z = 0; z < m_samplerHeight; z++)
                 {
                     var pos = new Vector3(startX + x, startY, startZ + z);
-                    var vals = new float[7];
 
-                    for (var i = 0; i < 6; i++)
-                    {
-                        // 跳过深度采样
-                        if (i == 1)
-                        {
-                            continue;
-                        }
-
-                        vals[i] = m_samplers[i].Sample(pos);
-                    }
-
-                    vals[6] = RsMath.RidgesFolded(vals[5]);
-
+                    var biome = NoiseManager.Instance.SampleBiome(pos, out var vals);
+                    
                     data[x, z].x = startX + x;
                     data[x, z].z = startZ + z;
                     data[x, z].values = vals;
-                    data[x, z].biome = sampler.Sample(vals);
+                    data[x, z].biome = biome;
                 }
             }
 

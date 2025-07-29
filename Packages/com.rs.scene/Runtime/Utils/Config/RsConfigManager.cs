@@ -8,25 +8,25 @@ namespace RS.Utils
 {
     public class RsConfigManager
     {
-        private static RsConfigManager m_instance;
+        private static RsConfigManager s_instance;
         
         public static RsConfigManager Instance
         {
             get
             {
-                if (m_instance == null)
+                if (s_instance == null)
                 {
-                    m_instance = new RsConfigManager();
+                    s_instance = new RsConfigManager();
                 }
 
-                return m_instance;
+                return s_instance;
             }
         }
 
         public static RsConfigManager Reload()
         {
-            m_instance = new RsConfigManager();
-            return m_instance;
+            s_instance = new RsConfigManager();
+            return s_instance;
         }
 
         private static string[] m_presetNoises = new string[]
@@ -53,6 +53,7 @@ namespace RS.Utils
             "Depth",
             "Erosion",
             "Factor",
+            "FinalDensity",
             "Humidity",
             "InterTest",
             "Offset",
@@ -60,7 +61,7 @@ namespace RS.Utils
             "RidgesFolded",
             "ShiftX",
             "ShiftZ",
-            "SurfaceHeight",
+            "SurfaceDensity",
             "Temperature",
             "YLimit",
         };

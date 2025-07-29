@@ -3,7 +3,7 @@
   "arguments": {
     "type" : "interpolated",
     "arguments": {
-      "value": "SurfaceHeight"
+      "value": "FinalDensity"
     }
   }
 }
