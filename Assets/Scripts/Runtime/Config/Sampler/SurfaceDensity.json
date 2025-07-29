@@ -1,0 +1,91 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "add",
+    "arguments": {
+      "left": 0.1171875,
+      "right": {
+        "type": "mul",
+        "arguments": {
+          "left": {
+            "type": "yClampedGradient",
+            "arguments": {
+              "min": 0,
+              "max": 24,
+              "from": 0,
+              "to": 1
+            }
+          },
+          "right": {
+            "type": "add",
+            "arguments": {
+              "left": -0.1171875,
+              "right": {
+                "type": "add",
+                "arguments": {
+                  "left": -0.078125,
+                  "right": {
+                    "type": "mul",
+                    "arguments": {
+                      "left": {
+                        "type": "yClampedGradient",
+                        "arguments": {
+                          "min": 304,
+                          "max": 320,
+                          "from": 1,
+                          "to": 0
+                        }
+                      },
+                      "right": {
+                        "type": "add",
+                        "arguments": {
+                          "left": 0.078125,
+                          "right": {
+                            "type": "clamp",
+                            "arguments": {
+                              "value": {
+                                "type": "add",
+                                "arguments": {
+                                  "left": -0.703125,
+                                  "right": {
+                                    "type": "mul",
+                                    "arguments": {
+                                      "left": 4,
+                                      "right": {
+                                        "type": "quarterNegative",
+                                        "arguments": {
+                                          "value": {
+                                            "type": "mul",
+                                            "arguments": {
+                                              "left": "Depth",
+                                              "right": {
+                                                "type": "cache2D",
+                                                "arguments": {
+                                                  "value": "Factor"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "min": -64,
+                              "max": 64
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

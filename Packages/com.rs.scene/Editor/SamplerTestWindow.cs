@@ -100,6 +100,7 @@ namespace RS.Scene
             if (GUILayout.Button("Generate New Seed", buttonStyle))
             {
                 m_seed = RsRandom.GetSeed();
+                RsSamplerManager.Reload();
             }
 
             if (GUILayout.Button("Refresh Configs", buttonStyle))
