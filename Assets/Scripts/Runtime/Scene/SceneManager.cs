@@ -12,29 +12,6 @@ using RS.Scene.Biome;
 
 namespace RS.Scene
 {
-    
-    
-    // public struct ChunkData
-    // {
-    //     public Vector3Int chunkPos;
-    //     public MeshData meshData;
-    //     public BlockType[] blocks;
-    // }
-
-    /// <summary>
-    /// 用于判断地表方块的数据上下文
-    /// </summary>
-    public struct SurfaceContext
-    {
-        public BiomeType biome;
-        public float surfaceNoise;
-        public float surfaceDepth;
-        public int waterHeight;
-        public int stoneDepthAbove;
-        public int stoneDepthBelow;
-        public int minSurfaceLevel;
-    }
-    
     public class SceneManager: MonoBehaviour
     {
         public GameObject chunkPrefab;

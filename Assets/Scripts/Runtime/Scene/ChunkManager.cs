@@ -3,12 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using RS.Scene.Biome;
 using RS.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
+    /// <summary>
+    /// 用于判断地表方块的数据上下文
+    /// </summary>
+    public struct SurfaceContext
+    {
+        public BiomeType biome;
+        public float surfaceNoise;
+        public float surfaceDepth;
+        public int waterHeight;
+        public int stoneDepthAbove;
+        public int stoneDepthBelow;
+        public int minSurfaceLevel;
+    }
+    
     public class ChunkManager: MonoBehaviour
     {
         public GameObject chunkPrefab;
@@ -144,10 +159,12 @@ namespace RS.Scene
                         
                     var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
                     
+                    var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
+                    
                     var mesh = new Mesh();
-                    mesh.vertices = chunk.meshData.vertices;
-                    mesh.triangles = chunk.meshData.triangles;
-                    mesh.uv = chunk.meshData.uvs;
+                    mesh.vertices = meshData.vertices;
+                    mesh.triangles = meshData.triangles;
+                    mesh.uv = meshData.uvs;
                     mesh.RecalculateNormals();
                     
                     var chunkTf = chunkGo.GetComponent<MeshFilter>();
@@ -208,7 +225,25 @@ namespace RS.Scene
                     for (var sy = 0; sy < 32; sy++)
                     {
                         var density = batchSampleResult[sx, sy, sz];
-                        blocks[index++] = JudgeBlockType(density);
+                        blocks[index++] = JudgeBaseBlockType(density);
+                    }
+                }
+            }
+            
+            // Surface判断，后续放到其他地方去
+            index = 0;
+            for (var sx = 0; sx < 32; sx++)
+            {
+                for (var sz = 0; sz < 32; sz++)
+                {
+                    for (var sy = 0; sy < 32; sy++)
+                    {
+                        if (blocks[index] != BlockType.Air)
+                        {
+                            blocks[index] = JudgeSurfaceBlockType(new SurfaceContext());
+                        }
+
+                        index++;
                     }
                 }
             }
@@ -217,13 +252,14 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} 数据耗时 {sw.ElapsedMilliseconds} ms");
-            
-            chunk.meshData = Chunk.BuildMesh(blocks, 32, 32);
+        }
 
-            return;
+        private BlockType JudgeSurfaceBlockType(SurfaceContext context)
+        {
+            return BlockType.Dirt;
         }
         
-        private BlockType JudgeBlockType(float density)
+        private BlockType JudgeBaseBlockType(float density)
         {
             return density > 0 ? BlockType.Stone : BlockType.Air;
         }
