@@ -2,14 +2,13 @@
 using System.Diagnostics;
 using RS.Scene.Biome;
 using RS.Utils;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
-    public struct BiomeData
+    public struct BiomeMapData
     {
         public BiomeType biome;
         public float[] values;
@@ -45,8 +44,8 @@ namespace RS.Scene
         private Vector3 m_pickData;
         
         private Texture2D m_biomeMap;
-        private BiomeData[,] m_biomeData;
-        private BiomeData m_pickBiomeData;
+        private BiomeMapData[,] m_biomeData;
+        private BiomeMapData m_PickBiomeMapData;
         private bool m_showBiomeMap = false;
 
         private RsConfigManager m_configManager;
@@ -163,7 +162,7 @@ namespace RS.Scene
                 if (m_showBiomeMap == false)
                 {
                     m_showBiomeMap = true;
-                    m_pickBiomeData = m_biomeData[0, 0];
+                    m_PickBiomeMapData = m_biomeData[0, 0];
                 }
                 
                 GUILayout.Label(m_biomeMap, GUILayout.Width(m_width), GUILayout.Height(m_height));
@@ -178,7 +177,7 @@ namespace RS.Scene
                     var pu = Mathf.Clamp(Mathf.FloorToInt(u * m_samplerWidth), 0, m_samplerWidth - 1);
                     var pv = m_samplerHeight - Mathf.Clamp(Mathf.FloorToInt(v * m_samplerHeight), 0, m_samplerHeight - 1);
 
-                    m_pickBiomeData = m_biomeData[pu, pv];
+                    m_PickBiomeMapData = m_biomeData[pu, pv];
                 }
             }
 
@@ -186,31 +185,31 @@ namespace RS.Scene
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("X:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField((m_pickBiomeData.x).ToString("F1"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField((m_PickBiomeMapData.x).ToString("F1"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("Z:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField((m_pickBiomeData.z).ToString("F1"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField((m_PickBiomeMapData.z).ToString("F1"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("c:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[0].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[0].ToString("F3"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("e:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[2].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[2].ToString("F3"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("h:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[3].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[3].ToString("F3"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("t:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[4].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[4].ToString("F3"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("r:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[5].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[5].ToString("F3"), labelStyle, GUILayout.Width(60));
 
                 EditorGUILayout.LabelField("pv:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.values[6].ToString("F3"), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.values[6].ToString("F3"), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.LabelField("biome:", labelStyle, GUILayout.Width(60));
-                EditorGUILayout.LabelField(m_pickBiomeData.biome.ToString(), labelStyle, GUILayout.Width(60));
+                EditorGUILayout.LabelField(m_PickBiomeMapData.biome.ToString(), labelStyle, GUILayout.Width(60));
                 
                 EditorGUILayout.EndHorizontal();
                 
@@ -307,7 +306,7 @@ namespace RS.Scene
         
         private Texture2D BiomeMapSample()
         {
-            var data = new BiomeData[m_samplerWidth, m_samplerHeight];
+            var data = new BiomeMapData[m_samplerWidth, m_samplerHeight];
 
             var startX = m_startPos.x;
             var startY = m_startPos.y;
@@ -339,7 +338,7 @@ namespace RS.Scene
             return GenerateBiomeMap(data, m_width, m_height);
         }
         
-        private static Texture2D GenerateBiomeMap(BiomeData[,] data, int width, int height)
+        private static Texture2D GenerateBiomeMap(BiomeMapData[,] data, int width, int height)
         {
             var sw = Stopwatch.StartNew();
 

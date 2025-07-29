@@ -87,9 +87,8 @@ namespace RS.Scene
             // 初始化Block UV
             Block.Init();
             
-            // 初始化噪声 ;
-            RsRandom.Init(seed);
-            RsSamplerManager.Reload();
+            // 初始化噪声
+            NoiseManager.Init(seed);
             m_sampler = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
 
             m_chunks = new Dictionary<Vector3Int, GameObject>();
@@ -450,14 +449,7 @@ namespace RS.Scene
         
         private BlockType JudgeBlockType(float density)
         {
-            if (density > 0)
-            {
-                return BlockType.Stone;
-            }
-            else
-            {
-                return BlockType.Air;
-            }
+            return density > 0 ? BlockType.Stone : BlockType.Air;
         }
         
     }
