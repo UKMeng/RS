@@ -71,7 +71,11 @@ namespace RS.Scene
 
             m_chunkManager = gameObject.AddComponent<ChunkManager>();
             m_chunkManager.chunkPrefab = chunkPrefab;
-            m_chunkManager.playerTransform = m_player;
+            
+            // 放置Player
+            // TODO: 后续位置要虽然随机但是要放在一个平地上
+            var pos = new Vector3(0, 90, 0);
+            m_player.position = pos;
         }
 
         /// <summary>
@@ -85,89 +89,7 @@ namespace RS.Scene
 
         public void Update()
         {
-            // 放置Player
-            // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(0, 90, 0);
-            m_player.position = pos;
-            // var x = Mathf.FloorToInt(pos.x / 32.0f);
-            // var z = Mathf.FloorToInt(pos.z / 32.0f);
-            //
-            // var toDeactivate = new List<Vector3>();
-            // var toDestroy = new List<Vector3>();
-            //
-            // // 优先加载后台生成好的Chunk
-            // while (m_chunkDataQueue.TryDequeue(out var chunkData))
-            // {
-            //     var chunkTsfPos = new Vector3(chunkData.chunkPos.x * 32, chunkData.chunkPos.y * 16,
-            //         chunkData.chunkPos.z * 32);
-            //
-            //     var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
-            //     var chunk = chunkGo.GetComponent<Chunk>();
-            //     chunk.blocks = chunkData.blocks;
-            //
-            //     var mesh = new Mesh();
-            //     mesh.vertices = chunkData.meshData.vertices;
-            //     mesh.triangles = chunkData.meshData.triangles;
-            //     mesh.uv = chunkData.meshData.uvs;
-            //     mesh.RecalculateNormals();
-            //     
-            //     var chunkTf = chunk.GetComponent<MeshFilter>();
-            //     chunkTf.mesh = mesh;
-            //
-            //     var chunkMc = chunk.GetComponent<MeshCollider>();
-            //     chunkMc.sharedMesh = mesh;
-            //
-            //     m_chunks[chunkData.chunkPos] = chunkGo;
-            //     m_loadRecord[chunkData.chunkPos] = 2;
-            // }
-            //
-            // // 遍历已有的chunk, 根据距离判断是否需要卸载或删除
-            // foreach (var chunkPos in m_loadRecord.Keys)
-            // {
-            //     var chunkX = chunkPos.x;
-            //     var chunkZ = chunkPos.z;
-            //     
-            //     if (m_loadRecord[chunkPos] == 2)
-            //     {
-            //         if (Mathf.Abs(chunkX - x) > m_deactivateDistance || Mathf.Abs(chunkZ - z) > m_deactivateDistance)
-            //         {
-            //             // 超出距离, 卸载
-            //             var chunkGo = m_chunks[chunkPos];
-            //             chunkGo.SetActive(false);
-            //         
-            //             toDeactivate.Add(chunkPos);
-            //         
-            //             Debug.Log($"[SceneManager] 触发卸载 {chunkPos}");
-            //         }
-            //     }
-            //
-            //     if (m_loadRecord[chunkPos] == 1)
-            //     {
-            //         if (Mathf.Abs(chunkX - x) > m_destroyDistance || Mathf.Abs(chunkZ - z) > m_destroyDistance)
-            //         {
-            //             // 超出距离, 删除
-            //             var chunkGo = m_chunks[chunkPos];
-            //             chunkGo.SetActive(false);
-            //             Destroy(chunkGo);
-            //             m_chunks.Remove(chunkPos);
-            //             
-            //         
-            //             toDestroy.Add(chunkPos);
-            //             Debug.Log($"[SceneManager] 触发删除 {chunkPos}");
-            //         }
-            //     }
-            // }
-            //
-            // foreach (var chunkPos in toDeactivate)
-            // {
-            //     m_loadRecord[chunkPos] = 1;
-            // }
-            //
-            // foreach (var chunkPos in toDestroy)
-            // {
-            //     m_loadRecord[chunkPos] = 0;
-            // }
-            
+            m_chunkManager.UpdateChunkStatus(m_player.position);
         }
         
         

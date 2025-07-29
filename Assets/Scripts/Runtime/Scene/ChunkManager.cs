@@ -12,15 +12,14 @@ namespace RS.Scene
     public class ChunkManager: MonoBehaviour
     {
         public GameObject chunkPrefab;
-        public Transform playerTransform;
         
         private Dictionary<Vector3Int, Chunk> m_chunks;
         private Queue<Chunk> m_chunkGeneratingQueue;
         private bool m_isGeneratingChunks;
         
-        private int m_loadDistance = 3;
-        private int m_deactivateDistance = 5;
-        private int m_destroyDistance = 10;
+        private int m_loadDistance = 6;
+        private int m_deactivateDistance = 10;
+        private int m_destroyDistance = 15;
         private int m_maxChunksPerFrame = 1;
 
         private InterpolatedSampler m_finalDensity;
@@ -39,13 +38,47 @@ namespace RS.Scene
             return m_chunks[chunkPos];
         }
         
-        public void Update()
+        public void UpdateChunkStatus(Vector3 playerPos)
         {
-            var playerChunkPos = Chunk.WorldPosToChunkPos(playerTransform.position);
-
-            var toGenerate = new List<Chunk>();
+            var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
+            
+            // 遍历已有的chunk, 根据距离判断是否需要卸载或删除
+            var playerChunkX = playerChunkPos.x;
+            var playerChunkZ = playerChunkPos.z;
+            foreach (var chunkPos in m_chunks.Keys)
+            {
+                var chunkX = chunkPos.x;
+                var chunkZ = chunkPos.z;
+                var chunk = m_chunks[chunkPos];
+                
+                if (chunk.status == ChunkStatus.Loaded)
+                {
+                    if (Mathf.Abs(chunkX - playerChunkX) > m_deactivateDistance || Mathf.Abs(chunkZ - playerChunkZ) > m_deactivateDistance)
+                    {
+                        // 超出距离, 卸载
+                        chunk.go.SetActive(false);
+                        chunk.status = ChunkStatus.Unload;
+                        
+                        Debug.Log($"[SceneManager] 触发卸载 {chunkPos}");
+                    }
+                }
+            
+                if (chunk.status == ChunkStatus.Unload)
+                {
+                    if (Mathf.Abs(chunkX - playerChunkX) > m_destroyDistance || Mathf.Abs(chunkZ - playerChunkZ) > m_destroyDistance)
+                    {
+                        // 超出距离, 删除
+                        chunk.go.SetActive(false);
+                        Destroy(chunk.go);
+                        chunk.status = ChunkStatus.Empty;
+                        
+                        Debug.Log($"[SceneManager] 触发删除 {chunkPos}");
+                    }
+                }
+            }
             
             // 收集需要加载或者更新的Chunk
+            var toGenerate = new List<Chunk>();
             for (var offsetX = -m_loadDistance; offsetX < m_loadDistance + 1; offsetX++)
             {
                 for (var offsetZ = -m_loadDistance; offsetZ < m_loadDistance + 1; offsetZ++)
@@ -89,12 +122,6 @@ namespace RS.Scene
                 }
             }
             
-            // 启动协程
-            // if (m_isGeneratingChunks)
-            // {
-            //     // 如果进入到此，说明分帧计算的chunk数量可能不太合适
-            //     Debug.LogError($"[SceneManager] 之前的协程未完成任务，此帧跳过");
-            // }
             if (!m_isGeneratingChunks && m_chunkGeneratingQueue.Count > 0)
             {
                 StartCoroutine(GenerateChunksCoroutine());
