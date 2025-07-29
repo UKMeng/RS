@@ -134,28 +134,6 @@ namespace RS.Utils
             
             return result;
         }
-        
-        public static float Fbm3D(Vector3 samplePosition, int octaves, float frequency, RsNoise noise)
-        {
-            var value = 0.0f;
-            
-            var amp = 0.5f;
-            var freq = frequency;
-
-            var gain = 0.5f;
-            var lacunarity = 2.0f;
-            
-            // var totalAmp = 0.0f;
-            
-            for (int i = 0; i < octaves; i++)
-            {
-                value += amp * noise.SimplexNoiseEvaluate(samplePosition, freq);
-                // totalAmp += amp;
-                freq *= lacunarity;
-                amp *= gain;
-            }
-            return  value;
-        }
 
         #region 3D Simplex Perlin Noise
         /*

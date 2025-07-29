@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -27,6 +28,7 @@ namespace RS.Utils
 
         public RsSamplerManager()
         {
+            Debug.Log($"[RsSamplerManager]初始化");
             m_samplers = new Dictionary<string, RsSampler>();
         }
 
@@ -34,6 +36,8 @@ namespace RS.Utils
         {
             if (!m_samplers.TryGetValue(samplerName, out var sampler))
             {
+                Debug.Log($"[RsSamplerManager]实例化{samplerName}");
+                
                 var config = RsConfigManager.Instance.GetSamplerConfig(samplerName);
                 sampler = config.BuildRsSampler();
                 m_samplers.Add(samplerName, sampler);

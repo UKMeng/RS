@@ -45,7 +45,7 @@ namespace RS.Scene
         
         private RsNoise m_noise;
 
-        private RsSampler m_sampler;
+        private InterpolatedSampler m_sampler;
 
         
         // 流式加载相关
@@ -74,7 +74,8 @@ namespace RS.Scene
             
             // 初始化噪声 ;
             RsRandom.Init(seed);
-            m_sampler = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler();
+            RsSamplerManager.Reload();
+            m_sampler = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
 
             m_chunks = new Dictionary<Vector3Int, GameObject>();
             m_chunkStatus = new Dictionary<Vector3Int, ChunkStatus>();
@@ -406,16 +407,19 @@ namespace RS.Scene
             blocks = new BlockType[32 * 32 * 32];
             var index = 0;
             
+            var batchSampleResult = m_sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
+            
             for (var sx = 0; sx < 32; sx++)
             {
                 for (var sz = 0; sz < 32; sz++)
                 {
                     for (var sy = 0; sy < 32; sy++)
                     {
-                        var sampleX = offsetX + sx;
-                        var sampleY = offsetY + sy;
-                        var sampleZ = offsetZ + sz;
-                        var density = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
+                        // var sampleX = offsetX + sx;
+                        // var sampleY = offsetY + sy;
+                        // var sampleZ = offsetZ + sz;
+                        // var density = m_sampler.Sample(new Vector3(sampleX, sampleY, sampleZ));
+                        var density = batchSampleResult[sx, sy, sz];
                         blocks[index++] = JudgeBlockType(density, sx + offsetX, sy + offsetY, sz + offsetZ);
                         
                         // noiseSamples[sx, sy, sz] = SampleNoise(sampleX, sampleY, sampleZ);
@@ -427,12 +431,6 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunkX} {chunkY} {chunkZ} 数据耗时 {sw.ElapsedMilliseconds} ms");
             return Chunk.BuildMesh(blocks, 32, 32);
-        }
-
-        private float SampleNoise(int x, int y, int z)
-        {
-            // return m_noise.SimplexNoiseEvaluate(new Vector3(x, y, z), 0.05f);
-            return RsNoise.Fbm3D(new Vector3(x, y, z), 3, 0.01f, m_noise);
         }
         
         private BlockType JudgeBlockType(float density, int x, int y, int z)
