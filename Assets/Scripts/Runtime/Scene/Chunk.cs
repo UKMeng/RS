@@ -9,17 +9,62 @@ using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
-    public class Chunk : MonoBehaviour
+    public enum ChunkStatus
+    {
+        Empty, // 未生成
+        Unload, // 已生成Mesh, 处于active == false
+        Loaded, // 当前场景已加载显示中
+        Generating, // 生成中，还没准备好
+    }
+    
+    public struct MeshData
+    {
+        public Vector3[] vertices;
+        public int[] triangles;
+        public Vector2[] uvs;
+    }
+    
+    public class Chunk
     {
         public BlockType[] blocks;
-        public int width = 32;
-        public int height = 32;
+        public ChunkStatus status;
+        public MeshData meshData;
+        public GameObject go;
+        public Vector3Int chunkPos; // 是Chunk自用的本地坐标
+        
+        private int m_width = 32;
+        private int m_height = 32;
 
+        public Chunk(Vector3Int chunkPos)
+        {
+            this.chunkPos = chunkPos;
+            blocks = new BlockType[32 * 32 * 32];
+            status = ChunkStatus.Empty;
+        }
+        
         public void ModifyBlock(Vector3 localPos, BlockType newBlockType)
         {
-            var index = GetArrayIndex((int)localPos.x, (int)localPos.y, (int)localPos.z);
+            var index = GetBlockIndex((int)localPos.x, (int)localPos.y, (int)localPos.z);
             blocks[index] = newBlockType;
             BuildMeshUsingJobSystem();
+        }
+
+        public static Vector3Int WorldPosToChunkPos(Vector3 worldPos)
+        {
+            return new Vector3Int(
+                Mathf.FloorToInt(worldPos.x / 32.0f),
+                Mathf.FloorToInt(worldPos.y / 16.0f),
+                Mathf.FloorToInt(worldPos.z / 32.0f)
+            );
+        }
+
+        public static Vector3 ChunkPosToWorldPos(Vector3Int chunkPos)
+        {
+            return new Vector3(
+                chunkPos.x * 32.0f,
+                chunkPos.y * 16.0f,
+                chunkPos.z * 32.0f
+            );
         }
 
         public static MeshData BuildMesh(BlockType[] blocks, int width, int height)
@@ -36,7 +81,7 @@ namespace RS.Scene
                 {
                     for (var y = 0; y < height; y++)
                     {
-                        var index = GetArrayIndex(x, y, z);
+                        var index = GetBlockIndex(x, y, z);
 
                         if (blocks[index] == BlockType.Air)
                         {
@@ -48,7 +93,7 @@ namespace RS.Scene
                         var uv = Block.uvTable[(int)blocks[index]];
                         
                         // Up
-                        var upIndex = GetArrayIndex(x, y + 1, z);
+                        var upIndex = GetBlockIndex(x, y + 1, z);
                         if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -71,7 +116,7 @@ namespace RS.Scene
                         }
                         
                         // Bottom
-                        var downIndex = GetArrayIndex(x, y - 1, z);
+                        var downIndex = GetBlockIndex(x, y - 1, z);
                         if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -94,7 +139,7 @@ namespace RS.Scene
                         }
                         
                         // Front
-                        var frontIndex = GetArrayIndex(x, y, z - 1);
+                        var frontIndex = GetBlockIndex(x, y, z - 1);
                         if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -117,7 +162,7 @@ namespace RS.Scene
                         }
                         
                         // Back
-                        var backIndex = GetArrayIndex(x, y, z + 1);
+                        var backIndex = GetBlockIndex(x, y, z + 1);
                         if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -140,7 +185,7 @@ namespace RS.Scene
                         }
                         
                         // Left
-                        var leftIndex = GetArrayIndex(x - 1, y, z);
+                        var leftIndex = GetBlockIndex(x - 1, y, z);
                         if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -163,7 +208,7 @@ namespace RS.Scene
                         }
                         
                         // right
-                        var rightIndex = GetArrayIndex(x + 1, y, z);
+                        var rightIndex = GetBlockIndex(x + 1, y, z);
                         if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -207,8 +252,8 @@ namespace RS.Scene
 
             var buildMeshJob = new BuildMeshJob
             {
-                width = width,
-                height = height,
+                width = m_width,
+                height = m_height,
                 blocks = new NativeArray<BlockType>(blocks, Allocator.TempJob),
                 uvTable = Block.uvTableArray,
                 vertices = vertices,
@@ -253,11 +298,11 @@ namespace RS.Scene
             
             mesh.RecalculateNormals();
             
-            GetComponent<MeshFilter>().mesh = mesh;
-            GetComponent<MeshCollider>().sharedMesh = mesh;
+            go.GetComponent<MeshFilter>().mesh = mesh;
+            go.GetComponent<MeshCollider>().sharedMesh = mesh;
 
             sw.Stop();
-            Debug.Log($"Chunk {transform.position} generated in {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"Chunk {chunkPos} generated in {sw.ElapsedMilliseconds} ms");
         }
 
         [BurstCompile]
@@ -460,13 +505,13 @@ namespace RS.Scene
             var triangles = new List<int>();
             var uvs = new List<Vector2>();
 
-            for (var x = 0; x < width; x++)
+            for (var x = 0; x < m_width; x++)
             {
-                for (var z = 0; z < width; z++)
+                for (var z = 0; z < m_width; z++)
                 {
-                    for (var y = 0; y < height; y++)
+                    for (var y = 0; y < m_height; y++)
                     {
-                        var index = GetArrayIndex(x, y, z);
+                        var index = GetBlockIndex(x, y, z);
 
                         if (blocks[index] == BlockType.Air)
                         {
@@ -478,7 +523,7 @@ namespace RS.Scene
                         var uv = Block.uvTable[(int)blocks[index]];
                         
                         // Up
-                        var upIndex = GetArrayIndex(x, y + 1, z);
+                        var upIndex = GetBlockIndex(x, y + 1, z);
                         if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -501,7 +546,7 @@ namespace RS.Scene
                         }
                         
                         // Bottom
-                        var downIndex = GetArrayIndex(x, y - 1, z);
+                        var downIndex = GetBlockIndex(x, y - 1, z);
                         if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -524,7 +569,7 @@ namespace RS.Scene
                         }
                         
                         // Front
-                        var frontIndex = GetArrayIndex(x, y, z - 1);
+                        var frontIndex = GetBlockIndex(x, y, z - 1);
                         if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -547,7 +592,7 @@ namespace RS.Scene
                         }
                         
                         // Back
-                        var backIndex = GetArrayIndex(x, y, z + 1);
+                        var backIndex = GetBlockIndex(x, y, z + 1);
                         if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -570,7 +615,7 @@ namespace RS.Scene
                         }
                         
                         // Left
-                        var leftIndex = GetArrayIndex(x - 1, y, z);
+                        var leftIndex = GetBlockIndex(x - 1, y, z);
                         if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -593,7 +638,7 @@ namespace RS.Scene
                         }
                         
                         // right
-                        var rightIndex = GetArrayIndex(x + 1, y, z);
+                        var rightIndex = GetBlockIndex(x + 1, y, z);
                         if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
                         {
                             var vertIndex = vertices.Count;
@@ -622,34 +667,15 @@ namespace RS.Scene
             mesh.triangles = triangles.ToArray();
             mesh.uv = uvs.ToArray();
             mesh.RecalculateNormals();
-
             
-            var mf = GetComponent<MeshFilter>();
-            if (mf.mesh != null)
-            {
-                DestroyImmediate(mf.mesh);
-            }
-
-            mf.mesh = mesh;
-            
-            // GetComponent<MeshFilter>().mesh = mesh;
-            GetComponent<MeshCollider>().sharedMesh = mesh;
+            go.GetComponent<MeshFilter>().mesh = mesh;
+            go.GetComponent<MeshCollider>().sharedMesh = mesh;
 
             sw.Stop();
-            Debug.Log($"Chunk {transform.position} generated in {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"Chunk {chunkPos} generated in {sw.ElapsedMilliseconds} ms");
         }
-
-        // private int GetArrayIndex(int x, int y, int z)
-        // {
-        //     if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= width)
-        //     {
-        //         return -1;
-        //     }
-        //     
-        //     return x * width * height + z * height + y;
-        // }
-        //
-        private static int GetArrayIndex(int x, int y, int z)
+        
+        private static int GetBlockIndex(int x, int y, int z)
         {
             if (x < 0 || x >= 32 || y < 0 || y >= 32 || z < 0 || z >= 32)
             {
@@ -658,6 +684,5 @@ namespace RS.Scene
             
             return x * 32 * 32 + z * 32 + y;
         }
-        
     }
 }
