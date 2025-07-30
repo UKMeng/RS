@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using RS.Scene.Biome;
 using RS.Utils;
+using RS.Item;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+
 
 namespace RS.Scene
 {

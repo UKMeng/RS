@@ -1,7 +1,10 @@
 ﻿using RS.Scene;
 using RS.Scene.Biome;
+using RS.GamePlay;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace RS.GMTool
 {
@@ -16,7 +19,8 @@ namespace RS.GMTool
         
         private PlayerInput m_playerInput;
         
-        public Transform player;
+        public Transform playerTsf;
+        public Player player;
 
         private DebugData m_debugData;
         
@@ -47,22 +51,28 @@ namespace RS.GMTool
                 return;
             }
 
-            var windowSize = new Rect(10, 10, 300, 120);
+            var windowSize = new Rect(10, 10, 300, 300);
             GUI.Window(0, windowSize, DrawWindow, "GM Tool Window");
         }
 
         private void DrawWindow(int windowId)
         {
-            if (player != null)
+            if (playerTsf != null)
             {
-                GUILayout.Label("玩家坐标:" + player.position);
+                GUILayout.Label("玩家坐标:" + playerTsf.position);
+                GUILayout.Label("玩家信息:");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("血量:" + player.Health);
+                GUILayout.Label("饥饿:" + player.Hungry);
+                GUILayout.EndHorizontal();
+                
                 GUILayout.Label("Biome:" + m_debugData.biomeType);
             }
         }
 
         private void UpdateDebugData()
         {
-            var pos = player.position;
+            var pos = playerTsf.position;
             m_debugData.biomeType = NoiseManager.Instance.SampleBiome(pos, out _);
         }
         

@@ -5,6 +5,8 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Burst;
 
+using RS.Item;
+
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene

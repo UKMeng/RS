@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 using RS.Utils;
 using RS.Scene;
+using RS.Item;
+using RS.GamePlay;
 
 namespace RS.GamePlay
 {

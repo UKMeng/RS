@@ -3,17 +3,8 @@ using Unity.Collections;
 using UnityEngine;
 
 
-namespace RS.Scene
+namespace RS.Item
 {
-    public enum BlockType : byte
-    {
-        Air,
-        Stone,
-        Dirt,
-        Sand,
-        Water,
-    }
-    
     public class Block
     {
         private BlockType m_type;
