@@ -43,7 +43,7 @@ namespace RS.Scene
             m_chunkManager.chunkPrefab = chunkPrefab;
 
             // 上午8点
-            m_time = new GameTime(960);
+            m_time = new GameTime(480);
             m_tickManager.Register(m_time);
             
             // 放置Player
