@@ -165,30 +165,34 @@ namespace RS.Scene
             while (m_chunkGeneratingQueue.Count > 0)
             {
                 var chunkPosXZ = m_chunkGeneratingQueue.Dequeue();
-                
-                // 生成Base Data
-                // 目前先假定y轴上能有192m 12个chunk
+
+                var chunks = new Chunk[12];
+                // 目前先假定y轴上能有192m 12个chunk，创建Chunk
                 for (var chunkY = 0; chunkY < 12; chunkY++)
                 {
                     var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
                     if (!m_chunks.TryGetValue(chunkPos, out var chunk))
                     {
                         chunk = new Chunk(chunkPos);
-                        m_chunks.Add(chunkPos, chunk);
-                    }
-                    
-                    if (chunk.status == ChunkStatus.Empty)
-                    {
                         chunk.status = ChunkStatus.BaseData;
-                        yield return StartCoroutine(GenerateBaseDataAsync(chunk));
+                        m_chunks.Add(chunkPos, chunk);
+                        chunks[chunkY] = chunk;
+                    }
+                }
+                
+                // 生成Base Data
+                for (var chunkY = 0; chunkY < 12; chunkY++)
+                {
+                    if (chunks[chunkY].status == ChunkStatus.BaseData)
+                    {
+                        yield return StartCoroutine(GenerateBaseDataAsync(chunks[chunkY]));
                     }
                 }
                 
                 // Aquifer阶段
                 for (var chunkY = 0; chunkY < 12; chunkY++)
                 {
-                    var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
-                    var chunk = m_chunks[chunkPos];
+                    var chunk = chunks[chunkY];
 
                     if (chunkY > 3)
                     {
@@ -216,8 +220,7 @@ namespace RS.Scene
                 }
                 for (var chunkY = 11; chunkY >= 0; chunkY--)
                 {
-                    var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
-                    var chunk = m_chunks[chunkPos];
+                    var chunk = chunks[chunkY];
                     
                     if (chunk.status == ChunkStatus.Surface)
                     {
