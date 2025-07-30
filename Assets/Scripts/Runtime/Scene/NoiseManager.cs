@@ -104,7 +104,7 @@ namespace RS.Scene
 
             // var stoneDepthAbove = SampleStoneDepthAbove(pos);
             
-            return new SurfaceContext { biome = biome };
+            return new SurfaceContext { biome = biome, stoneDepthAbove = 0 };
         }
 
         // public int SampleStoneDepthAbove(Vector3 pos)

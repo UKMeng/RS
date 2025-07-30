@@ -12,7 +12,8 @@ namespace RS.Scene
     public enum ChunkStatus
     {
         Empty, // 空Chunk
-        DataPreparing, // 数据准备中
+        BaseData, // 基础数据准备中
+        Surface, // 地表数据准备中
         DataReady, // 数据准备完成，Mesh未生成
         MeshReady, // Mesh未加载active == false
         Loaded, // 当前场景已加载显示中
@@ -677,7 +678,7 @@ namespace RS.Scene
             Debug.Log($"Chunk {chunkPos} generated in {sw.ElapsedMilliseconds} ms");
         }
         
-        private static int GetBlockIndex(int x, int y, int z)
+        public static int GetBlockIndex(int x, int y, int z)
         {
             if (x < 0 || x >= 32 || y < 0 || y >= 32 || z < 0 || z >= 32)
             {

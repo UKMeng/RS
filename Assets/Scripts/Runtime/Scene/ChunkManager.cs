@@ -15,7 +15,7 @@ namespace RS.Scene
         public GameObject chunkPrefab;
         
         private Dictionary<Vector3Int, Chunk> m_chunks;
-        private Queue<Chunk> m_chunkGeneratingQueue;
+        private Queue<Vector2Int> m_chunkGeneratingQueue;
         private bool m_isGeneratingChunks;
         
         private int m_loadDistance = 6;
@@ -28,7 +28,7 @@ namespace RS.Scene
         public void Start()
         {
             m_chunks = new Dictionary<Vector3Int, Chunk>();
-            m_chunkGeneratingQueue = new Queue<Chunk>();
+            m_chunkGeneratingQueue = new Queue<Vector2Int>();
             m_isGeneratingChunks = false;
             
             m_finalDensity = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
@@ -80,33 +80,31 @@ namespace RS.Scene
             }
             
             // 收集需要加载或者更新的Chunk
-            var toGenerate = new List<Chunk>();
+            var toGenerate = new List<Vector2Int>();
             for (var offsetX = -m_loadDistance; offsetX < m_loadDistance + 1; offsetX++)
             {
                 for (var offsetZ = -m_loadDistance; offsetZ < m_loadDistance + 1; offsetZ++)
                 {
                     var chunkX = playerChunkPos.x + offsetX;
                     var chunkZ = playerChunkPos.z + offsetZ;
-
+                    
+                    
                     // 目前先假定y轴上能有192m 12个chunk
-                    // 为了纵向各数据判定的准确性，y轴12个chunk的数据准备完毕才能够进行下一步地表等判断
                     for (var chunkY = 11; chunkY > -1; chunkY--)
                     {
                         var chunkPos = new Vector3Int(chunkX, chunkY, chunkZ);
 
-                        if (!m_chunks.TryGetValue(chunkPos, out var chunk))
+                        if (!m_chunks.TryGetValue(chunkPos, out var chunk) || chunk.status == ChunkStatus.Empty)
                         {
-                            chunk = new Chunk(chunkPos);
-                            m_chunks.Add(chunkPos, chunk);
-                        }
-
-                        if (chunk.status == ChunkStatus.Empty)
-                        {
+                            // chunk生成以xz一组为单位
+                            // 为了纵向各数据判定的准确性，y轴12个chunk的数据准备完毕才能够进行下一步地表等判断
+                            // 如果一个是Empty，那么全员都是没有生成，需要进入生成阶段
                             // chunk为空，需要生成blocks数据
-                            toGenerate.Add(chunk);
-                            chunk.status = ChunkStatus.DataPreparing;
+                            toGenerate.Add(new Vector2Int(chunkX, chunkZ));
+                            continue;
                         }
-                        else if (chunk.status == ChunkStatus.DataReady)
+                        
+                        if (chunk.status == ChunkStatus.DataReady)
                         {
                             // chunk数据准备完成，生成Mesh投入场景
                             // 简易剔除，只生成玩家所在平面往下2格的Chunk
@@ -142,8 +140,10 @@ namespace RS.Scene
             }
             
             // 根据离玩家距离排序, 排序后放入待生成队列
+            var playerChunkPosXZ = new Vector2Int(playerChunkPos.x, playerChunkPos.z);
             toGenerate.Sort((a, b) =>
-                (a.chunkPos - playerChunkPos).sqrMagnitude.CompareTo((b.chunkPos - playerChunkPos).sqrMagnitude));
+                (a - playerChunkPosXZ).sqrMagnitude.CompareTo((b - playerChunkPosXZ).sqrMagnitude));
+            
             foreach (var pos in toGenerate)
             {
                 if (!m_chunkGeneratingQueue.Contains(pos))
@@ -164,25 +164,61 @@ namespace RS.Scene
             
             while (m_chunkGeneratingQueue.Count > 0)
             {
-                for (var i = 0; i < m_maxChunksPerFrame && m_chunkGeneratingQueue.Count > 0; i++)
+                var chunkPosXZ = m_chunkGeneratingQueue.Dequeue();
+                
+                // 生成Base Data
+                // 目前先假定y轴上能有192m 12个chunk
+                for (var chunkY = 0; chunkY < 12; chunkY++)
                 {
-                    var chunk = m_chunkGeneratingQueue.Dequeue();
+                    var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
+                    if (!m_chunks.TryGetValue(chunkPos, out var chunk))
+                    {
+                        chunk = new Chunk(chunkPos);
+                        m_chunks.Add(chunkPos, chunk);
+                    }
                     
-                    yield return StartCoroutine(GenerateChunkDataAsync(chunk));
+                    if (chunk.status == ChunkStatus.Empty)
+                    {
+                        chunk.status = ChunkStatus.BaseData;
+                        yield return StartCoroutine(GenerateBaseDataAsync(chunk));
+                    }
                 }
+                
+                // 生成Surface阶段
+                var offsetX = chunkPosXZ.x * 32;
+                var offsetZ = chunkPosXZ.y * 32;
+                var contexts = new SurfaceContext[32 * 32];
+                for (var sx = 0; sx < 32; sx++)
+                {
+                    for (var sz = 0; sz < 32; sz++)
+                    {
+                        contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
+                    }
+                }
+                for (var chunkY = 11; chunkY >= 0; chunkY--)
+                {
+                    var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
+                    var chunk = m_chunks[chunkPos];
+                    
+                    if (chunk.status == ChunkStatus.Surface)
+                    {
+                        GenerateSurface(chunk, contexts);
+                    }
+                }
+
                 yield return null;
             }
 
             m_isGeneratingChunks = false;
         }
 
-        private IEnumerator GenerateChunkDataAsync(Chunk chunk)
+        private IEnumerator GenerateBaseDataAsync(Chunk chunk)
         {
             Task.Run(() =>
             {
                 try
                 {
-                    GenerateChunkBlockData(chunk);
+                    GenerateBaseData(chunk);
                 }
                 catch (Exception e)
                 {
@@ -190,13 +226,13 @@ namespace RS.Scene
                 }
             });
 
-            while (chunk.status == ChunkStatus.DataPreparing)
+            while (chunk.status == ChunkStatus.BaseData)
             {
                 yield return null;
             }
         }
         
-        private void GenerateChunkBlockData(Chunk chunk)
+        private void GenerateBaseData(Chunk chunk)
         {
             var offsetX = chunk.chunkPos.x * 32;
             var offsetZ = chunk.chunkPos.z * 32;
@@ -220,46 +256,64 @@ namespace RS.Scene
                     }
                 }
             }
+
+            chunk.blocks = blocks;
+            chunk.status = ChunkStatus.Surface;
+            
+            sw.Stop();
+            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
+        }
+
+        private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
+        {
+            var offsetX = chunk.chunkPos.x * 32;
+            var offsetZ = chunk.chunkPos.z * 32;
+            var offsetY = chunk.chunkPos.y * 32;
+            
+            var sw = Stopwatch.StartNew();
             
             // Surface判断，后续放到其他地方去
-            index = 0;
             for (var sx = 0; sx < 32; sx++)
             {
                 for (var sz = 0; sz < 32; sz++)
                 {
-                    var bottomPos = new Vector3(offsetX + sx, offsetY, offsetZ + sz);
-                    var context = NoiseManager.Instance.SampleSurface(bottomPos);
-                    
-                    for (var sy = 0; sy < 32; sy++)
+                    var context = contexts[sx * 32 + sz];
+                    var index = Chunk.GetBlockIndex(sx, 31, sz);
+                    for (var sy = 31; sy >= 0; sy--)
                     {
-                        if (blocks[index] == BlockType.Stone)
+                        if (chunk.blocks[index] == BlockType.Stone)
                         {
-                            blocks[index] = JudgeSurfaceBlockType(context);
-                            // context.stoneDepthAbove++;
+                            chunk.blocks[index] = JudgeSurfaceBlockType(context);
+                            context.stoneDepthAbove++;
+                        }
+                        else if (chunk.blocks[index] == BlockType.Air)
+                        {
+                            context.stoneDepthAbove = 0;
                         }
 
-                        index++;
+                        index--;
                     }
                 }
             }
-
-            chunk.blocks = blocks;
+            
             chunk.status = ChunkStatus.DataReady;
-
+            
             sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} 数据耗时 {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
         }
+        
 
         private BlockType JudgeSurfaceBlockType(SurfaceContext context)
         {
-            if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+            if (context.stoneDepthAbove < 4)
             {
-                return BlockType.Dirt;
+                if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+                {
+                    return BlockType.Dirt;
+                }
             }
-            else
-            {
-                return BlockType.Stone;
-            }
+            
+            return BlockType.Stone;
         }
         
         private BlockType JudgeBaseBlockType(float density)
