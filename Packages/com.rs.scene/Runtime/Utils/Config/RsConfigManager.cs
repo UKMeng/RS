@@ -49,6 +49,8 @@ namespace RS.Utils
             "BiomeHumidity",
             "BiomeTemperature",
             "CavePillars",
+            "CaveNoodle",
+            "Compare",
             "Continents",
             "Depth",
             "Erosion",
