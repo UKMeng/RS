@@ -11,6 +11,7 @@ namespace RS.GMTool
     public struct DebugData
     {
         public BiomeType biomeType;
+        public string gameTime;
     }
     
     public class GMToolWindow : MonoBehaviour
@@ -18,6 +19,8 @@ namespace RS.GMTool
         private bool m_showWindow = false;
         
         private PlayerInput m_playerInput;
+
+        private SceneManager m_sceneManager;
         
         public Player player;
 
@@ -27,6 +30,7 @@ namespace RS.GMTool
         private void Awake()
         {
             m_playerInput = GetComponent<PlayerInput>();
+            m_sceneManager = GetComponent<SceneManager>();
             m_debugData = new DebugData();
         }
 
@@ -58,6 +62,8 @@ namespace RS.GMTool
         {
             if (player != null)
             {
+                GUILayout.Label("游戏时间:" + m_debugData.gameTime);
+                
                 GUILayout.Label("玩家坐标:" + player.Position);
                 GUILayout.Label("玩家信息:");
                 GUILayout.BeginHorizontal();
@@ -73,6 +79,7 @@ namespace RS.GMTool
         {
             var pos = player.Position;
             m_debugData.biomeType = NoiseManager.Instance.SampleBiome(pos, out _);
+            m_debugData.gameTime = m_sceneManager.GetGameTime();
         }
         
     }
