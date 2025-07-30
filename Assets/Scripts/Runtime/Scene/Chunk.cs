@@ -11,10 +11,12 @@ namespace RS.Scene
 {
     public enum ChunkStatus
     {
-        Empty, // 未生成
-        Unload, // 已生成Mesh, 处于active == false
+        Empty, // 空Chunk
+        DataPreparing, // 数据准备中
+        DataReady, // 数据准备完成，Mesh未生成
+        MeshReady, // Mesh未加载active == false
         Loaded, // 当前场景已加载显示中
-        Generating, // 生成中，还没准备好
+        MeshGenerating, // Mesh生成中
     }
     
     public struct MeshData

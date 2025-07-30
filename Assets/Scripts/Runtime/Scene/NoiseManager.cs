@@ -8,6 +8,20 @@ using Debug = UnityEngine.Debug;
 namespace RS.Scene
 {
     /// <summary>
+    /// 用于判断地表方块的数据上下文
+    /// </summary>
+    public struct SurfaceContext
+    {
+        public BiomeType biome;
+        public float surfaceNoise;
+        public float surfaceDepth;
+        public int waterHeight;
+        public int stoneDepthAbove; // 本方格距离上方最近空气格之间的非液体格的数量，如果上方直接为空气则为0
+        public int stoneDepthBelow;
+        public int minSurfaceLevel;
+    }
+    
+    /// <summary>
     /// 总管噪声,随机数,采样器的类，保持随机数统一
     /// 各种噪声、随机数都通过这里来获取
     /// </summary>
@@ -83,5 +97,19 @@ namespace RS.Scene
             
             return m_biomeSampler.Sample(biomeParams);
         }
+
+        public SurfaceContext SampleSurface(Vector3 pos)
+        {
+            var biome = SampleBiome(pos, out _);
+
+            // var stoneDepthAbove = SampleStoneDepthAbove(pos);
+            
+            return new SurfaceContext { biome = biome };
+        }
+
+        // public int SampleStoneDepthAbove(Vector3 pos)
+        // {
+        //     
+        // }
     }
 }

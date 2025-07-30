@@ -10,20 +10,6 @@ using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
 {
-    /// <summary>
-    /// 用于判断地表方块的数据上下文
-    /// </summary>
-    public struct SurfaceContext
-    {
-        public BiomeType biome;
-        public float surfaceNoise;
-        public float surfaceDepth;
-        public int waterHeight;
-        public int stoneDepthAbove;
-        public int stoneDepthBelow;
-        public int minSurfaceLevel;
-    }
-    
     public class ChunkManager: MonoBehaviour
     {
         public GameObject chunkPrefab;
@@ -59,6 +45,7 @@ namespace RS.Scene
             
             // 遍历已有的chunk, 根据距离判断是否需要卸载或删除
             var playerChunkX = playerChunkPos.x;
+            var playerChunkY = playerChunkPos.y;
             var playerChunkZ = playerChunkPos.z;
             foreach (var chunkPos in m_chunks.Keys)
             {
@@ -72,22 +59,22 @@ namespace RS.Scene
                     {
                         // 超出距离, 卸载
                         chunk.go.SetActive(false);
-                        chunk.status = ChunkStatus.Unload;
+                        chunk.status = ChunkStatus.MeshReady;
                         
-                        Debug.Log($"[SceneManager] 触发卸载 {chunkPos}");
+                        Debug.Log($"[SceneManager] 触发卸载Mesh {chunkPos}");
                     }
                 }
             
-                if (chunk.status == ChunkStatus.Unload)
+                if (chunk.status == ChunkStatus.MeshReady)
                 {
                     if (Mathf.Abs(chunkX - playerChunkX) > m_destroyDistance || Mathf.Abs(chunkZ - playerChunkZ) > m_destroyDistance)
                     {
                         // 超出距离, 删除
                         chunk.go.SetActive(false);
                         Destroy(chunk.go);
-                        chunk.status = ChunkStatus.Empty;
+                        chunk.status = ChunkStatus.DataReady;
                         
-                        Debug.Log($"[SceneManager] 触发删除 {chunkPos}");
+                        Debug.Log($"[SceneManager] 触发删除Mesh {chunkPos}");
                     }
                 }
             }
@@ -102,6 +89,7 @@ namespace RS.Scene
                     var chunkZ = playerChunkPos.z + offsetZ;
 
                     // 目前先假定y轴上能有192m 12个chunk
+                    // 为了纵向各数据判定的准确性，y轴12个chunk的数据准备完毕才能够进行下一步地表等判断
                     for (var chunkY = 11; chunkY > -1; chunkY--)
                     {
                         var chunkPos = new Vector3Int(chunkX, chunkY, chunkZ);
@@ -114,11 +102,38 @@ namespace RS.Scene
 
                         if (chunk.status == ChunkStatus.Empty)
                         {
+                            // chunk为空，需要生成blocks数据
                             toGenerate.Add(chunk);
-                            chunk.status = ChunkStatus.Generating;
+                            chunk.status = ChunkStatus.DataPreparing;
                         }
-                        else if (chunk.status == ChunkStatus.Unload)
+                        else if (chunk.status == ChunkStatus.DataReady)
                         {
+                            // chunk数据准备完成，生成Mesh投入场景
+                            // 简易剔除，只生成玩家所在平面往下2格的Chunk
+                            if (chunkY >= playerChunkPos.y - 1)
+                            {
+                                var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
+                                var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
+                                var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
+                                var mesh = new Mesh();
+                                mesh.vertices = meshData.vertices;
+                                mesh.triangles = meshData.triangles;
+                                mesh.uv = meshData.uvs;
+                                mesh.RecalculateNormals();
+                    
+                                var chunkTf = chunkGo.GetComponent<MeshFilter>();
+                                chunkTf.mesh = mesh;
+                    
+                                var chunkMc = chunkGo.GetComponent<MeshCollider>();
+                                chunkMc.sharedMesh = mesh;
+
+                                chunk.go = chunkGo;
+                                chunk.status = ChunkStatus.Loaded;
+                            }
+                        }
+                        else if (chunk.status == ChunkStatus.MeshReady)
+                        {
+                            // chunk的mesh之前卸载了，重新改为加载
                             chunk.go.SetActive(true);
                             chunk.status = ChunkStatus.Loaded;
                         }
@@ -154,27 +169,6 @@ namespace RS.Scene
                     var chunk = m_chunkGeneratingQueue.Dequeue();
                     
                     yield return StartCoroutine(GenerateChunkDataAsync(chunk));
-                    
-                    var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
-                        
-                    var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
-                    
-                    var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
-                    
-                    var mesh = new Mesh();
-                    mesh.vertices = meshData.vertices;
-                    mesh.triangles = meshData.triangles;
-                    mesh.uv = meshData.uvs;
-                    mesh.RecalculateNormals();
-                    
-                    var chunkTf = chunkGo.GetComponent<MeshFilter>();
-                    chunkTf.mesh = mesh;
-                    
-                    var chunkMc = chunkGo.GetComponent<MeshCollider>();
-                    chunkMc.sharedMesh = mesh;
-
-                    chunk.go = chunkGo;
-                    chunk.status = ChunkStatus.Loaded;
                 }
                 yield return null;
             }
@@ -184,14 +178,11 @@ namespace RS.Scene
 
         private IEnumerator GenerateChunkDataAsync(Chunk chunk)
         {
-            var isDone = false;
-            
             Task.Run(() =>
             {
                 try
                 {
-                    GenerateChunkMesh(chunk);
-                    isDone = true;
+                    GenerateChunkBlockData(chunk);
                 }
                 catch (Exception e)
                 {
@@ -199,13 +190,13 @@ namespace RS.Scene
                 }
             });
 
-            while (!isDone)
+            while (chunk.status == ChunkStatus.DataPreparing)
             {
                 yield return null;
             }
         }
         
-        private void GenerateChunkMesh(Chunk chunk)
+        private void GenerateChunkBlockData(Chunk chunk)
         {
             var offsetX = chunk.chunkPos.x * 32;
             var offsetZ = chunk.chunkPos.z * 32;
@@ -236,11 +227,15 @@ namespace RS.Scene
             {
                 for (var sz = 0; sz < 32; sz++)
                 {
+                    var bottomPos = new Vector3(offsetX + sx, offsetY, offsetZ + sz);
+                    var context = NoiseManager.Instance.SampleSurface(bottomPos);
+                    
                     for (var sy = 0; sy < 32; sy++)
                     {
-                        if (blocks[index] != BlockType.Air)
+                        if (blocks[index] == BlockType.Stone)
                         {
-                            blocks[index] = JudgeSurfaceBlockType(new SurfaceContext());
+                            blocks[index] = JudgeSurfaceBlockType(context);
+                            // context.stoneDepthAbove++;
                         }
 
                         index++;
@@ -249,6 +244,7 @@ namespace RS.Scene
             }
 
             chunk.blocks = blocks;
+            chunk.status = ChunkStatus.DataReady;
 
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} 数据耗时 {sw.ElapsedMilliseconds} ms");
@@ -256,7 +252,14 @@ namespace RS.Scene
 
         private BlockType JudgeSurfaceBlockType(SurfaceContext context)
         {
-            return BlockType.Dirt;
+            if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+            {
+                return BlockType.Dirt;
+            }
+            else
+            {
+                return BlockType.Stone;
+            }
         }
         
         private BlockType JudgeBaseBlockType(float density)
