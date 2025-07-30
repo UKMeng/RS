@@ -335,7 +335,7 @@ namespace RS.Scene
                     {
                         if (chunk.blocks[index] == BlockType.Stone)
                         {
-                            chunk.blocks[index] = JudgeSurfaceBlockType(context);
+                            chunk.blocks[index] = JudgeSurfaceBlockType(ref context);
                             context.stoneDepthAbove++;
                         }
                         else if (chunk.blocks[index] == BlockType.Air)
@@ -345,6 +345,8 @@ namespace RS.Scene
 
                         index--;
                     }
+
+                    contexts[sx * 32 + sz] = context;
                 }
             }
             
@@ -355,7 +357,7 @@ namespace RS.Scene
         }
         
 
-        private BlockType JudgeSurfaceBlockType(SurfaceContext context)
+        private BlockType JudgeSurfaceBlockType(ref SurfaceContext context)
         {
             if (context.stoneDepthAbove < 4)
             {
