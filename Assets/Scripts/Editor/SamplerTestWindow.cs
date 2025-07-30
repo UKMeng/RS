@@ -18,7 +18,7 @@ namespace RS.Scene
     
     public class SamplerTestWindow : EditorWindow
     {
-        private Int64 m_seed = 1882775509054175955;
+        private long m_seed = 1882775509054175955;
         
         // 采样起始位置
         private Vector3Int m_startPos = new Vector3Int(0, 100, 0);

@@ -14,7 +14,7 @@ namespace RS.Scene
 {
     public class MapWindow : EditorWindow
     {
-        private Int64 m_seed = 20250715;
+        private long m_seed = 20250715;
         private int m_width = 2048;
         private int m_height = 2048;
 

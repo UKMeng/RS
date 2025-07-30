@@ -286,7 +286,7 @@ namespace RS.Utils
                     {
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
                         sampler = new RsSampler(noise);
                     }
                     else
@@ -304,7 +304,7 @@ namespace RS.Utils
                     {
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
                         
                         var xzScale = xzScaleToken.Value<float>();
                         var yScale = yScaleToken.Value<float>();
@@ -324,7 +324,7 @@ namespace RS.Utils
                     {
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
                         sampler = new ShiftASampler(noise);
                     }
                     else
@@ -340,7 +340,7 @@ namespace RS.Utils
                     {
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
                         sampler = new ShiftBSampler(noise);
                     }
                     else
@@ -361,7 +361,7 @@ namespace RS.Utils
                     {
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextUInt64(), noiseConfig);
+                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
 
                         var samplerX = ParseJTokenToSampler(x);
                         var samplerY = ParseJTokenToSampler(y);

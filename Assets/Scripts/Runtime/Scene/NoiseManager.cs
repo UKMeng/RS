@@ -46,7 +46,7 @@ namespace RS.Scene
             s_instance = new NoiseManager(seed);
         }
 
-        private Int64 m_seed;
+        private long m_seed;
         private BiomeSampler m_biomeSampler;
 
         private RsSampler m_continents;
@@ -56,7 +56,7 @@ namespace RS.Scene
         private RsSampler m_biomeTemperature;
         private RsSampler m_Ridges;
         
-        private NoiseManager(Int64 seed)
+        private NoiseManager(long seed)
         {
             Debug.Log($"[NoiseManager] 初始化中，seed: {seed}");
             var sw = Stopwatch.StartNew();

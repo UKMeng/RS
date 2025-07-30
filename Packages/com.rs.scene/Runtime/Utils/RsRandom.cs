@@ -24,25 +24,25 @@ namespace RS.Utils
             }
         }
 
-        public static RsRandom Init(Int64 seed)
+        public static RsRandom Init(long seed)
         {
             Debug.Log($"[Random] RsRandom Instance Init with Seed {seed}");
             s_instance = new RsRandom(seed);
             return s_instance;
         }
         
-        private UInt64 m_seed;
-        private UInt64 a = 2862933555777941756;
-        private UInt64 b = 3037000493;
-        private UInt64 c = 1;
-        private UInt64 mod = 1UL << 63;
+        private ulong m_seed;
+        private ulong a = 2862933555777941756;
+        private ulong b = 3037000493;
+        private ulong c = 1;
+        private ulong mod = 1UL << 63;
 
-        private UInt64 m_state;
+        private ulong m_state;
         
-        public RsRandom(Int64 seed)
+        public RsRandom(long seed)
         {
             // 转成无符号数便于计算
-            m_seed = (UInt64)(seed - Int64.MinValue);
+            m_seed = (ulong)(seed - long.MinValue);
 
             m_state = m_seed % mod;
         }
@@ -53,7 +53,7 @@ namespace RS.Utils
             m_state = (a * m_state * m_state + b * m_state + c) % mod;
         }
 
-        public UInt64 NextUInt64()
+        public ulong NextULong()
         {
             Next();
             return m_state;
@@ -80,7 +80,7 @@ namespace RS.Utils
             Next();
 
             // 暂时不在这里检查min < max
-            var range = (UInt64)(max - min);
+            var range = (ulong)(max - min);
             return (int) (m_state % range) + min;
         }
         
@@ -89,7 +89,7 @@ namespace RS.Utils
         /// 获取随机64位种子
         /// </summary>
         /// <returns></returns>
-        public static Int64 GetSeed()
+        public static long GetSeed()
         {
             var bytes = new byte[8];
             RandomNumberGenerator.Fill(bytes);

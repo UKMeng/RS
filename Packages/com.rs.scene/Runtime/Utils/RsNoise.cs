@@ -16,17 +16,17 @@ namespace RS.Utils
         private float m_firstValueFactor;
         
         
-        public RsNoise(UInt64 seed)
+        public RsNoise(ulong seed)
         {
             Randomize(seed);
         }
 
-        public RsNoise(UInt64 seed, RsNoiseConfig config)
+        public RsNoise(ulong seed, RsNoiseConfig config)
             : this(seed, config.amplitudes, config.firstOctave)
         {
         }
         
-        public RsNoise(UInt64 seed, float[] amplitudes, int firstOctave)
+        public RsNoise(ulong seed, float[] amplitudes, int firstOctave)
         {
             Randomize(seed);
             m_amplitudes = amplitudes;
@@ -36,7 +36,7 @@ namespace RS.Utils
             m_firstValueFactor = Mathf.Pow(2.0f, m_octaves - 1) / (Mathf.Pow(2.0f, m_octaves) - 1.0f);
         }
         
-        public static float[,] GenerateWhiteNoise(int width, int height, Int64 seed)
+        public static float[,] GenerateWhiteNoise(int width, int height, long seed)
         {
             var sw = Stopwatch.StartNew();
             
@@ -65,7 +65,7 @@ namespace RS.Utils
         //     return Mathf.PerlinNoise(x + 500, z + 500);
         // }
 
-        public static float[,] GeneratePerlinNoise(int width, int height, Int64 seed)
+        public static float[,] GeneratePerlinNoise(int width, int height, long seed)
         {
             var sw = Stopwatch.StartNew();
             
@@ -88,7 +88,7 @@ namespace RS.Utils
             return noise;
         }
 
-        public static float[,] GenerateSimplexNoise(int width, int height, UInt64 seed)
+        public static float[,] GenerateSimplexNoise(int width, int height, ulong seed)
         {
             var sw = Stopwatch.StartNew();
             
@@ -407,7 +407,7 @@ namespace RS.Utils
         }
 
 
-        void Randomize(UInt64 seed)
+        void Randomize(ulong seed)
         {
             _random = new int[RandomSize * 2];
 
@@ -417,7 +417,7 @@ namespace RS.Utils
                 // Unpack the seed into 4 bytes then perform a bitwise XOR operation
                 // with each byte
                 var F = new byte[4];
-                UnpackLittleUInt64(seed, ref F);
+                UnpackLittleULong(seed, ref F);
 
                 for (int i = 0; i < Source.Length; i++)
                 {
@@ -458,12 +458,12 @@ namespace RS.Utils
         }
 
         /// <summary>
-        /// Unpack the given integer (Int64) to an array of 4 bytes in little endian format.
+        /// Unpack the given integer (ulong) to an array of 4 bytes in little endian format.
         /// If the length of the buffer is too smal, it wil be resized.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="buffer">The output buffer.</param>
-        static byte[] UnpackLittleUInt64(UInt64 value, ref byte[] buffer)
+        static byte[] UnpackLittleULong(ulong value, ref byte[] buffer)
         {
             if (buffer.Length < 4)
                 Array.Resize(ref buffer, 4);

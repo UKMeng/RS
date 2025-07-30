@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-using RS.Utils;
 using RS.GMTool;
-using RS.Scene.Biome;
 
 namespace RS.Scene
 {
@@ -18,7 +12,7 @@ namespace RS.Scene
     {
         public GameObject chunkPrefab;
 
-        public Int64 seed = 1284752702419125144;
+        public long seed = 1284752702419125144;
 
         private Transform m_player;
         
