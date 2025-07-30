@@ -77,16 +77,16 @@ namespace RS.Scene
 
         private static Vector2[] CalUVs(int x, int y)
         {
-            var margin = 2;
-            var width = 1028;
-            var height = 3084;
+            var margin = 10;
+            var width = 1044;
+            var height = 3132;
             var textureSize = 1024;
             
             var uvs = new Vector2[4];
-            uvs[0] = new Vector2((float)(x * textureSize + (x + 1) * margin) / width, (float)(y * textureSize + (y + 1) * margin) / height);
-            uvs[1] = new Vector2((float)((x + 1) * textureSize + (x + 1) * margin) / width, (float)(y * textureSize + (y + 1) * margin) / height);
-            uvs[2] = new Vector2((float)((x + 1) * textureSize + (x + 1) * margin) / width, (float)((y + 1) * textureSize + (y + 1) * margin) / height);
-            uvs[3] = new Vector2((float)(x * textureSize + (x + 1) * margin) / width, (float)((y + 1) * textureSize + (y + 1) * margin) / height);
+            uvs[0] = new Vector2((float)(x * textureSize + (2 * x + 1) * margin) / width, (float)(y * textureSize + (2 * y + 1) * margin) / height);
+            uvs[1] = new Vector2((float)((x + 1) * textureSize + (2 * x + 1) * margin) / width, (float)(y * textureSize + (2 * y + 1) * margin) / height);
+            uvs[2] = new Vector2((float)((x + 1) * textureSize + (2 * x + 1) * margin) / width, (float)((y + 1) * textureSize + (2 * y + 1) * margin) / height);
+            uvs[3] = new Vector2((float)(x * textureSize + (2 * x + 1) * margin) / width, (float)((y + 1) * textureSize + (2 * y + 1) * margin) / height);
             return uvs;
         }
         
