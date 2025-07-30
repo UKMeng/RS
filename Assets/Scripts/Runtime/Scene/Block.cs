@@ -29,8 +29,9 @@ namespace RS.Scene
         {
             uvTable = new Vector2[Enum.GetValues(typeof(BlockType)).Length][];
 
-            uvTable[(int)BlockType.Stone] = CalUVs(0, 0);
-            uvTable[(int)BlockType.Dirt] = CalUVs(0, 1);
+            uvTable[(int)BlockType.Water] = CalUVs(0, 0);
+            uvTable[(int)BlockType.Stone] = CalUVs(0, 1);
+            uvTable[(int)BlockType.Dirt] = CalUVs(0, 2);
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 4, Allocator.Persistent);
 
@@ -78,7 +79,7 @@ namespace RS.Scene
         {
             var margin = 2;
             var width = 1028;
-            var height = 2056;
+            var height = 3084;
             var textureSize = 1024;
             
             var uvs = new Vector2[4];

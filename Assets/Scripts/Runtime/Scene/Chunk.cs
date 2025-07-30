@@ -13,6 +13,7 @@ namespace RS.Scene
     {
         Empty, // 空Chunk
         BaseData, // 基础数据准备中
+        Aquifer, // 水域数据准备中
         Surface, // 地表数据准备中
         DataReady, // 数据准备完成，Mesh未生成
         MeshReady, // Mesh未加载active == false

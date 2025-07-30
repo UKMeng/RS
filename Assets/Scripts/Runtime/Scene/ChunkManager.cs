@@ -184,6 +184,25 @@ namespace RS.Scene
                     }
                 }
                 
+                // Aquifer阶段
+                for (var chunkY = 0; chunkY < 12; chunkY++)
+                {
+                    var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
+                    var chunk = m_chunks[chunkPos];
+
+                    if (chunkY > 3)
+                    {
+                        chunk.status = ChunkStatus.Surface;
+                        continue;
+                    }
+                    
+                    if (chunk.status == ChunkStatus.Aquifer)
+                    {
+                        GenerateAquifer(chunk);
+                    }
+                }
+                
+                
                 // 生成Surface阶段
                 var offsetX = chunkPosXZ.x * 32;
                 var offsetZ = chunkPosXZ.y * 32;
@@ -258,21 +277,51 @@ namespace RS.Scene
             }
 
             chunk.blocks = blocks;
-            chunk.status = ChunkStatus.Surface;
+            chunk.status = ChunkStatus.Aquifer;
             
             sw.Stop();
             Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
         }
+        
+        private void GenerateAquifer(Chunk chunk)
+        {
+            // var offsetX = chunk.chunkPos.x * 32;
+            // var offsetY = chunk.chunkPos.y * 32;
+            // var offsetZ = chunk.chunkPos.z * 32;
+            var sw = Stopwatch.StartNew();
+            
+            // 简单按海平面判断, 目前传入的Chunk都低于海平面
+            var index = 0;
+            for (var sx = 0; sx < 32; sx++)
+            {
+                for (var sz = 0; sz < 32; sz++)
+                {
+                    for (var sy = 0; sy < 32; sy++)
+                    {
+                        if (chunk.blocks[index] == BlockType.Air)
+                        {
+                            chunk.blocks[index] = BlockType.Water;
+                        }
+
+                        index++;
+                    }
+                }
+            }
+            
+            chunk.status = ChunkStatus.Surface;
+            
+            sw.Stop();
+            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+        }
 
         private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
         {
-            var offsetX = chunk.chunkPos.x * 32;
-            var offsetZ = chunk.chunkPos.z * 32;
-            var offsetY = chunk.chunkPos.y * 32;
+            // var offsetX = chunk.chunkPos.x * 32;
+            // var offsetZ = chunk.chunkPos.z * 32;
+            // var offsetY = chunk.chunkPos.y * 32;
             
             var sw = Stopwatch.StartNew();
             
-            // Surface判断，后续放到其他地方去
             for (var sx = 0; sx < 32; sx++)
             {
                 for (var sz = 0; sz < 32; sz++)
