@@ -1,5 +1,4 @@
-﻿using System;
-using RS.GamePlay;
+﻿using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -14,7 +13,7 @@ namespace RS.Scene
 
         public long seed = 1284752702419125144;
 
-        private Transform m_player;
+        private Player m_player;
         
         // 流式加载相关
         private ChunkManager m_chunkManager;
@@ -23,9 +22,8 @@ namespace RS.Scene
         {
             var player = GameObject.Find("Player");
 
-            m_player = player.transform;
-            GetComponent<GMToolWindow>().playerTsf = player.transform;
-            GetComponent<GMToolWindow>().player = player.GetComponent<Player>();
+            m_player = player.GetComponent<Player>();
+            GetComponent<GMToolWindow>().player = m_player;
             
             // 初始化Block UV
             Block.Init();
@@ -39,7 +37,7 @@ namespace RS.Scene
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
             var pos = new Vector3(0, 90, 0);
-            m_player.position = pos;
+            m_player.Position = pos;
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace RS.Scene
 
         public void Update()
         {
-            m_chunkManager.UpdateChunkStatus(m_player.position);
+            m_chunkManager.UpdateChunkStatus(m_player.Position);
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)

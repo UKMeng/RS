@@ -19,7 +19,6 @@ namespace RS.GMTool
         
         private PlayerInput m_playerInput;
         
-        public Transform playerTsf;
         public Player player;
 
         private DebugData m_debugData;
@@ -57,9 +56,9 @@ namespace RS.GMTool
 
         private void DrawWindow(int windowId)
         {
-            if (playerTsf != null)
+            if (player != null)
             {
-                GUILayout.Label("玩家坐标:" + playerTsf.position);
+                GUILayout.Label("玩家坐标:" + player.Position);
                 GUILayout.Label("玩家信息:");
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("血量:" + player.Health);
@@ -72,7 +71,7 @@ namespace RS.GMTool
 
         private void UpdateDebugData()
         {
-            var pos = playerTsf.position;
+            var pos = player.Position;
             m_debugData.biomeType = NoiseManager.Instance.SampleBiome(pos, out _);
         }
         
