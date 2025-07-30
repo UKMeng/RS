@@ -11,6 +11,8 @@ namespace RS.Scene
     {
         public GameObject chunkPrefab;
 
+        public GameObject dayLight;
+        
         public long seed = 1284752702419125144;
 
         private Player m_player;
@@ -63,11 +65,22 @@ namespace RS.Scene
         public void Update()
         {
             m_chunkManager.UpdateChunkStatus(m_player.Position);
+            UpdateDayLight();
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)
         {
             return m_chunkManager.GetChunk(chunkPos);
+        }
+
+        private void UpdateDayLight()
+        {
+            var dayProgress = m_time.GetDayProgress();
+            // sunAngle = 0.0f时太阳从地平线升起 假设6点(dayProgress = 0.25)地平线升起，360 * 0.25 = 90的偏差
+            var sunAngle = dayProgress * 360.0f - 90.0f;
+
+            // 在x轴模拟太阳旋转运动
+            dayLight.transform.rotation = Quaternion.Euler(sunAngle, -30.0f, 0.0f);
         }
 
         public string GetGameTime()
