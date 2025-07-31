@@ -121,10 +121,16 @@ namespace RS.Scene
             return m_chunkManager.GetBlockType(blockPos);
         }
 
-        public void PlaceBlock(Vector3Int blockPos, BlockType blockType)
+        public void PlaceBlock(Vector3Int blockPos, BlockType blockType, bool delayUpdate = false)
         {
-            m_chunkManager.PlaceBlock(blockPos, blockType);
+            m_chunkManager.PlaceBlock(blockPos, blockType, delayUpdate);
         }
+
+        public void UpdateChunkMeshOnTick(Chunk chunk)
+        {
+            m_tickManager.UpdateChunkMeshOnTick(chunk);
+        }
+        
         
     }
 }

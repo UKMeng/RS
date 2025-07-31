@@ -52,7 +52,6 @@ namespace RS.Scene
         {
             var index = GetBlockIndex(localPos);
             blocks[index] = newBlockType;
-            BuildMeshUsingJobSystem();
         }
 
         public static Vector3Int BlockWorldPosToChunkPos(Vector3Int blockWorldPos)

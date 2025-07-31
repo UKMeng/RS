@@ -418,7 +418,7 @@ namespace RS.Scene
             return chunk.blocks[Chunk.GetBlockIndex(Chunk.BlockWorldPosToBlockLocalPos(blockPos))];
         }
 
-        public void PlaceBlock(Vector3Int blockPos, BlockType blockType)
+        public void PlaceBlock(Vector3Int blockPos, BlockType blockType, bool delayUpdate = false)
         {
             var chunk = GetChunk(Chunk.BlockWorldPosToChunkPos(blockPos));
             if (chunk == null || chunk.status < ChunkStatus.DataReady)
@@ -431,6 +431,14 @@ namespace RS.Scene
             var blockLocalPos = Chunk.BlockWorldPosToBlockLocalPos(blockPos);
             Debug.Log($"[ChunkManager] 放置方块 {chunk.chunkPos}, {blockLocalPos}");
             chunk.ModifyBlock(blockLocalPos, blockType);
+            if (delayUpdate)
+            {
+                SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+            }
+            else
+            {
+                chunk.BuildMeshUsingJobSystem();
+            }
         }
     }
 }
