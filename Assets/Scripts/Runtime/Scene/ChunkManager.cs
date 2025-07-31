@@ -27,7 +27,7 @@ namespace RS.Scene
 
         private InterpolatedSampler m_finalDensity;
 
-        public void Start()
+        public void Awake()
         {
             m_chunks = new Dictionary<Vector3Int, Chunk>();
             m_chunkGeneratingQueue = new Queue<Vector2Int>();
@@ -45,7 +45,56 @@ namespace RS.Scene
 
             return chunk;
         }
-        
+
+        public void GenerateNewChunk(Vector3 playerPos)
+        {
+            var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
+
+            // 遍历已有的chunk, 根据距离判断是否需要卸载或删除
+            var playerChunkX = playerChunkPos.x;
+            var playerChunkY = playerChunkPos.y;
+            var playerChunkZ = playerChunkPos.z;
+
+            // 收集需要加载或者更新的Chunk
+            var toGenerate = new List<Vector2Int>();
+            for (var offsetX = -m_loadDistance; offsetX < m_loadDistance + 1; offsetX++)
+            {
+                for (var offsetZ = -m_loadDistance; offsetZ < m_loadDistance + 1; offsetZ++)
+                {
+                    var chunkX = playerChunkPos.x + offsetX;
+                    var chunkZ = playerChunkPos.z + offsetZ;
+                    var chunkPos = new Vector3Int(chunkX, 0, chunkZ);
+
+                    if (!m_chunks.TryGetValue(chunkPos, out var chunk) || chunk.status == ChunkStatus.Empty)
+                    {
+                        // chunk生成以xz一组为单位
+                        // 为了纵向各数据判定的准确性，y轴12个chunk的数据准备完毕才能够进行下一步地表等判断
+                        // 如果一个是Empty，那么全员都是没有生成，需要进入生成阶段
+                        // chunk为空，需要生成blocks数据
+                        toGenerate.Add(new Vector2Int(chunkX, chunkZ));
+                    }
+                }
+            }
+            
+            // 根据离玩家距离排序, 排序后放入待生成队列
+            var playerChunkPosXZ = new Vector2Int(playerChunkPos.x, playerChunkPos.z);
+            toGenerate.Sort((a, b) =>
+                (a - playerChunkPosXZ).sqrMagnitude.CompareTo((b - playerChunkPosXZ).sqrMagnitude));
+            
+            foreach (var pos in toGenerate)
+            {
+                if (!m_chunkGeneratingQueue.Contains(pos))
+                {
+                    m_chunkGeneratingQueue.Enqueue(pos);
+                }
+            }
+            
+            if (!m_isGeneratingChunks && m_chunkGeneratingQueue.Count > 0)
+            {
+                StartCoroutine(GenerateChunksCoroutine());
+            }
+        }
+
         public void UpdateChunkStatus(Vector3 playerPos)
         {
             var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
@@ -86,15 +135,12 @@ namespace RS.Scene
                 }
             }
             
-            // 收集需要加载或者更新的Chunk
-            var toGenerate = new List<Vector2Int>();
             for (var offsetX = -m_loadDistance; offsetX < m_loadDistance + 1; offsetX++)
             {
                 for (var offsetZ = -m_loadDistance; offsetZ < m_loadDistance + 1; offsetZ++)
                 {
                     var chunkX = playerChunkPos.x + offsetX;
                     var chunkZ = playerChunkPos.z + offsetZ;
-                    
                     
                     // 目前先假定y轴上能有192m 12个chunk
                     for (var chunkY = 11; chunkY > -1; chunkY--)
@@ -103,11 +149,7 @@ namespace RS.Scene
 
                         if (!m_chunks.TryGetValue(chunkPos, out var chunk) || chunk.status == ChunkStatus.Empty)
                         {
-                            // chunk生成以xz一组为单位
-                            // 为了纵向各数据判定的准确性，y轴12个chunk的数据准备完毕才能够进行下一步地表等判断
-                            // 如果一个是Empty，那么全员都是没有生成，需要进入生成阶段
-                            // chunk为空，需要生成blocks数据
-                            toGenerate.Add(new Vector2Int(chunkX, chunkZ));
+                            // chunk生成以xz一组为单位还没有生成
                             break;
                         }
                         
@@ -144,24 +186,6 @@ namespace RS.Scene
                         }
                     }
                 }
-            }
-            
-            // 根据离玩家距离排序, 排序后放入待生成队列
-            var playerChunkPosXZ = new Vector2Int(playerChunkPos.x, playerChunkPos.z);
-            toGenerate.Sort((a, b) =>
-                (a - playerChunkPosXZ).sqrMagnitude.CompareTo((b - playerChunkPosXZ).sqrMagnitude));
-            
-            foreach (var pos in toGenerate)
-            {
-                if (!m_chunkGeneratingQueue.Contains(pos))
-                {
-                    m_chunkGeneratingQueue.Enqueue(pos);
-                }
-            }
-            
-            if (!m_isGeneratingChunks && m_chunkGeneratingQueue.Count > 0)
-            {
-                StartCoroutine(GenerateChunksCoroutine());
             }
         }
         

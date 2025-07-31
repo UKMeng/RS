@@ -29,6 +29,7 @@ namespace RS.Scene
         
         // 流式加载相关
         private ChunkManager m_chunkManager;
+        private Vector3 m_lastPosition;
         
         // 游戏内更新相关
         private TickManager m_tickManager;
@@ -62,6 +63,7 @@ namespace RS.Scene
             // TODO: 后续位置要虽然随机但是要放在一个平地上
             var pos = new Vector3(0, 90, 0);
             m_player.Position = pos;
+            m_lastPosition = new Vector3(0, 0, 0);
             
             Debug.Log($"[SceneManager]初始化完毕");
         }
@@ -78,6 +80,13 @@ namespace RS.Scene
 
         public void Update()
         {
+            // 生成Chunk的数据不需要每次都执行
+            if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
+            {
+                m_chunkManager.GenerateNewChunk(m_player.Position);
+                m_lastPosition = m_player.Position;
+            }
+
             m_chunkManager.UpdateChunkStatus(m_player.Position);
             UpdateDayLight();
         }
