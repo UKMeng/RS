@@ -46,5 +46,11 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
         }
+        
+        [MenuItem("RSTest/Debug Output")]
+        public static void DebugOutput()
+        {
+            Debug.Log($"{System.Environment.Version}");
+        }
     }
 }

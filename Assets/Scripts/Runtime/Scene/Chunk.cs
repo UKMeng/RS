@@ -6,7 +6,7 @@ using Unity.Jobs;
 using Unity.Burst;
 
 using RS.Item;
-
+using RS.Utils;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene
@@ -48,13 +48,50 @@ namespace RS.Scene
             status = ChunkStatus.Empty;
         }
         
-        public void ModifyBlock(Vector3 localPos, BlockType newBlockType)
+        public void ModifyBlock(Vector3Int localPos, BlockType newBlockType)
         {
-            var index = GetBlockIndex((int)localPos.x, (int)localPos.y, (int)localPos.z);
+            var index = GetBlockIndex(localPos);
             blocks[index] = newBlockType;
             BuildMeshUsingJobSystem();
         }
 
+        public static Vector3Int BlockWorldPosToChunkPos(Vector3Int blockWorldPos)
+        {
+            return new Vector3Int(
+                blockWorldPos.x / 32,
+                blockWorldPos.y / 32,
+                blockWorldPos.z / 32
+            );
+        }
+
+        public static Vector3Int BlockWorldPosToBlockLocalPos(Vector3Int blockWorldPos)
+        {
+            return new Vector3Int(
+                RsMath.Mod(blockWorldPos.x, 32),
+                blockWorldPos.y % 32,
+                RsMath.Mod(blockWorldPos.z, 32)
+            );
+        }
+
+        public static Vector3Int WorldPosToBlockWorldPos(Vector3 worldPos)
+        {
+            return new Vector3Int(
+                Mathf.FloorToInt(worldPos.x),
+                Mathf.FloorToInt(worldPos.y * 2),
+                Mathf.FloorToInt(worldPos.z)
+            );
+        }
+
+        public static Vector3Int WorldPosToBlockLocalPos(Vector3 worldPos)
+        {
+            return new Vector3Int(
+                RsMath.Mod((int)worldPos.x, 32),
+                (int)(worldPos.y * 2 % 32),
+                RsMath.Mod((int)worldPos.z, 32)
+            );
+        }
+        
+        
         public static Vector3Int WorldPosToChunkPos(Vector3 worldPos)
         {
             return new Vector3Int(
@@ -689,6 +726,11 @@ namespace RS.Scene
             }
             
             return x * 32 * 32 + z * 32 + y;
+        }
+
+        public static int GetBlockIndex(Vector3Int blockLocalPos)
+        {
+            return GetBlockIndex(blockLocalPos.x, blockLocalPos.y, blockLocalPos.z);
         }
     }
 }

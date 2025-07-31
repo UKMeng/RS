@@ -38,7 +38,12 @@ namespace RS.Scene
 
         public Chunk GetChunk(Vector3Int chunkPos)
         {
-            return m_chunks[chunkPos];
+            if (!m_chunks.TryGetValue(chunkPos, out var chunk))
+            {
+                return null;
+            }
+
+            return chunk;
         }
         
         public void UpdateChunkStatus(Vector3 playerPos)
@@ -103,7 +108,7 @@ namespace RS.Scene
                             // 如果一个是Empty，那么全员都是没有生成，需要进入生成阶段
                             // chunk为空，需要生成blocks数据
                             toGenerate.Add(new Vector2Int(chunkX, chunkZ));
-                            continue;
+                            break;
                         }
                         
                         if (chunk.status == ChunkStatus.DataReady)
@@ -285,7 +290,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Aquifer;
             
             sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"[ChunkManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         private void GenerateAquifer(Chunk chunk)
@@ -375,6 +380,31 @@ namespace RS.Scene
         private BlockType JudgeBaseBlockType(float density)
         {
             return density > 0 ? BlockType.Stone : BlockType.Air;
+        }
+
+        public BlockType GetBlockType(Vector3Int blockPos)
+        {
+            var chunk = GetChunk(Chunk.BlockWorldPosToChunkPos(blockPos));
+            if (chunk == null || chunk.status < ChunkStatus.DataReady)
+            {
+                // chunk未生成时，默认返回Stone;
+                return BlockType.Stone;
+            }
+            
+            return chunk.blocks[Chunk.GetBlockIndex(Chunk.BlockWorldPosToBlockLocalPos(blockPos))];
+        }
+
+        public void PlaceBlock(Vector3Int blockPos, BlockType blockType)
+        {
+            var chunk = GetChunk(Chunk.BlockWorldPosToChunkPos(blockPos));
+            if (chunk == null || chunk.status < ChunkStatus.DataReady)
+            {
+                // chunk未生成时
+                Debug.LogError($"[ChunkManager] 无法放置方块, Chunk未生成 {blockPos}");
+                return;
+            }
+
+            chunk.ModifyBlock(Chunk.BlockWorldPosToBlockLocalPos(blockPos), blockType);
         }
     }
 }

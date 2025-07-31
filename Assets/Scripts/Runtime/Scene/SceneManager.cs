@@ -9,6 +9,16 @@ namespace RS.Scene
 {
     public class SceneManager: MonoBehaviour
     {
+        private static SceneManager s_instance;
+
+        public static SceneManager Instance
+        {
+            get
+            {
+                return s_instance;
+            }
+        }
+        
         public GameObject chunkPrefab;
 
         public GameObject dayLight;
@@ -26,6 +36,8 @@ namespace RS.Scene
         
         public void Start()
         {
+            s_instance = this;
+            
             var player = GameObject.Find("Player");
 
             m_player = player.GetComponent<Player>();
@@ -50,6 +62,8 @@ namespace RS.Scene
             // TODO: 后续位置要虽然随机但是要放在一个平地上
             var pos = new Vector3(0, 90, 0);
             m_player.Position = pos;
+            
+            Debug.Log($"[SceneManager]初始化完毕");
         }
 
         /// <summary>
@@ -86,6 +100,16 @@ namespace RS.Scene
         public string GetGameTime()
         {
             return m_time.GetTime();
+        }
+
+        public BlockType GetBlockType(Vector3Int blockPos)
+        {
+            return m_chunkManager.GetBlockType(blockPos);
+        }
+
+        public void PlaceBlock(Vector3Int blockPos, BlockType blockType)
+        {
+            m_chunkManager.PlaceBlock(blockPos, blockType);
         }
         
     }

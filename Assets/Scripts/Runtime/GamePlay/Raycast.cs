@@ -62,7 +62,7 @@ namespace RS.GamePlay
                 var normal = hitInfo.normal;
                 var blockPos = RsMath.GetBlockMinCorner(pos, normal);
                 var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                var blockLocalPos = new Vector3(RsMath.Mod((int)blockPos.x, 32), blockPos.y * 2 % 32, RsMath.Mod((int)blockPos.z, 32));
+                var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
                 Debug.Log($"Hit Position: {pos}");
 
                 Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
@@ -113,7 +113,7 @@ namespace RS.GamePlay
                 }
                 
                 var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                var blockLocalPos = new Vector3(RsMath.Mod((int)blockPos.x, 32), blockPos.y * 2 % 32, RsMath.Mod((int)blockPos.z, 32));
+                var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
                 Debug.Log($"Hit Position: {pos}");
 
                 Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
