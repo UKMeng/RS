@@ -21,12 +21,6 @@ namespace RS.Item
             var newLiquids = new List<Liquid>();
             foreach (var liquid in m_liquids)
             {
-                if (liquid.Depth == liquid.MaxDepth)
-                {
-                    continue;
-                }
-                
-                // 先只检查水平方向的
                 var forward = liquid.Position + Vector3Int.forward;
                 var back = liquid.Position + Vector3Int.back;
                 var left = liquid.Position + Vector3Int.left;
@@ -45,7 +39,7 @@ namespace RS.Item
                 {
                     var isFloat = CheckLiquidFlow(liquid, down, newLiquids, true);
 
-                    if (!isFloat)
+                    if (!isFloat && liquid.Depth != liquid.MaxDepth)
                     {
                         CheckLiquidFlow(liquid, forward, newLiquids);
                         CheckLiquidFlow(liquid, back, newLiquids);
@@ -67,10 +61,15 @@ namespace RS.Item
                 newLiquids.Add(newLiquid);
                 SceneManager.Instance.PlaceBlock(direction, liquid.Type);
 
-                return !isDown;
+                return isDown;
             }
 
-            return true;
+            if (block == BlockType.Water)
+            {
+                return isDown;
+            }
+
+            return false;
         }
     }
 }
