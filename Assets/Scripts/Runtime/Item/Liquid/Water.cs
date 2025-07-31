@@ -5,17 +5,17 @@ namespace RS.Item
     public class Water: Liquid
     {
         public override string Name => "Water";
+        public override int MaxDepth => 4;
+        public override BlockType Type => BlockType.Water;
         
-        protected override Liquid Spread(Vector3Int pos, byte depth, Liquid source)
+        public override Liquid Spread(Vector3Int pos, byte depth)
         {
-            return new Water(pos, depth, this);
+            return new Water(pos, depth);
         }
 
-        public Water(Vector3Int pos, byte depth, Liquid source)
-            : base(pos, depth, source)
+        public Water(Vector3Int pos, byte depth = 0)
+            : base(pos, depth)
         {
-            m_maxDepth = 7;
         }
-        
     }
 }

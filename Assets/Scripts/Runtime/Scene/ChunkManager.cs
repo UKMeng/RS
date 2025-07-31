@@ -314,7 +314,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Aquifer;
             
             sw.Stop();
-            Debug.Log($"[ChunkManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[ChunkManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         private void GenerateAquifer(Chunk chunk)
@@ -345,7 +345,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Surface;
             
             sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
         private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
@@ -384,7 +384,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.DataReady;
             
             sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
         }
         
 
@@ -428,7 +428,9 @@ namespace RS.Scene
                 return;
             }
 
-            chunk.ModifyBlock(Chunk.BlockWorldPosToBlockLocalPos(blockPos), blockType);
+            var blockLocalPos = Chunk.BlockWorldPosToBlockLocalPos(blockPos);
+            Debug.Log($"[ChunkManager] 放置方块 {chunk.chunkPos}, {blockLocalPos}");
+            chunk.ModifyBlock(blockLocalPos, blockType);
         }
     }
 }

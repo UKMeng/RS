@@ -106,6 +106,11 @@ namespace RS.Scene
             dayLight.transform.rotation = Quaternion.Euler(sunAngle, -30.0f, 0.0f);
         }
 
+        public void RegisterTickEvent(IUpdateByTick sub)
+        {
+            m_tickManager.Register(sub);
+        }
+
         public string GetGameTime()
         {
             return m_time.GetTime();

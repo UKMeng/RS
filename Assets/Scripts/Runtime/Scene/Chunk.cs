@@ -58,9 +58,9 @@ namespace RS.Scene
         public static Vector3Int BlockWorldPosToChunkPos(Vector3Int blockWorldPos)
         {
             return new Vector3Int(
-                blockWorldPos.x / 32,
-                blockWorldPos.y / 32,
-                blockWorldPos.z / 32
+                Mathf.FloorToInt(blockWorldPos.x / 32.0f),
+                Mathf.FloorToInt(blockWorldPos.y / 32.0f),
+                Mathf.FloorToInt(blockWorldPos.z / 32.0f)
             );
         }
 
@@ -280,7 +280,7 @@ namespace RS.Scene
                 { vertices = vertices.ToArray(), triangles = triangles.ToArray(), uvs = uvs.ToArray() };
             
             sw.Stop();
-            Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
 
             return meshData;
         }

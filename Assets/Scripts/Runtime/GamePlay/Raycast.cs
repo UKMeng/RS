@@ -111,17 +111,20 @@ namespace RS.GamePlay
                 {
                     blockPos.z -= 1;
                 }
-                
-                var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
-                Debug.Log($"Hit Position: {pos}");
 
-                Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
+                var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
+                // var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
+                // var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
+                Debug.Log($"Hit Position: {pos}");
+                Debug.Log($"Block World Pos: {blockWorldPos}");
+                // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
+                SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
+                SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
                 
                 // 放置这个block
                 // 首先获取chunk
-                var chunk = m_sceneManager.GetChunk(chunkPos);
-                chunk.ModifyBlock(blockLocalPos, BlockType.Stone);
+                // var chunk = m_sceneManager.GetChunk(chunkPos);
+                // chunk.ModifyBlock(blockLocalPos, BlockType.Stone);
             }
         }
     }
