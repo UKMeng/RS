@@ -31,25 +31,46 @@ namespace RS.Item
                 var back = liquid.Position + Vector3Int.back;
                 var left = liquid.Position + Vector3Int.left;
                 var right = liquid.Position + Vector3Int.right;
+                var down = liquid.Position + Vector3Int.down;
 
-                CheckLiquidFlow(liquid, forward, newLiquids);
-                CheckLiquidFlow(liquid, back, newLiquids);
-                CheckLiquidFlow(liquid, left, newLiquids);
-                CheckLiquidFlow(liquid, right, newLiquids);
+                if (liquid == m_source)
+                {
+                    CheckLiquidFlow(liquid, forward, newLiquids);
+                    CheckLiquidFlow(liquid, back, newLiquids);
+                    CheckLiquidFlow(liquid, left, newLiquids);
+                    CheckLiquidFlow(liquid, right, newLiquids);
+                    CheckLiquidFlow(liquid, down, newLiquids, true);
+                }
+                else
+                {
+                    var isFloat = CheckLiquidFlow(liquid, down, newLiquids, true);
+
+                    if (!isFloat)
+                    {
+                        CheckLiquidFlow(liquid, forward, newLiquids);
+                        CheckLiquidFlow(liquid, back, newLiquids);
+                        CheckLiquidFlow(liquid, left, newLiquids);
+                        CheckLiquidFlow(liquid, right, newLiquids);
+                    }
+                }
             }
             
             m_liquids.AddRange(newLiquids);
         }
 
-        private void CheckLiquidFlow(Liquid liquid, Vector3Int direction, List<Liquid> newLiquids)
+        private bool CheckLiquidFlow(Liquid liquid, Vector3Int direction, List<Liquid> newLiquids, bool isDown = false)
         {
             var block = SceneManager.Instance.GetBlockType(direction);
             if (block == BlockType.Air)
             {
-                var newLiquid = liquid.Spread(direction, (byte)(liquid.Depth + 1));
+                var newLiquid = liquid.Spread(direction, isDown ? liquid.Depth : (byte)(liquid.Depth + 1));
                 newLiquids.Add(newLiquid);
                 SceneManager.Instance.PlaceBlock(direction, liquid.Type);
+
+                return !isDown;
             }
+
+            return true;
         }
     }
 }
