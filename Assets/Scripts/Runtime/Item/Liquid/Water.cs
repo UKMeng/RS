@@ -5,7 +5,7 @@ namespace RS.Item
     public class Water: Liquid
     {
         public override string Name => "Water";
-        public override int MaxDepth => 4;
+        public override int MaxDepth => 7;
         public override BlockType Type => BlockType.Water;
         
         public override Liquid Spread(Vector3Int pos, byte depth)

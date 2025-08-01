@@ -7,6 +7,7 @@ using RS.Scene.Biome;
 using RS.Utils;
 using RS.Item;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using Debug = UnityEngine.Debug;
 
 
@@ -155,27 +156,11 @@ namespace RS.Scene
                         
                         if (chunk.status == ChunkStatus.DataReady)
                         {
-                            // chunk数据准备完成，生成Mesh投入场景
+                            // chunk数据准备完成，还没有生成Mesh和对应GameObject
                             // 简易剔除，只生成玩家所在平面往下2格的Chunk
                             if (chunkY >= playerChunkPos.y - 1)
                             {
-                                var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
-                                var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
-                                var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
-                                var mesh = new Mesh();
-                                mesh.vertices = meshData.vertices;
-                                mesh.triangles = meshData.triangles;
-                                mesh.uv = meshData.uvs;
-                                mesh.RecalculateNormals();
-                    
-                                var chunkTf = chunkGo.GetComponent<MeshFilter>();
-                                chunkTf.mesh = mesh;
-                    
-                                var chunkMc = chunkGo.GetComponent<MeshCollider>();
-                                chunkMc.sharedMesh = mesh;
-
-                                chunk.go = chunkGo;
-                                chunk.status = ChunkStatus.Loaded;
+                                InitChunkMesh(chunk);
                             }
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
@@ -187,6 +172,39 @@ namespace RS.Scene
                     }
                 }
             }
+        }
+
+        private void InitChunkMesh(Chunk chunk)
+        {
+            var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
+            var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
+            var waterGo = chunkGo.transform.Find("Water").gameObject;
+            var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
+            var mesh = new Mesh();
+            mesh.vertices = meshData.vertices;
+            mesh.triangles = meshData.triangles;
+            mesh.uv = meshData.uvs;
+            mesh.RecalculateNormals();
+
+            var waterMesh = new Mesh();
+            waterMesh.vertices = meshData.waterVertices;
+            waterMesh.triangles = meshData.waterTriangles;
+            waterMesh.RecalculateNormals();
+                    
+            var chunkTf = chunkGo.GetComponent<MeshFilter>();
+            chunkTf.mesh = mesh;
+                    
+            var chunkMc = chunkGo.GetComponent<MeshCollider>();
+            chunkMc.sharedMesh = mesh;
+            
+            var waterTf = waterGo.GetComponent<MeshFilter>();
+            waterTf.mesh = waterMesh;
+            
+            var waterMc = waterGo.GetComponent<MeshCollider>();
+            waterMc.sharedMesh = waterMesh;
+
+            chunk.go = chunkGo;
+            chunk.status = ChunkStatus.Loaded;
         }
         
         private IEnumerator GenerateChunksCoroutine()
@@ -437,7 +455,7 @@ namespace RS.Scene
             }
             else
             {
-                chunk.BuildMeshUsingJobSystem();
+                chunk.UpdateMesh();
             }
         }
     }

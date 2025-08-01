@@ -25,9 +25,14 @@ namespace RS.Scene
     
     public struct MeshData
     {
+        // normal block
         public Vector3[] vertices;
         public int[] triangles;
         public Vector2[] uvs;
+        
+        // water block
+        public Vector3[] waterVertices;
+        public int[] waterTriangles;
     }
     
     public class Chunk
@@ -117,6 +122,9 @@ namespace RS.Scene
             var triangles = new List<int>();
             var uvs = new List<Vector2>();
 
+            var wVertices = new List<Vector3>();
+            var wTriangles = new List<int>();
+
             for (var x = 0; x < width; x++)
             {
                 for (var z = 0; z < width; z++)
@@ -124,19 +132,131 @@ namespace RS.Scene
                     for (var y = 0; y < height; y++)
                     {
                         var index = GetBlockIndex(x, y, z);
+                        var upIndex = GetBlockIndex(x, y + 1, z);
+                        var downIndex = GetBlockIndex(x, y - 1, z);
+                        var frontIndex = GetBlockIndex(x, y, z - 1);
+                        var backIndex = GetBlockIndex(x, y, z + 1);
+                        var leftIndex = GetBlockIndex(x - 1, y, z);
+                        var rightIndex = GetBlockIndex(x + 1, y, z);
+                        var elevation = y * 0.5f;
 
                         if (blocks[index] == BlockType.Air)
                         {
                             continue;
                         }
 
-                        var elevation = y * 0.5f;
+                        if (blocks[index] == BlockType.Water)
+                        {
+                            // Up
+                            if (upIndex == -1 || blocks[upIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 3);
+                                wTriangles.Add(vertIndex + 2);
+                            }
+                            
+                            // Down
+                            if (downIndex == -1 || blocks[downIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x, elevation, z));
+                                wVertices.Add(new Vector3(x + 1, elevation, z));
+                                wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                wVertices.Add(new Vector3(x, elevation, z + 1));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 3);
+                            }
+                            
+                            // Front
+                            if (frontIndex == -1 || blocks[frontIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x, elevation, z));
+                                wVertices.Add(new Vector3(x + 1, elevation, z));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 3);
+                                wTriangles.Add(vertIndex + 2);
+                            }
+                            
+                            // Back
+                            if (backIndex == -1 || blocks[backIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x, elevation, z + 1));
+                                wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 3);
+                            }
+                            
+                            // Left
+                            if (leftIndex == -1 || blocks[leftIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x, elevation, z + 1));
+                                wVertices.Add(new Vector3(x, elevation, z));
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+                                wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 3);
+                                wTriangles.Add(vertIndex + 2);
+                            }
+                            
+                            // right
+                            if (rightIndex == -1 || blocks[rightIndex] != BlockType.Water)
+                            {
+                                var vertIndex = wVertices.Count;
+                                wVertices.Add(new Vector3(x + 1, elevation, z));
+                                wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 2);
+                                wTriangles.Add(vertIndex + 1);
+                                wTriangles.Add(vertIndex);
+                                wTriangles.Add(vertIndex + 3);
+                                wTriangles.Add(vertIndex + 2);
+                            }
+
+                            continue;
+                        }
+                        
 
                         var uv = Block.uvTable[(int)blocks[index]];
                         
                         // Up
-                        var upIndex = GetBlockIndex(x, y + 1, z);
-                        if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
+                        if (upIndex == -1 || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -157,9 +277,8 @@ namespace RS.Scene
                             uvs.Add(uv[3]);
                         }
                         
-                        // Bottom
-                        var downIndex = GetBlockIndex(x, y - 1, z);
-                        if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
+                        // Down
+                        if (downIndex == -1 || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -181,8 +300,7 @@ namespace RS.Scene
                         }
                         
                         // Front
-                        var frontIndex = GetBlockIndex(x, y, z - 1);
-                        if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
+                        if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -204,8 +322,7 @@ namespace RS.Scene
                         }
                         
                         // Back
-                        var backIndex = GetBlockIndex(x, y, z + 1);
-                        if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
+                        if (backIndex == -1 || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -227,8 +344,7 @@ namespace RS.Scene
                         }
                         
                         // Left
-                        var leftIndex = GetBlockIndex(x - 1, y, z);
-                        if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
+                        if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -250,8 +366,7 @@ namespace RS.Scene
                         }
                         
                         // right
-                        var rightIndex = GetBlockIndex(x + 1, y, z);
-                        if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
+                        if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x + 1, elevation, z));
@@ -276,12 +391,50 @@ namespace RS.Scene
             }
 
             var meshData = new MeshData
-                { vertices = vertices.ToArray(), triangles = triangles.ToArray(), uvs = uvs.ToArray() };
+            {
+                vertices = vertices.ToArray(), triangles = triangles.ToArray(), uvs = uvs.ToArray(),
+                waterVertices = wVertices.ToArray(), waterTriangles = wTriangles.ToArray(),
+            };
             
             sw.Stop();
             // Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
 
             return meshData;
+        }
+
+
+        public void UpdateMesh()
+        {
+            var sw = Stopwatch.StartNew();
+
+            var meshData = BuildMesh(blocks, 32, 32);
+            
+            var waterGo = go.transform.Find("Water").gameObject;
+            var mesh = new Mesh();
+            mesh.vertices = meshData.vertices;
+            mesh.triangles = meshData.triangles;
+            mesh.uv = meshData.uvs;
+            mesh.RecalculateNormals();
+
+            var waterMesh = new Mesh();
+            waterMesh.vertices = meshData.waterVertices;
+            waterMesh.triangles = meshData.waterTriangles;
+            waterMesh.RecalculateNormals();
+                    
+            var chunkTf = go.GetComponent<MeshFilter>();
+            chunkTf.mesh = mesh;
+                    
+            var chunkMc = go.GetComponent<MeshCollider>();
+            chunkMc.sharedMesh = mesh;
+            
+            var waterTf = waterGo.GetComponent<MeshFilter>();
+            waterTf.mesh = waterMesh;
+            
+            var waterMc = waterGo.GetComponent<MeshCollider>();
+            waterMc.sharedMesh = waterMesh;
+
+            sw.Stop();
+            Debug.Log($"Chunk Mesh Updated in {sw.ElapsedMilliseconds} ms");
         }
         
         public void BuildMeshUsingJobSystem()

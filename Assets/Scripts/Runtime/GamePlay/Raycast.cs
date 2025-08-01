@@ -71,7 +71,7 @@ namespace RS.GamePlay
                 // 首先获取chunk
                 var chunk = m_sceneManager.GetChunk(chunkPos);
                 chunk.ModifyBlock(blockLocalPos, BlockType.Air);
-                chunk.BuildMeshUsingJobSystem();
+                chunk.UpdateMesh();
             }
         }
 

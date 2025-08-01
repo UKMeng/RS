@@ -40,7 +40,7 @@ namespace RS.Scene
                 // 延迟在本tick更新的chunk mesh
                 foreach (var chunk in m_toUpdateChunks)
                 {
-                    chunk.BuildMeshUsingJobSystem();
+                    chunk.UpdateMesh();
                 }
                 m_toUpdateChunks.Clear();
             }
