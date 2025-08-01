@@ -231,6 +231,8 @@ namespace RS.Scene
 
         public BlockType[] CollectNeighborBlocks(Vector3Int chunkPos)
         {
+            // var sw = Stopwatch.StartNew();
+            
             var blocks = new BlockType[32 * 32 * 6];
             var index = 0;
             // 上
@@ -371,6 +373,9 @@ namespace RS.Scene
                 }
             }
 
+            // sw.Stop();
+            // Debug.Log($"[ChunkManager]CollectNeighborBlocks: {sw.ElapsedMilliseconds}ms");
+            
             return blocks;
         }
 

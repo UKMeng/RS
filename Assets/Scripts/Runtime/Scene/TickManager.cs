@@ -38,11 +38,11 @@ namespace RS.Scene
                 }
 
                 // 延迟在本tick更新的chunk mesh
-                foreach (var chunk in m_toUpdateChunks)
+                if (m_toUpdateChunks.Count > 0)
                 {
-                    chunk.UpdateMesh();
+                    Chunk.BuildMeshUsingJobSystem(m_toUpdateChunks);
+                    m_toUpdateChunks.Clear();
                 }
-                m_toUpdateChunks.Clear();
             }
         }
         

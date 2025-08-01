@@ -443,68 +443,141 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"Chunk Mesh Updated in {sw.ElapsedMilliseconds} ms");
         }
-        
-        public void BuildMeshUsingJobSystem()
+
+        /// <summary>
+        /// 使用JobSystem来同时处理多个Chunk的mesh构建
+        /// </summary>
+        /// <param name="chunks"></param>
+        public static void BuildMeshUsingJobSystem(List<Chunk> chunks)
         {
             var sw = Stopwatch.StartNew();
+            var chunkCount = chunks.Count;
+            var jobHandles = new NativeArray<JobHandle>(chunkCount, Allocator.Temp);
+            var jobs = new NativeArray<BuildMeshJob>(chunkCount, Allocator.Temp);
+            var verticesList = new NativeList<Vector3>[chunkCount];
+            var trianglesList = new NativeList<int>[chunkCount];
+            var uvsList = new NativeList<Vector2>[chunkCount];
+            var waterVerticesList = new NativeList<Vector3>[chunkCount];
+            var waterTrianglesList = new NativeList<int>[chunkCount];
 
-            var vertices = new NativeList<Vector3>(Allocator.TempJob);
-            var trianlges = new NativeList<int>(Allocator.TempJob);
-            var uvs = new NativeList<Vector2>(Allocator.TempJob);
-
-            var buildMeshJob = new BuildMeshJob
+            for (var i = 0; i < chunkCount; i++)
             {
-                width = m_width,
-                height = m_height,
-                blocks = new NativeArray<BlockType>(blocks, Allocator.TempJob),
-                uvTable = Block.uvTableArray,
-                vertices = vertices,
-                triangles = trianlges,
-                uvs = uvs
-            };
+                verticesList[i] = new NativeList<Vector3>(Allocator.TempJob);
+                trianglesList[i] = new NativeList<int>(Allocator.TempJob);
+                uvsList[i] = new NativeList<Vector2>(Allocator.TempJob);
+                waterVerticesList[i] = new NativeList<Vector3>(Allocator.TempJob);
+                waterTrianglesList[i] = new NativeList<int>(Allocator.TempJob);
 
-            var jobHandle = buildMeshJob.Schedule();
-            jobHandle.Complete();
+                var buildMeshJob = new BuildMeshJob()
+                {
+                    width = 32,
+                    height = 32,
+                    blocks = new NativeArray<BlockType>(chunks[i].blocks, Allocator.TempJob),
+                    extraBlocks = new NativeArray<BlockType>(ChunkManager.Instance.CollectNeighborBlocks(chunks[i].chunkPos), Allocator.TempJob),
+                    uvTable = Block.uvTableArray,
+                    vertices = verticesList[i],
+                    triangles = trianglesList[i],
+                    uvs = uvsList[i],
+                    wVertices = waterVerticesList[i],
+                    wTriangles = waterTrianglesList[i],
+                };
 
-            var mesh = new Mesh();
-            
-            var verticesArray = new Vector3[vertices.Length];
-            var vertexIndex = 0;
-            foreach (var vertex in vertices)
-            {
-                verticesArray[vertexIndex++] = vertex;
+                jobs[i] = buildMeshJob;
+                jobHandles[i] = buildMeshJob.Schedule();
             }
             
-            var trianglesArray = new int[trianlges.Length];
-            var triangleIndex = 0;
-            foreach (var triangle in trianlges)
-            {
-                trianglesArray[triangleIndex++] = triangle;
-            }
+            // 等待全部完成
+            JobHandle.CompleteAll(jobHandles);
             
-            var uvArray = new Vector2[uvs.Length];
-            var uvIndex = 0;
-            foreach (var uv in uvs)
+            // 处理生成数据
+            for (var i = 0; i < chunkCount; i++)
             {
-                uvArray[uvIndex++] = uv;
+                var vertices = verticesList[i];
+                var triangles = trianglesList[i];
+                var uvs = uvsList[i];
+                var waterVertices = waterVerticesList[i];
+                var waterTriangles = waterTrianglesList[i];
+                
+                var verticesArray = new Vector3[vertices.Length];
+                var vertexIndex = 0;
+                foreach (var vertex in vertices)
+                {
+                    verticesArray[vertexIndex++] = vertex;
+                }
+            
+                var trianglesArray = new int[triangles.Length];
+                var triangleIndex = 0;
+                foreach (var triangle in triangles)
+                {
+                    trianglesArray[triangleIndex++] = triangle;
+                }
+            
+                var uvArray = new Vector2[uvs.Length];
+                var uvIndex = 0;
+                foreach (var uv in uvs)
+                {
+                    uvArray[uvIndex++] = uv;
+                }
+                
+                var waterVerticesArray = new Vector3[waterVertices.Length];
+                var waterVertexIndex = 0;
+                foreach (var waterVertex in waterVertices)
+                {
+                    waterVerticesArray[waterVertexIndex++] = waterVertex;
+                }
+            
+                var waterTrianglesArray = new int[waterTriangles.Length];
+                var waterTriangleIndex = 0;
+                foreach (var waterTriangle in waterTriangles)
+                {
+                    waterTrianglesArray[waterTriangleIndex++] = waterTriangle;
+                }
+                
+
+                var mesh = new Mesh();
+                mesh.vertices = verticesArray;
+                mesh.triangles = trianglesArray;
+                mesh.uv = uvArray;
+                mesh.RecalculateNormals();
+
+                var waterMesh = new Mesh();
+                waterMesh.vertices = waterVerticesArray;
+                waterMesh.triangles = waterTrianglesArray;
+                waterMesh.RecalculateNormals();
+                    
+                var go = chunks[i].go;
+                var waterGo = go.transform.Find("Water").gameObject;
+                var chunkTf = go.GetComponent<MeshFilter>();
+                chunkTf.mesh = mesh;
+                    
+                var chunkMc = go.GetComponent<MeshCollider>();
+                chunkMc.sharedMesh = mesh;
+            
+                var waterTf = waterGo.GetComponent<MeshFilter>();
+                waterTf.mesh = waterMesh;
+            
+                var waterMc = waterGo.GetComponent<MeshCollider>();
+                waterMc.sharedMesh = waterMesh;
             }
 
-            vertices.Dispose();
-            trianlges.Dispose();
-            uvs.Dispose();
-            buildMeshJob.blocks.Dispose();
-            
-            mesh.vertices = verticesArray;
-            mesh.triangles = trianglesArray;
-            mesh.uv = uvArray;
-            
-            mesh.RecalculateNormals();
-            
-            go.GetComponent<MeshFilter>().mesh = mesh;
-            go.GetComponent<MeshCollider>().sharedMesh = mesh;
 
+            // Dispose所有数据
+            for (var i = 0; i < chunkCount; i++)
+            {
+                verticesList[i].Dispose();
+                trianglesList[i].Dispose();
+                uvsList[i].Dispose();
+                waterVerticesList[i].Dispose();
+                waterTrianglesList[i].Dispose();
+                jobs[i].blocks.Dispose();
+                jobs[i].extraBlocks.Dispose();
+            }
+
+            jobs.Dispose();
+            jobHandles.Dispose();
+            
             sw.Stop();
-            Debug.Log($"Chunk {chunkPos} generated in {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"{chunkCount} chunks meshes generated in {sw.ElapsedMilliseconds} ms");
         }
 
         [BurstCompile]
@@ -513,10 +586,14 @@ namespace RS.Scene
             [ReadOnly] public int width;
             [ReadOnly] public int height;
             [ReadOnly] public NativeArray<BlockType> blocks;
+            [ReadOnly] public NativeArray<BlockType> extraBlocks;
             [ReadOnly] public NativeArray<Vector2> uvTable;
             public NativeList<Vector3> vertices;
             public NativeList<int> triangles;
             public NativeList<Vector2> uvs;
+            public NativeList<Vector3> wVertices;
+            public NativeList<int> wTriangles;
+            
 
             public void Execute()
             {
@@ -526,14 +603,128 @@ namespace RS.Scene
                     {
                         for (var y = 0; y < height; y++)
                         {
-                            var index = GetArrayIndex(x, y, z);
+                            var index = GetBlockIndex(x, y, z);
+                            var upIndex = GetBlockIndex(x, y + 1, z);
+                            var downIndex = GetBlockIndex(x, y - 1, z);
+                            var frontIndex = GetBlockIndex(x, y, z - 1);
+                            var backIndex = GetBlockIndex(x, y, z + 1);
+                            var leftIndex = GetBlockIndex(x - 1, y, z);
+                            var rightIndex = GetBlockIndex(x + 1, y, z);
+                            var elevation = y * 0.5f;
 
                             if (blocks[index] == BlockType.Air)
                             {
                                 continue;
                             }
 
-                            var elevation = y * 0.5f;
+                            if (blocks[index] == BlockType.Water)
+                            {
+                                // 水面只有遇到空气时才会生成面
+                                // Up
+                                if ((y == 31 && extraBlocks[upIndex] == BlockType.Air) || blocks[upIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 3);
+                                    wTriangles.Add(vertIndex + 2);
+                                }
+                                
+                                // Down
+                                if ((y == 0 && extraBlocks[downIndex] == BlockType.Air) || blocks[downIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x, elevation, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                    wVertices.Add(new Vector3(x, elevation, z + 1));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 3);
+                                }
+                                
+                                // Front
+                                if ((z == 0 && extraBlocks[frontIndex] == BlockType.Air) || blocks[frontIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x, elevation, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 3);
+                                    wTriangles.Add(vertIndex + 2);
+                                }
+                                
+                                // Back
+                                if ((z == 31 && extraBlocks[backIndex] == BlockType.Air) || blocks[backIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x, elevation, z + 1));
+                                    wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 3);
+                                }
+                                
+                                // Left
+                                if ((x == 0 && extraBlocks[leftIndex] == BlockType.Air) || blocks[leftIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x, elevation, z + 1));
+                                    wVertices.Add(new Vector3(x, elevation, z));
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z));
+                                    wVertices.Add(new Vector3(x, elevation + 0.5f, z + 1));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 3);
+                                    wTriangles.Add(vertIndex + 2);
+                                }
+                                
+                                // right
+                                if ((x == 31 && extraBlocks[rightIndex] == BlockType.Air) || blocks[rightIndex] == BlockType.Air)
+                                {
+                                    var vertIndex = wVertices.Length;
+                                    wVertices.Add(new Vector3(x + 1, elevation, z));
+                                    wVertices.Add(new Vector3(x + 1, elevation, z + 1));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z + 1));
+                                    wVertices.Add(new Vector3(x + 1, elevation + 0.5f, z));
+
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 2);
+                                    wTriangles.Add(vertIndex + 1);
+                                    wTriangles.Add(vertIndex);
+                                    wTriangles.Add(vertIndex + 3);
+                                    wTriangles.Add(vertIndex + 2);
+                                }
+
+                                continue;
+                            }
+                            
 
                             var uv = new NativeArray<Vector4>(4, Allocator.Temp);
                             var uvIndex = (int)blocks[index] * 4;
@@ -541,10 +732,10 @@ namespace RS.Scene
                             {
                                 uv[i] = uvTable[uvIndex + i];
                             }
-
+                            
                             // Up
-                            var upIndex = GetArrayIndex(x, y + 1, z);
-                            if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
+                            if ((y == 31 && (extraBlocks[upIndex] == BlockType.Air || extraBlocks[upIndex] == BlockType.Water)) 
+                                || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -558,16 +749,16 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 3);
                                 triangles.Add(vertIndex + 2);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
-                            // Bottom
-                            var downIndex = GetArrayIndex(x, y - 1, z);
-                            if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
+                            
+                            // Down
+                            if ((y == 0 && (extraBlocks[downIndex] == BlockType.Air || extraBlocks[downIndex] == BlockType.Water)) 
+                                || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z));
@@ -581,16 +772,16 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 2);
                                 triangles.Add(vertIndex + 3);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
+                            
                             // Front
-                            var frontIndex = GetArrayIndex(x, y, z - 1);
-                            if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
+                            if ((z == 0 && (extraBlocks[frontIndex] == BlockType.Air || extraBlocks[frontIndex] == BlockType.Water)) 
+                                || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z));
@@ -604,16 +795,16 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 3);
                                 triangles.Add(vertIndex + 2);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
+                            
                             // Back
-                            var backIndex = GetArrayIndex(x, y, z + 1);
-                            if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
+                            if ((z == 31 && (extraBlocks[backIndex] == BlockType.Air || extraBlocks[backIndex] == BlockType.Water)) 
+                                || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z + 1));
@@ -627,16 +818,16 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 2);
                                 triangles.Add(vertIndex + 3);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
+                            
                             // Left
-                            var leftIndex = GetArrayIndex(x - 1, y, z);
-                            if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
+                            if ((x == 0 && (extraBlocks[leftIndex] == BlockType.Air || extraBlocks[leftIndex] == BlockType.Water)) 
+                                || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z + 1));
@@ -650,16 +841,16 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 3);
                                 triangles.Add(vertIndex + 2);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
+                            
                             // right
-                            var rightIndex = GetArrayIndex(x + 1, y, z);
-                            if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
+                            if ((x == 31 && (extraBlocks[rightIndex] == BlockType.Air || extraBlocks[rightIndex] == BlockType.Water)) 
+                                || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x + 1, elevation, z));
@@ -673,27 +864,63 @@ namespace RS.Scene
                                 triangles.Add(vertIndex);
                                 triangles.Add(vertIndex + 3);
                                 triangles.Add(vertIndex + 2);
-
+                                
                                 uvs.Add(uv[0]);
                                 uvs.Add(uv[1]);
                                 uvs.Add(uv[2]);
                                 uvs.Add(uv[3]);
                             }
-
                             uv.Dispose();
                         }
                     }
                 }
             }
             
-            private int GetArrayIndex(int x, int y, int z)
+            private int GetBlockIndex(int x, int y, int z)
             {
-                if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= width)
+                // 当超出边界时(只能超过1且只能有一个维度超过)，可以从一个32x32x6的数组中获取一个索引，顺序是上下前后左右
+                // 上
+                if (y == 32)
+                {
+                    return x * 32 + z;;
+                }
+
+                // 下
+                if (y == -1)
+                {
+                    return 1024 + x * 32 + z;
+                }
+            
+                // 前
+                if (z == -1)
+                {
+                    return 2048 + x * 32 + y;
+                }
+
+                // 后
+                if (z == 32)
+                {
+                    return 3072 + x * 32 + y;
+                }
+
+                // 左
+                if (x == -1)
+                {
+                    return 4096 + z * 32 + y;
+                }
+            
+                // 右
+                if (x == 32)
+                {
+                    return 5120 + z * 32 + y;
+                }
+            
+                if (x < 0 || x >= 32 || y < 0 || y >= 32 || z < 0 || z >= 32)
                 {
                     return -1;
                 }
             
-                return x * width * height + z * height + y;
+                return x * 1024 + z * 32 + y;
             }
         }
 
