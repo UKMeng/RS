@@ -15,7 +15,27 @@ namespace RS.Scene
 {
     public class ChunkManager: MonoBehaviour
     {
+        private static ChunkManager s_instance;
+
+        public static ChunkManager Instance
+        {
+            get
+            {
+                return s_instance;
+            }
+        }
+        
         public GameObject chunkPrefab;
+
+        private static Vector3Int[] m_directions = new Vector3Int[]
+        {
+            new Vector3Int(0, 1, 0), // up
+            new Vector3Int(0, -1, 0), // down
+            new Vector3Int(0, 0, -1), // front
+            new Vector3Int(0, 0, 1), // back
+            new Vector3Int(-1, 0, 0), // left
+            new Vector3Int(1, 0, 0), // right
+        };
         
         private Dictionary<Vector3Int, Chunk> m_chunks;
         private Queue<Vector2Int> m_chunkGeneratingQueue;
@@ -30,6 +50,7 @@ namespace RS.Scene
 
         public void Awake()
         {
+            s_instance = this;
             m_chunks = new Dictionary<Vector3Int, Chunk>();
             m_chunkGeneratingQueue = new Queue<Vector2Int>();
             m_isGeneratingChunks = false;
@@ -179,7 +200,8 @@ namespace RS.Scene
             var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
             var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
             var waterGo = chunkGo.transform.Find("Water").gameObject;
-            var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32);
+            var extraBlocks = CollectNeighborBlocks(chunk.chunkPos);
+            var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32, extraBlocks);
             var mesh = new Mesh();
             mesh.vertices = meshData.vertices;
             mesh.triangles = meshData.triangles;
@@ -190,23 +212,168 @@ namespace RS.Scene
             waterMesh.vertices = meshData.waterVertices;
             waterMesh.triangles = meshData.waterTriangles;
             waterMesh.RecalculateNormals();
-                    
+
             var chunkTf = chunkGo.GetComponent<MeshFilter>();
             chunkTf.mesh = mesh;
-                    
+
             var chunkMc = chunkGo.GetComponent<MeshCollider>();
             chunkMc.sharedMesh = mesh;
-            
+
             var waterTf = waterGo.GetComponent<MeshFilter>();
             waterTf.mesh = waterMesh;
-            
+
             var waterMc = waterGo.GetComponent<MeshCollider>();
             waterMc.sharedMesh = waterMesh;
 
             chunk.go = chunkGo;
             chunk.status = ChunkStatus.Loaded;
         }
-        
+
+        public BlockType[] CollectNeighborBlocks(Vector3Int chunkPos)
+        {
+            var blocks = new BlockType[32 * 32 * 6];
+            var index = 0;
+            // 上
+            var upChunk = GetChunk(chunkPos + new Vector3Int(0, 1, 0));
+            if (upChunk == null || upChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = upChunk.blocks[Chunk.GetBlockIndex(x, 0, z)];
+                    }
+                }
+            }
+            
+            // 下
+            var downChunk = GetChunk(chunkPos + new Vector3Int(0, -1, 0));
+            if (downChunk == null || downChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = downChunk.blocks[Chunk.GetBlockIndex(x, 31, z)];
+                    }
+                }
+            }
+            
+            // 前
+            var frontChunk = GetChunk(chunkPos + new Vector3Int(0, 0, -1));
+            if (frontChunk == null || frontChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var y = 0; y < 32; y++)
+                    {
+                        blocks[index++] = frontChunk.blocks[Chunk.GetBlockIndex(x, y, 31)];
+                    }
+                }
+            }
+            
+            // 后
+            var backChunk = GetChunk(chunkPos + new Vector3Int(0, 0, 1));
+            if (backChunk == null || backChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var y = 0; y < 32; y++)
+                    {
+                        blocks[index++] = backChunk.blocks[Chunk.GetBlockIndex(x, y, 0)];
+                    }
+                }
+            }
+            
+            // 左
+            var leftChunk = GetChunk(chunkPos + new Vector3Int(-1, 0, 0));
+            if (leftChunk == null || leftChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var z = 0; z < 32; z++)
+                {
+                    for (var y = 0; y < 32; y++)
+                    {
+                        blocks[index++] = leftChunk.blocks[Chunk.GetBlockIndex(31, y, z)];
+                    }
+                }
+            }
+            
+            // 右
+            var rightChunk = GetChunk(chunkPos + new Vector3Int(1, 0, 0));
+            if (rightChunk == null || rightChunk.status < ChunkStatus.DataReady)
+            {
+                for (var x = 0; x < 32; x++)
+                {
+                    for (var z = 0; z < 32; z++)
+                    {
+                        blocks[index++] = BlockType.Air;
+                    }
+                }
+            }
+            else
+            {
+                for (var z = 0; z < 32; z++)
+                {
+                    for (var y = 0; y < 32; y++)
+                    {
+                        blocks[index++] = rightChunk.blocks[Chunk.GetBlockIndex(0, y, z)];
+                    }
+                }
+            }
+
+            return blocks;
+        }
+
         private IEnumerator GenerateChunksCoroutine()
         {
             m_isGeneratingChunks = true;
@@ -401,8 +568,23 @@ namespace RS.Scene
             
             chunk.status = ChunkStatus.DataReady;
             
+            // 数据完成时，通知邻居更新mesh，如果有的话
+            NotifyNeighborUpdateMesh(chunk.chunkPos);
+            
             sw.Stop();
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
+        }
+
+        private void NotifyNeighborUpdateMesh(Vector3Int chunkPos)
+        {
+            foreach (var dir in m_directions)
+            {
+                var chunk = GetChunk(chunkPos + dir);
+                if (chunk != null && chunk.status > ChunkStatus.DataReady)
+                {
+                    SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                }
+            }
         }
         
 

@@ -20,7 +20,6 @@ namespace RS.Scene
         DataReady, // 数据准备完成，Mesh未生成
         MeshReady, // Mesh未加载active == false
         Loaded, // 当前场景已加载显示中
-        MeshGenerating, // Mesh生成中
     }
     
     public struct MeshData
@@ -114,7 +113,7 @@ namespace RS.Scene
             );
         }
 
-        public static MeshData BuildMesh(BlockType[] blocks, int width, int height)
+        public static MeshData BuildMesh(BlockType[] blocks, int width, int height, BlockType[] extraBlocks)
         {
             var sw = Stopwatch.StartNew();
             
@@ -149,7 +148,7 @@ namespace RS.Scene
                         {
                             // 水面只有遇到空气时才会生成面
                             // Up
-                            if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
+                            if ((y == 31 && extraBlocks[upIndex] == BlockType.Air) || blocks[upIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -166,7 +165,7 @@ namespace RS.Scene
                             }
                             
                             // Down
-                            if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
+                            if ((y == 0 && extraBlocks[downIndex] == BlockType.Air) || blocks[downIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z));
@@ -183,7 +182,7 @@ namespace RS.Scene
                             }
                             
                             // Front
-                            if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
+                            if ((z == 0 && extraBlocks[frontIndex] == BlockType.Air) || blocks[frontIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z));
@@ -200,7 +199,7 @@ namespace RS.Scene
                             }
                             
                             // Back
-                            if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
+                            if ((z == 31 && extraBlocks[backIndex] == BlockType.Air) || blocks[backIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z + 1));
@@ -217,7 +216,7 @@ namespace RS.Scene
                             }
                             
                             // Left
-                            if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
+                            if ((x == 0 && extraBlocks[leftIndex] == BlockType.Air) || blocks[leftIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z + 1));
@@ -234,7 +233,7 @@ namespace RS.Scene
                             }
                             
                             // right
-                            if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
+                            if ((x == 31 && extraBlocks[rightIndex] == BlockType.Air) || blocks[rightIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x + 1, elevation, z));
@@ -257,7 +256,8 @@ namespace RS.Scene
                         var uv = Block.uvTable[(int)blocks[index]];
                         
                         // Up
-                        if (upIndex == -1 || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
+                        if ((y == 31 && (extraBlocks[upIndex] == BlockType.Air || extraBlocks[upIndex] == BlockType.Water)) 
+                            || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -279,7 +279,8 @@ namespace RS.Scene
                         }
                         
                         // Down
-                        if (downIndex == -1 || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
+                        if ((y == 0 && (extraBlocks[downIndex] == BlockType.Air || extraBlocks[downIndex] == BlockType.Water)) 
+                            || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -301,7 +302,8 @@ namespace RS.Scene
                         }
                         
                         // Front
-                        if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
+                        if ((z == 0 && (extraBlocks[frontIndex] == BlockType.Air || extraBlocks[frontIndex] == BlockType.Water)) 
+                            || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -323,7 +325,8 @@ namespace RS.Scene
                         }
                         
                         // Back
-                        if (backIndex == -1 || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
+                        if ((z == 31 && (extraBlocks[backIndex] == BlockType.Air || extraBlocks[backIndex] == BlockType.Water)) 
+                            || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -345,7 +348,8 @@ namespace RS.Scene
                         }
                         
                         // Left
-                        if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
+                        if ((x == 0 && (extraBlocks[leftIndex] == BlockType.Air || extraBlocks[leftIndex] == BlockType.Water)) 
+                            || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -367,7 +371,8 @@ namespace RS.Scene
                         }
                         
                         // right
-                        if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
+                        if ((x == 31 && (extraBlocks[rightIndex] == BlockType.Air || extraBlocks[rightIndex] == BlockType.Water)) 
+                            || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x + 1, elevation, z));
@@ -408,7 +413,8 @@ namespace RS.Scene
         {
             var sw = Stopwatch.StartNew();
 
-            var meshData = BuildMesh(blocks, 32, 32);
+            var extraBlocks = ChunkManager.Instance.CollectNeighborBlocks(chunkPos);
+            var meshData = BuildMesh(blocks, 32, 32, extraBlocks);
             
             var waterGo = go.transform.Find("Water").gameObject;
             var mesh = new Mesh();
@@ -873,12 +879,49 @@ namespace RS.Scene
         
         public static int GetBlockIndex(int x, int y, int z)
         {
+            // 当超出边界时(只能超过1且只能有一个维度超过)，可以从一个32x32x6的数组中获取一个索引，顺序是上下前后左右
+            // 上
+            if (y == 32)
+            {
+                return x * 32 + z;;
+            }
+
+            // 下
+            if (y == -1)
+            {
+                return 1024 + x * 32 + z;
+            }
+            
+            // 前
+            if (z == -1)
+            {
+                return 2048 + x * 32 + y;
+            }
+
+            // 后
+            if (z == 32)
+            {
+                return 3072 + x * 32 + y;
+            }
+
+            // 左
+            if (x == -1)
+            {
+                return 4096 + z * 32 + y;
+            }
+            
+            // 右
+            if (x == 32)
+            {
+                return 5120 + z * 32 + y;
+            }
+            
             if (x < 0 || x >= 32 || y < 0 || y >= 32 || z < 0 || z >= 32)
             {
                 return -1;
             }
             
-            return x * 32 * 32 + z * 32 + y;
+            return x * 1024 + z * 32 + y;
         }
 
         public static int GetBlockIndex(Vector3Int blockLocalPos)
