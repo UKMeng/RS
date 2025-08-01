@@ -147,8 +147,9 @@ namespace RS.Scene
 
                         if (blocks[index] == BlockType.Water)
                         {
+                            // 水面只有遇到空气时才会生成面
                             // Up
-                            if (upIndex == -1 || blocks[upIndex] != BlockType.Water)
+                            if (upIndex == -1 || blocks[upIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -165,7 +166,7 @@ namespace RS.Scene
                             }
                             
                             // Down
-                            if (downIndex == -1 || blocks[downIndex] != BlockType.Water)
+                            if (downIndex == -1 || blocks[downIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z));
@@ -182,7 +183,7 @@ namespace RS.Scene
                             }
                             
                             // Front
-                            if (frontIndex == -1 || blocks[frontIndex] != BlockType.Water)
+                            if (frontIndex == -1 || blocks[frontIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z));
@@ -199,7 +200,7 @@ namespace RS.Scene
                             }
                             
                             // Back
-                            if (backIndex == -1 || blocks[backIndex] != BlockType.Water)
+                            if (backIndex == -1 || blocks[backIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z + 1));
@@ -216,7 +217,7 @@ namespace RS.Scene
                             }
                             
                             // Left
-                            if (leftIndex == -1 || blocks[leftIndex] != BlockType.Water)
+                            if (leftIndex == -1 || blocks[leftIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x, elevation, z + 1));
@@ -233,7 +234,7 @@ namespace RS.Scene
                             }
                             
                             // right
-                            if (rightIndex == -1 || blocks[rightIndex] != BlockType.Water)
+                            if (rightIndex == -1 || blocks[rightIndex] == BlockType.Air)
                             {
                                 var vertIndex = wVertices.Count;
                                 wVertices.Add(new Vector3(x + 1, elevation, z));
