@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Utils
@@ -325,6 +325,7 @@ namespace RS.Utils
                         var noiseName = noiseToken.Value<string>();
                         var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
                         var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
+                        // var noise = 
                         sampler = new ShiftASampler(noise);
                     }
                     else

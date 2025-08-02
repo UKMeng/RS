@@ -1,6 +1,0 @@
-﻿{
-  "name": "RSSceneRuntimeAssembly",
-  "references": [
-    "Unity.Burst"
-  ]
-}

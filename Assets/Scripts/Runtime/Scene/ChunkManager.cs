@@ -558,10 +558,23 @@ namespace RS.Scene
                         {
                             chunk.blocks[index] = JudgeSurfaceBlockType(ref context);
                             context.stoneDepthAbove++;
+                            context.waterHeight++;
                         }
                         else if (chunk.blocks[index] == BlockType.Air)
                         {
                             context.stoneDepthAbove = 0;
+                            context.waterHeight = Int32.MinValue;
+                        }
+                        else if (chunk.blocks[index] == BlockType.Water)
+                        {
+                            if (context.waterHeight < 0)
+                            {
+                                context.waterHeight = 1;
+                            }
+                            else
+                            {
+                                context.waterHeight++;
+                            }
                         }
 
                         index--;
@@ -595,7 +608,8 @@ namespace RS.Scene
 
         private BlockType JudgeSurfaceBlockType(ref SurfaceContext context)
         {
-            if (context.stoneDepthAbove < 4)
+            // 上方无水的表面
+            if (context.waterHeight < 0 && context.stoneDepthAbove == 0)
             {
                 if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
                 {
@@ -606,6 +620,11 @@ namespace RS.Scene
                 {
                     return BlockType.Sand;
                 }
+            }
+            
+            if (context.stoneDepthAbove < 4)
+            {
+                
             }
             
             return BlockType.Stone;

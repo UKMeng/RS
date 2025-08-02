@@ -15,9 +15,9 @@ namespace RS.Scene
         public BiomeType biome;
         public float surfaceNoise;
         public float surfaceDepth;
-        public int waterHeight;
+        public int waterHeight;     // 本方块距离上方最近的液体表面上方一格的距离，如果上方有空气，则不在水下，值为int最小值
         public int stoneDepthAbove; // 本方格距离上方最近空气格之间的非液体格的数量，如果上方直接为空气则为0
-        public int stoneDepthBelow;
+        public int stoneDepthBelow; 
         public int minSurfaceLevel;
     }
     
@@ -104,7 +104,7 @@ namespace RS.Scene
 
             // var stoneDepthAbove = SampleStoneDepthAbove(pos);
             
-            return new SurfaceContext { biome = biome, stoneDepthAbove = 0 };
+            return new SurfaceContext { biome = biome, waterHeight = int.MinValue, stoneDepthAbove = 0 };
         }
 
         // public int SampleStoneDepthAbove(Vector3 pos)

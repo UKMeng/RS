@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 7332266410825812662, guid: 699d2cff103069041975a5b8a7a5c610, type: 3}
   dayLight: {fileID: 410087039}
-  seed: 20250715
+  seed: 5976248485116943334
 --- !u!4 &50099546
 Transform:
   m_ObjectHideFlags: 0
