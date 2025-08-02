@@ -601,6 +601,11 @@ namespace RS.Scene
                 {
                     return BlockType.Dirt;
                 }
+
+                if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)
+                {
+                    return BlockType.Sand;
+                }
             }
             
             return BlockType.Stone;

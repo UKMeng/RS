@@ -295,10 +295,10 @@ namespace RS.Scene
                             triangles.Add(vertIndex + 2);
                             triangles.Add(vertIndex + 3);
                             
-                            uvs.Add(uv[0]);
-                            uvs.Add(uv[1]);
-                            uvs.Add(uv[2]);
-                            uvs.Add(uv[3]);
+                            uvs.Add(uv[4]);
+                            uvs.Add(uv[5]);
+                            uvs.Add(uv[6]);
+                            uvs.Add(uv[7]);
                         }
                         
                         // Front
@@ -320,17 +320,17 @@ namespace RS.Scene
 
                             if (y % 2 == 0)
                             {
-                                uvs.Add(uv[4]);
-                                uvs.Add(uv[5]);
-                                uvs.Add(uv[6]);
-                                uvs.Add(uv[7]);
-                            }
-                            else
-                            {
                                 uvs.Add(uv[8]);
                                 uvs.Add(uv[9]);
                                 uvs.Add(uv[10]);
                                 uvs.Add(uv[11]);
+                            }
+                            else
+                            {
+                                uvs.Add(uv[12]);
+                                uvs.Add(uv[13]);
+                                uvs.Add(uv[14]);
+                                uvs.Add(uv[15]);
                             }
                             
                         }
@@ -354,17 +354,17 @@ namespace RS.Scene
                             
                             if (y % 2 == 0)
                             {
-                                uvs.Add(uv[4]);
-                                uvs.Add(uv[5]);
-                                uvs.Add(uv[6]);
-                                uvs.Add(uv[7]);
-                            }
-                            else
-                            {
                                 uvs.Add(uv[8]);
                                 uvs.Add(uv[9]);
                                 uvs.Add(uv[10]);
                                 uvs.Add(uv[11]);
+                            }
+                            else
+                            {
+                                uvs.Add(uv[12]);
+                                uvs.Add(uv[13]);
+                                uvs.Add(uv[14]);
+                                uvs.Add(uv[15]);
                             }
                         }
                         
@@ -387,17 +387,17 @@ namespace RS.Scene
                             
                             if (y % 2 == 0)
                             {
-                                uvs.Add(uv[4]);
-                                uvs.Add(uv[5]);
-                                uvs.Add(uv[6]);
-                                uvs.Add(uv[7]);
-                            }
-                            else
-                            {
                                 uvs.Add(uv[8]);
                                 uvs.Add(uv[9]);
                                 uvs.Add(uv[10]);
                                 uvs.Add(uv[11]);
+                            }
+                            else
+                            {
+                                uvs.Add(uv[12]);
+                                uvs.Add(uv[13]);
+                                uvs.Add(uv[14]);
+                                uvs.Add(uv[15]);
                             }
                         }
                         
@@ -420,17 +420,17 @@ namespace RS.Scene
                             
                             if (y % 2 == 0)
                             {
-                                uvs.Add(uv[4]);
-                                uvs.Add(uv[5]);
-                                uvs.Add(uv[6]);
-                                uvs.Add(uv[7]);
-                            }
-                            else
-                            {
                                 uvs.Add(uv[8]);
                                 uvs.Add(uv[9]);
                                 uvs.Add(uv[10]);
                                 uvs.Add(uv[11]);
+                            }
+                            else
+                            {
+                                uvs.Add(uv[12]);
+                                uvs.Add(uv[13]);
+                                uvs.Add(uv[14]);
+                                uvs.Add(uv[15]);
                             }
                         }
                     }
@@ -767,9 +767,9 @@ namespace RS.Scene
                             }
                             
 
-                            var uv = new NativeArray<Vector4>(12, Allocator.Temp);
-                            var uvIndex = (int)blocks[index] * 12;
-                            for (var i = 0; i < 12; i++)
+                            var uv = new NativeArray<Vector4>(16, Allocator.Temp);
+                            var uvIndex = (int)blocks[index] * 16;
+                            for (var i = 0; i < 16; i++)
                             {
                                 uv[i] = uvTable[uvIndex + i];
                             }
@@ -814,10 +814,10 @@ namespace RS.Scene
                                 triangles.Add(vertIndex + 2);
                                 triangles.Add(vertIndex + 3);
                                 
-                                uvs.Add(uv[0]);
-                                uvs.Add(uv[1]);
-                                uvs.Add(uv[2]);
-                                uvs.Add(uv[3]);
+                                uvs.Add(uv[4]);
+                                uvs.Add(uv[5]);
+                                uvs.Add(uv[6]);
+                                uvs.Add(uv[7]);
                             }
                             
                             // Front
@@ -839,17 +839,17 @@ namespace RS.Scene
                                 
                                 if (y % 2 == 0)
                                 {
-                                    uvs.Add(uv[4]);
-                                    uvs.Add(uv[5]);
-                                    uvs.Add(uv[6]);
-                                    uvs.Add(uv[7]);
-                                }
-                                else
-                                {
                                     uvs.Add(uv[8]);
                                     uvs.Add(uv[9]);
                                     uvs.Add(uv[10]);
                                     uvs.Add(uv[11]);
+                                }
+                                else
+                                {
+                                    uvs.Add(uv[12]);
+                                    uvs.Add(uv[13]);
+                                    uvs.Add(uv[14]);
+                                    uvs.Add(uv[15]);
                                 }
                             }
                             
@@ -872,17 +872,17 @@ namespace RS.Scene
                                 
                                 if (y % 2 == 0)
                                 {
-                                    uvs.Add(uv[4]);
-                                    uvs.Add(uv[5]);
-                                    uvs.Add(uv[6]);
-                                    uvs.Add(uv[7]);
-                                }
-                                else
-                                {
                                     uvs.Add(uv[8]);
                                     uvs.Add(uv[9]);
                                     uvs.Add(uv[10]);
                                     uvs.Add(uv[11]);
+                                }
+                                else
+                                {
+                                    uvs.Add(uv[12]);
+                                    uvs.Add(uv[13]);
+                                    uvs.Add(uv[14]);
+                                    uvs.Add(uv[15]);
                                 }
                             }
                             
@@ -905,17 +905,17 @@ namespace RS.Scene
                                 
                                 if (y % 2 == 0)
                                 {
-                                    uvs.Add(uv[4]);
-                                    uvs.Add(uv[5]);
-                                    uvs.Add(uv[6]);
-                                    uvs.Add(uv[7]);
-                                }
-                                else
-                                {
                                     uvs.Add(uv[8]);
                                     uvs.Add(uv[9]);
                                     uvs.Add(uv[10]);
                                     uvs.Add(uv[11]);
+                                }
+                                else
+                                {
+                                    uvs.Add(uv[12]);
+                                    uvs.Add(uv[13]);
+                                    uvs.Add(uv[14]);
+                                    uvs.Add(uv[15]);
                                 }
                             }
                             
@@ -938,17 +938,17 @@ namespace RS.Scene
                                 
                                 if (y % 2 == 0)
                                 {
-                                    uvs.Add(uv[4]);
-                                    uvs.Add(uv[5]);
-                                    uvs.Add(uv[6]);
-                                    uvs.Add(uv[7]);
-                                }
-                                else
-                                {
                                     uvs.Add(uv[8]);
                                     uvs.Add(uv[9]);
                                     uvs.Add(uv[10]);
                                     uvs.Add(uv[11]);
+                                }
+                                else
+                                {
+                                    uvs.Add(uv[12]);
+                                    uvs.Add(uv[13]);
+                                    uvs.Add(uv[14]);
+                                    uvs.Add(uv[15]);
                                 }
                             }
                             uv.Dispose();

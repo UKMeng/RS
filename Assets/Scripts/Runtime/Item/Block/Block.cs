@@ -33,11 +33,11 @@ namespace RS.Item
         {
             uvTable = new Vector2[Enum.GetValues(typeof(BlockType)).Length][];
 
-            uvTable[(int)BlockType.Stone] = CalUVs((0, 0), (0, 0));
-            uvTable[(int)BlockType.Dirt] = CalUVs((1, 0), (1, 0));
-            uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1));
+            uvTable[(int)BlockType.Stone] = CalUVs((0, 0), (0, 0),(0, 0));
+            uvTable[(int)BlockType.Dirt] = CalUVs((1, 0), (1, 0), (1, 0));
+            uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
 
-            uvTableArray = new NativeArray<Vector2>(uvTable.Length * 12, Allocator.Persistent);
+            uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);
 
             for (var i = 0; i < uvTable.Length; i++)
             {
@@ -46,8 +46,8 @@ namespace RS.Item
                     continue;
                 }
 
-                var index = i * 12;
-                for (var j = 0; j < 12; j++)
+                var index = i * 16;
+                for (var j = 0; j < 16; j++)
                 {
                     uvTableArray[index + j] = uvTable[i][j];
                 }
@@ -60,16 +60,18 @@ namespace RS.Item
         }
 
         /// <summary>
-        /// 计算3组uv，1组top，2组side
+        /// 计算4组uv，1组top，1组bottom，2组side
         /// </summary>
         /// <param name="top"></param>
+        /// <param name="bottom"></param>
         /// <param name="side"></param>
         /// <returns></returns>
-        private static Vector2[] CalUVs((int, int) top, (int, int) side)
+        private static Vector2[] CalUVs((int, int) top, (int, int) bottom, (int, int) side)
         {
             var uvs = new List<Vector2>();
             
             uvs.AddRange(CalUVs(top.Item1, top.Item2, 0));
+            uvs.AddRange(CalUVs(bottom.Item1, bottom.Item2, 0));
             uvs.AddRange(CalUVs(side.Item1, side.Item2, 1));
             uvs.AddRange(CalUVs(side.Item1, side.Item2, 2));
             
