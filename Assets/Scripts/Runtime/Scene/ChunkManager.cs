@@ -599,7 +599,7 @@ namespace RS.Scene
             {
                 if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
                 {
-                    return BlockType.Dirt;
+                    return BlockType.Grass;
                 }
 
                 if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)

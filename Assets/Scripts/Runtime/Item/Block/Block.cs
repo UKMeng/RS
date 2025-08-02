@@ -35,6 +35,7 @@ namespace RS.Item
 
             uvTable[(int)BlockType.Stone] = CalUVs((0, 0), (0, 0),(0, 0));
             uvTable[(int)BlockType.Dirt] = CalUVs((1, 0), (1, 0), (1, 0));
+            uvTable[(int)BlockType.Grass] = CalUVs((3, 1), (1, 0), (3, 0), true);
             uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);
@@ -66,13 +67,13 @@ namespace RS.Item
         /// <param name="bottom"></param>
         /// <param name="side"></param>
         /// <returns></returns>
-        private static Vector2[] CalUVs((int, int) top, (int, int) bottom, (int, int) side)
+        private static Vector2[] CalUVs((int, int) top, (int, int) bottom, (int, int) side, bool onlyHalf = false)
         {
             var uvs = new List<Vector2>();
             
             uvs.AddRange(CalUVs(top.Item1, top.Item2, 0));
             uvs.AddRange(CalUVs(bottom.Item1, bottom.Item2, 0));
-            uvs.AddRange(CalUVs(side.Item1, side.Item2, 1));
+            uvs.AddRange(CalUVs(side.Item1, side.Item2, onlyHalf ? 2 : 1));
             uvs.AddRange(CalUVs(side.Item1, side.Item2, 2));
             
             
@@ -82,8 +83,8 @@ namespace RS.Item
         private static Vector2[] CalUVs(int x, int y, int half)
         {
             var margin = 0;
-            var width = 2048;
-            var height = 2048;
+            var width = 4096;
+            var height = 4096;
             var textureSize = 1024;
 
             var uvs = new Vector2[4];

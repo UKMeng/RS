@@ -5,6 +5,7 @@
         Air,
         Stone,
         Dirt,
+        Grass,
         Sand,
         Water,
     }
