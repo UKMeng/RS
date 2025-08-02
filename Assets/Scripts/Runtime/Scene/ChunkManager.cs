@@ -623,6 +623,11 @@ namespace RS.Scene
                     {
                         return BlockType.Grass;
                     }
+
+                    if (context.biome == BiomeType.SnowForest || context.biome == BiomeType.SnowPlain)
+                    {
+                        return BlockType.Snow;
+                    }
             
                     if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)
                     {
@@ -634,6 +639,11 @@ namespace RS.Scene
                 if (context.stoneDepthAbove < context.surfaceDepth)
                 {
                     if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+                    {
+                        return BlockType.Dirt;
+                    }
+                    
+                    if (context.biome == BiomeType.SnowForest || context.biome == BiomeType.SnowPlain)
                     {
                         return BlockType.Dirt;
                     }

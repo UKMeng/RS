@@ -36,6 +36,7 @@ namespace RS.Item
             uvTable[(int)BlockType.Stone] = CalUVs((0, 0), (0, 0),(0, 0));
             uvTable[(int)BlockType.Dirt] = CalUVs((1, 0), (1, 0), (1, 0));
             uvTable[(int)BlockType.Grass] = CalUVs((3, 1), (1, 0), (3, 0), true);
+            uvTable[(int)BlockType.Snow] = CalUVs((2, 1), (1, 0), (2, 0), true);
             uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);
