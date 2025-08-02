@@ -317,6 +317,26 @@ namespace RS.Utils
                     
                     break;
                 }
+                case "weirdScaled":
+                {
+                    if (arguments.TryGetValue("noise", out var noiseToken)
+                        && arguments.TryGetValue("rarity", out var rarityToken)
+                        && arguments.TryGetValue("mapper", out var mapperToken))
+                    {
+                        var noiseName = noiseToken.Value<string>();
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
+                        var rarity = ParseJTokenToSampler(rarityToken);
+                        var mapper = mapperToken.Value<int>();
+                        
+                        sampler = new WeirdScaledSampler(noise, rarity, mapper);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[RsConfig] Parse Failed {type}");
+                    }
+                    
+                    break;
+                }
                 case "shiftA":
                 {
                     if (arguments.TryGetValue("noise", out var noiseToken))

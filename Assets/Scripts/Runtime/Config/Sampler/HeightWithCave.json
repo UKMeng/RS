@@ -99,7 +99,13 @@
                   "right": "CaveEntrances"
                 }
               },
-              "right": 10000000
+              "right": {
+                "type": "add",
+                "arguments": {
+                  "left": "CaveSpaghetti2d",
+                  "right": "CaveSpaghettiRoughness"
+                }
+              }
             }
           },
           "right": {

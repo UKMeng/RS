@@ -31,7 +31,10 @@ namespace RS.Utils
 
         private static string[] m_presetNoises = new string[]
         {
+            "CaveLayer",
+            "Cheese",
             "Continentalness",
+            "Entrance",
             "Erosion",
             "Humidity",
             "Jagged",
@@ -40,6 +43,16 @@ namespace RS.Utils
             "PillarRareness",
             "PillarThickness",
             "Ridges",
+            "Spaghetti2d",
+            "Spaghetti2dElevation",
+            "Spaghetti2dModulator",
+            "Spaghetti2dThickness",
+            "Spaghetti3d1",
+            "Spaghetti3d2",
+            "Spaghetti3dRarity",
+            "Spaghetti3dThickness",
+            "SpaghettiRoughness",
+            "SpaghettiRoughnessModulator",
             "Surface",
             "Temperature"
         };
@@ -47,14 +60,19 @@ namespace RS.Utils
         private static string[] m_presetSamplers = new string[]
         {
             "Base3D",
+            "CaveEntrances",
             "CavePillars",
             "CaveNoodle",
+            "CaveSpaghetti2d",
+            "CaveSpaghettiRoughness",
             "Compare",
             "Continents",
             "Depth",
             "Erosion",
             "Factor",
             "FinalDensity",
+            "Height",
+            "HeightWithCave",
             "Humidity",
             "InterTest",
             "Offset",
@@ -62,9 +80,11 @@ namespace RS.Utils
             "RidgesFolded",
             "ShiftX",
             "ShiftZ",
+            "Spaghetti2dThicknessModulator",
             "SurfaceDensity",
             "SurfaceNoise",
             "Temperature",
+            "Temp",
             "YLimit",
         };
 

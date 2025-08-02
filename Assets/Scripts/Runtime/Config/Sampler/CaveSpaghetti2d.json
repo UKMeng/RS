@@ -1,0 +1,86 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "clamp",
+    "arguments": {
+      "value": {
+        "type": "max",
+        "arguments": {
+          "left": {
+            "type": "add",
+            "arguments": {
+              "left": {
+                "type": "weirdScaled",
+                "arguments": {
+                  "noise": "Spaghetti2d",
+                  "rarity": {
+                    "type": "noise",
+                    "arguments": {
+                      "noise": "Spaghetti2dModulator",
+                      "xzScale": 2,
+                      "yScale": 1
+                    }
+                  },
+                  "mapper": 2
+                }
+              },
+              "right": {
+                "type": "mul",
+                "arguments": {
+                  "left": 0.083,
+                  "right": "Spaghetti2dThicknessModulator"
+                }
+              }
+            }
+          },
+          "right": {
+            "type": "cube",
+            "arguments": {
+              "value": {
+                "type": "add",
+                "arguments": {
+                  "left": {
+                    "type": "abs",
+                    "arguments": {
+                      "value": {
+                        "type": "add",
+                        "arguments": {
+                          "left": {
+                            "type": "mul",
+                            "arguments": {
+                              "left": 8,
+                              "right": {
+                                "type": "noise",
+                                "arguments": {
+                                  "noise": "Spaghetti2dElevation",
+                                  "xzScale": 1,
+                                  "yScale": 0
+                                }
+                              }
+                            }
+                          },
+                          "right": {
+                            "type": "yClampedGradient",
+                            "arguments": {
+                              "min": 0,
+                              "max": 384,
+                              "from": 8,
+                              "to": -40
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right": "Spaghetti2dThicknessModulator"
+                }
+              }
+            }
+          }
+        }
+      },
+      "min": -1,
+      "max": 1
+    }
+  }
+}

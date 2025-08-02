@@ -1,0 +1,29 @@
+﻿{
+  "type": "sampler",
+  "arguments": {
+    "type": "cacheOnce",
+    "arguments": {
+      "value":
+      {
+        "type": "add",
+        "arguments": {
+          "left": -0.95,
+          "right": {
+            "type": "mul",
+            "arguments": {
+              "left": -0.35,
+              "right": {
+                "type": "noise",
+                "arguments": {
+                  "noise": "Spaghetti2dThickness",
+                  "xzScale": 2,
+                  "yScale": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

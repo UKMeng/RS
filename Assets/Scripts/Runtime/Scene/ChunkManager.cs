@@ -415,7 +415,8 @@ namespace RS.Scene
                 {
                     var chunk = chunks[chunkY];
 
-                    if (chunkY > 3)
+                    // 暂时把水生成关闭
+                    if (chunkY > -1)
                     {
                         chunk.status = ChunkStatus.Surface;
                         continue;
@@ -659,6 +660,11 @@ namespace RS.Scene
             if (context.stoneDepthAbove < context.surfaceDepth)
             {
                 if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+                {
+                    return BlockType.Dirt;
+                }
+                
+                if (context.biome == BiomeType.SnowForest || context.biome == BiomeType.SnowPlain)
                 {
                     return BlockType.Dirt;
                 }

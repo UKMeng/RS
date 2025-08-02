@@ -19,6 +19,78 @@ namespace RS.Utils
             return base.Sample(new Vector3(pos.x * m_xzScale, pos.y * m_yScale, pos.z * m_xzScale));
         }
     }
+
+    public class WeirdScaledSampler : RsSampler
+    {
+        private RsSampler m_raritySampler;
+        private int m_type;
+        public WeirdScaledSampler(RsNoise noise, RsSampler raritySampler, int type)
+            : base(noise)
+        {
+            m_raritySampler = raritySampler;
+            m_type = type;
+        }
+
+        public override float Sample(Vector3 pos)
+        {
+            float rarity;
+            if (m_type == 1)
+            {
+                rarity = RarityMapperType1(m_raritySampler.Sample(pos));
+            }
+            else
+            {
+                rarity = RarityMapperType2(m_raritySampler.Sample(pos));
+            }
+
+            return base.Sample(pos / rarity);
+        }
+
+        private float RarityMapperType1(float rarity)
+        {
+            if (rarity < -0.5f)
+            {
+                return 0.75f;
+            }
+            
+            if (rarity < 0f)
+            {
+                return 1.0f;
+            }
+
+            if (rarity < 0.5f)
+            {
+                return 1.5f;
+            }
+
+            return 2.0f;
+        }
+        
+        private float RarityMapperType2(float rarity)
+        {
+            if (rarity < -0.75f)
+            {
+                return 0.5f;
+            }
+            
+            if (rarity < -0.5f)
+            {
+                return 0.75f;
+            }
+
+            if (rarity < 0.5f)
+            {
+                return 1.0f;
+            }
+
+            if (rarity < 0.75f)
+            {
+                return 2.0f;
+            }
+
+            return 3.0f;
+        }
+    }
     
     // public class BlendedNoiseSampler : RsSampler
     // {
