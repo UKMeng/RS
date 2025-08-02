@@ -40,6 +40,7 @@ namespace RS.Utils
             "PillarRareness",
             "PillarThickness",
             "Ridges",
+            "Surface",
             "Temperature"
         };
 
@@ -64,6 +65,7 @@ namespace RS.Utils
             "ShiftX",
             "ShiftZ",
             "SurfaceDensity",
+            "SurfaceNoise",
             "Temperature",
             "YLimit",
         };

@@ -57,7 +57,8 @@ namespace RS.Scene
         private RsSampler m_erosion;
         private RsSampler m_biomeHumidity;
         private RsSampler m_biomeTemperature;
-        private RsSampler m_Ridges;
+        private RsSampler m_ridges;
+        private RsSampler m_surfaceNoise;
 
         private Dictionary<string, RsNoise> m_noises;
         private Dictionary<string, RsSampler> m_samplers;
@@ -85,7 +86,8 @@ namespace RS.Scene
             m_erosion = GetOrCreateSampler("Erosion");
             m_biomeHumidity = GetOrCreateSampler("BiomeHumidity");
             m_biomeTemperature = GetOrCreateSampler("BiomeTemperature");
-            m_Ridges = GetOrCreateSampler("Ridges");
+            m_ridges = GetOrCreateSampler("Ridges");
+            m_surfaceNoise = GetOrCreateSampler("SurfaceNoise");
             m_biomeSampler = new BiomeSampler();
             
             sw.Stop();
@@ -125,7 +127,7 @@ namespace RS.Scene
             biomeParams[2] = m_erosion.Sample(pos);
             biomeParams[3] = m_biomeHumidity.Sample(pos);
             biomeParams[4] = m_biomeTemperature.Sample(pos);
-            biomeParams[5] = m_Ridges.Sample(pos);
+            biomeParams[5] = m_ridges.Sample(pos);
             biomeParams[6] = RsMath.RidgesFolded(biomeParams[5]);
             
             return m_biomeSampler.Sample(biomeParams);
@@ -134,15 +136,16 @@ namespace RS.Scene
         public SurfaceContext SampleSurface(Vector3 pos)
         {
             var biome = SampleBiome(pos, out _);
-
-            // var stoneDepthAbove = SampleStoneDepthAbove(pos);
+            var surfaceNoise = m_surfaceNoise.Sample(pos);
+            var surfaceDepth = Mathf.FloorToInt(6 * surfaceNoise + 6);
             
-            return new SurfaceContext { biome = biome, waterHeight = int.MinValue, stoneDepthAbove = 0 };
+            return new SurfaceContext
+            {
+                biome = biome, 
+                surfaceDepth = surfaceDepth,
+                waterHeight = int.MinValue,
+                stoneDepthAbove = 0
+            };
         }
-
-        // public int SampleStoneDepthAbove(Vector3 pos)
-        // {
-        //     
-        // }
     }
 }

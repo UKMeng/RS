@@ -608,23 +608,55 @@ namespace RS.Scene
 
         private BlockType JudgeSurfaceBlockType(ref SurfaceContext context)
         {
-            // 上方无水的表面
-            if (context.waterHeight < 0 && context.stoneDepthAbove == 0)
+            if (context.surfaceDepth <= 0)
+            {
+                return BlockType.Stone;
+            }
+            
+            // 上方无水
+            if (context.waterHeight < 0)
+            {
+                // 表层
+                if (context.stoneDepthAbove == 0)
+                {
+                    if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+                    {
+                        return BlockType.Grass;
+                    }
+            
+                    if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)
+                    {
+                        return BlockType.Sand;
+                    }
+                }
+                
+                // 非表层
+                if (context.stoneDepthAbove < context.surfaceDepth)
+                {
+                    if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
+                    {
+                        return BlockType.Dirt;
+                    }
+            
+                    if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)
+                    {
+                        return BlockType.Sand;
+                    }
+                }
+            }
+            
+            // 上方有水
+            if (context.stoneDepthAbove < context.surfaceDepth)
             {
                 if (context.biome == BiomeType.Forest || context.biome == BiomeType.Plain)
                 {
-                    return BlockType.Grass;
+                    return BlockType.Dirt;
                 }
-
+            
                 if (context.biome == BiomeType.Beach || context.biome == BiomeType.Desert || context.biome == BiomeType.Ocean || context.biome == BiomeType.BadLand || context.biome == BiomeType.River)
                 {
                     return BlockType.Sand;
                 }
-            }
-            
-            if (context.stoneDepthAbove < 4)
-            {
-                
             }
             
             return BlockType.Stone;

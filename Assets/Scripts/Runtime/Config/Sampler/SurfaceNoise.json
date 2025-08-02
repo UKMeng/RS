@@ -9,7 +9,7 @@
           "value" : {
             "type": "normal",
             "arguments": {
-              "noise": "Offset"
+              "noise": "Surface"
             }
           }
         }
