@@ -1,9 +1,19 @@
 ﻿{
   "type" : "sampler",
   "arguments" : {
-    "type" : "normal",
+    "type" : "flatCache",
     "arguments" : {
-      "noise" : "Humidity"
+      "value" : {
+        "type": "shiftedNoise",
+        "arguments": {
+          "noise": "Humidity",
+          "x": "ShiftX",
+          "y": 0,
+          "z": "ShiftZ",
+          "xzScale": 0.25,
+          "yScale": 0.0
+        }
+      }
     }
   }
 }

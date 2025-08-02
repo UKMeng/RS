@@ -55,8 +55,8 @@ namespace RS.Scene
         private RsSampler m_continents;
         private RsSampler m_depth;
         private RsSampler m_erosion;
-        private RsSampler m_biomeHumidity;
-        private RsSampler m_biomeTemperature;
+        private RsSampler m_humidity;
+        private RsSampler m_temperature;
         private RsSampler m_ridges;
         private RsSampler m_surfaceNoise;
 
@@ -84,8 +84,8 @@ namespace RS.Scene
             m_continents = GetOrCreateSampler("Continents");
             m_depth = GetOrCreateSampler("Depth");
             m_erosion = GetOrCreateSampler("Erosion");
-            m_biomeHumidity = GetOrCreateSampler("BiomeHumidity");
-            m_biomeTemperature = GetOrCreateSampler("BiomeTemperature");
+            m_humidity = GetOrCreateSampler("Humidity");
+            m_temperature = GetOrCreateSampler("Temperature");
             m_ridges = GetOrCreateSampler("Ridges");
             m_surfaceNoise = GetOrCreateSampler("SurfaceNoise");
             m_biomeSampler = new BiomeSampler();
@@ -125,8 +125,8 @@ namespace RS.Scene
             biomeParams[0] = m_continents.Sample(pos);
             // vals[1] = m_depth.Sample(pos);
             biomeParams[2] = m_erosion.Sample(pos);
-            biomeParams[3] = m_biomeHumidity.Sample(pos);
-            biomeParams[4] = m_biomeTemperature.Sample(pos);
+            biomeParams[3] = m_humidity.Sample(pos);
+            biomeParams[4] = m_temperature.Sample(pos);
             biomeParams[5] = m_ridges.Sample(pos);
             biomeParams[6] = RsMath.RidgesFolded(biomeParams[5]);
             

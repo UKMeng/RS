@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 7332266410825812662, guid: 699d2cff103069041975a5b8a7a5c610, type: 3}
   dayLight: {fileID: 410087039}
-  seed: 8095262704949301799
+  seed: 1213541
 --- !u!4 &50099546
 Transform:
   m_ObjectHideFlags: 0
@@ -395,6 +395,14 @@ PrefabInstance:
       value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 657185006897926158, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: MoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 657185006897926158, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: SprintSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 657185006897926158, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
       propertyPath: LookSensitivity
       value: 10
       objectReference: {fileID: 0}
@@ -445,6 +453,10 @@ PrefabInstance:
     - target: {fileID: 3862277631971027947, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4738558639147882546, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: m_StepOffset
+      value: 0.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

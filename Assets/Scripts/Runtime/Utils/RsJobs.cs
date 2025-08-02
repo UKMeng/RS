@@ -34,7 +34,7 @@ namespace RS.Utils
 
         private Color Viridis(float v)
         {
-            // if (Mathf.Abs(v - 0.5f) < 0.01f)
+            // if (Mathf.Abs(v - 0.75f) < 0.005f)
             // {
             //     return Color.red;
             // }

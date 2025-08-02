@@ -47,8 +47,6 @@ namespace RS.Utils
         private static string[] m_presetSamplers = new string[]
         {
             "Base3D",
-            "BiomeHumidity",
-            "BiomeTemperature",
             "CavePillars",
             "CaveNoodle",
             "Compare",

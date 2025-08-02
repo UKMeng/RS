@@ -14,14 +14,14 @@
                 "type": "mul",
                 "arguments": {
                   "left": "Depth",
-                  "right": "Factor"
+                  "right": 1
                 }
               }
             }
           }
         }
       },
-      "right" : "Base3D"
+      "right" : 0
     }
   }
 }

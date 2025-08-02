@@ -52,7 +52,7 @@ namespace RS.Utils
             }
 
             var x0 = m_locations[xPos];
-            var x1 = m_locations[xPos] + 1;
+            var x1 = m_locations[xPos + 1];
             var y0 = m_values[xPos].Sample(pos);
             var y1 = m_values[xPos + 1].Sample(pos);
             var dy0 = m_derivatives[xPos];
