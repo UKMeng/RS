@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using RS.Scene.Biome;
 using RS.Utils;
@@ -44,6 +45,8 @@ namespace RS.Scene
         public static void Init(Int64 seed)
         {
             s_instance = new NoiseManager(seed);
+            // 需要在单例对象生成后
+            s_instance.InitNoiseManager();
         }
 
         private long m_seed;
@@ -55,33 +58,63 @@ namespace RS.Scene
         private RsSampler m_biomeHumidity;
         private RsSampler m_biomeTemperature;
         private RsSampler m_Ridges;
+
+        private Dictionary<string, RsNoise> m_noises;
+        private Dictionary<string, RsSampler> m_samplers;
         
         private NoiseManager(long seed)
         {
-            Debug.Log($"[NoiseManager] 初始化中，seed: {seed}");
-            var sw = Stopwatch.StartNew();
-            
             m_seed = seed;
+            m_noises = new Dictionary<string, RsNoise>();
+            m_samplers = new Dictionary<string, RsSampler>();
+        }
+
+        private void InitNoiseManager()
+        {
+            Debug.Log($"[NoiseManager] 初始化中，seed: {m_seed}");
+            var sw = Stopwatch.StartNew();
             
             // 理论上只有这里能够重置
             // 重置随机数生成器
-            RsRandom.Init(seed);
+            RsRandom.Init(m_seed);
             // 重置配置管理器
             RsConfigManager.Reload();
-            // 重置采样器缓存
-            RsSamplerManager.Reload();
-
+            // 重置采样器与噪声缓存
+            m_continents = GetOrCreateSampler("Continents");
+            m_depth = GetOrCreateSampler("Depth");
+            m_erosion = GetOrCreateSampler("Erosion");
+            m_biomeHumidity = GetOrCreateSampler("BiomeHumidity");
+            m_biomeTemperature = GetOrCreateSampler("BiomeTemperature");
+            m_Ridges = GetOrCreateSampler("Ridges");
             m_biomeSampler = new BiomeSampler();
-            
-            m_continents = RsSamplerManager.Instance.GetOrCreateSampler("Continents");
-            m_depth = RsSamplerManager.Instance.GetOrCreateSampler("Depth");
-            m_erosion = RsSamplerManager.Instance.GetOrCreateSampler("Erosion");
-            m_biomeHumidity = RsSamplerManager.Instance.GetOrCreateSampler("BiomeHumidity");
-            m_biomeTemperature = RsSamplerManager.Instance.GetOrCreateSampler("BiomeTemperature");
-            m_Ridges = RsSamplerManager.Instance.GetOrCreateSampler("Ridges");
             
             sw.Stop();
             Debug.Log($"[NoiseManager] 初始化完成，耗时: {sw.ElapsedMilliseconds}ms");
+        }
+        
+        public RsSampler GetOrCreateSampler(string samplerName)
+        {
+            if (!m_samplers.TryGetValue(samplerName, out var sampler))
+            {
+                // Debug.Log($"[RsSamplerManager]实例化{samplerName}");
+                var config = RsConfigManager.Instance.GetSamplerConfig(samplerName);
+                sampler = config.BuildRsSampler();
+                m_samplers.Add(samplerName, sampler);
+            }
+
+            return sampler;
+        }
+
+        public RsNoise GetOrCreateNoise(string noiseName)
+        {
+            if (!m_noises.TryGetValue(noiseName, out var noise))
+            {
+                var config = RsConfigManager.Instance.GetNoiseConfig(noiseName);
+                noise = new RsNoise(RsRandom.Instance.NextULong(), config);
+                m_noises.Add(noiseName, noise);
+            }
+
+            return noise;
         }
 
         public BiomeType SampleBiome(Vector3 pos, out float[] biomeParams)

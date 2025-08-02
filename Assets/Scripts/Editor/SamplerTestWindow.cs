@@ -143,7 +143,7 @@ namespace RS.Scene
             // 采样并生成纹理
             if (GUILayout.Button("Generate", buttonStyle))
             {
-                var sampler = RsSamplerManager.Instance.GetOrCreateSampler(m_sampler);
+                var sampler = NoiseManager.Instance.GetOrCreateSampler(m_sampler);
                 
                 m_texture = Sample(sampler);
                 m_biomeMap = null;

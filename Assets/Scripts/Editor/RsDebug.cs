@@ -18,7 +18,6 @@ namespace RS.Scene
             Debug.Log("Sample Benchmark");
 
             RsRandom.Init(20250715);
-            RsSamplerManager.Reload();
 
             var samplerName = "InterTest";
             

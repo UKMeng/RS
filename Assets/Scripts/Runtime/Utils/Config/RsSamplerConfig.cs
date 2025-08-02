@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RS.Scene;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Utils
@@ -285,8 +286,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("noise", out var noiseToken))
                     {
                         var noiseName = noiseToken.Value<string>();
-                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
                         sampler = new RsSampler(noise);
                     }
                     else
@@ -303,8 +303,7 @@ namespace RS.Utils
                         && arguments.TryGetValue("yScale", out var yScaleToken))
                     {
                         var noiseName = noiseToken.Value<string>();
-                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
                         
                         var xzScale = xzScaleToken.Value<float>();
                         var yScale = yScaleToken.Value<float>();
@@ -323,9 +322,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("noise", out var noiseToken))
                     {
                         var noiseName = noiseToken.Value<string>();
-                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
-                        // var noise = 
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
                         sampler = new ShiftASampler(noise);
                     }
                     else
@@ -340,8 +337,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("noise", out var noiseToken))
                     {
                         var noiseName = noiseToken.Value<string>();
-                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
                         sampler = new ShiftBSampler(noise);
                     }
                     else
@@ -361,8 +357,7 @@ namespace RS.Utils
                         && arguments.TryGetValue("yScale", out var yScaleValue))
                     {
                         var noiseName = noiseToken.Value<string>();
-                        var noiseConfig = RsConfigManager.Instance.GetNoiseConfig(noiseName);
-                        var noise = new RsNoise(RsRandom.Instance.NextULong(), noiseConfig);
+                        var noise = NoiseManager.Instance.GetOrCreateNoise(noiseName);
 
                         var samplerX = ParseJTokenToSampler(x);
                         var samplerY = ParseJTokenToSampler(y);
@@ -450,7 +445,7 @@ namespace RS.Utils
             if (token.Type == JTokenType.String)
             {
                 var samplerName = token.Value<string>();
-                return RsSamplerManager.Instance.GetOrCreateSampler(samplerName);
+                return NoiseManager.Instance.GetOrCreateSampler(samplerName);
                 //
                 // var config = RsConfigManager.Instance.GetSamplerConfig(token.ToObject<string>());
                 // return config.BuildRsSampler();
