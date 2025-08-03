@@ -43,7 +43,7 @@ namespace RS.Utils
                 rarity = RarityMapperType2(m_raritySampler.Sample(pos));
             }
 
-            return base.Sample(pos / rarity);
+            return rarity * Mathf.Abs(base.Sample(pos / rarity));
         }
 
         private float RarityMapperType1(float rarity)

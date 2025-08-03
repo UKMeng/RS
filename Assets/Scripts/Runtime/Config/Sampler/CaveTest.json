@@ -1,0 +1,127 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "rangeChoice",
+    "arguments" : {
+      "input": "Height",
+      "inRange": {
+        "type" : "min",
+        "arguments": {
+          "left": "Height",
+          "right": {
+            "type": "mul",
+            "arguments": {
+              "left": 5,
+              "right": "CaveEntrances"
+            }
+          }
+        }
+      },
+      "outRange": {
+        "type": "max",
+        "arguments": {
+          "left": {
+            "type": "min",
+            "arguments": {
+              "left": {
+                "type": "min",
+                "arguments": {
+                  "left": {
+                    "type": "add",
+                    "arguments": {
+                      "left": {
+                        "type": "mul",
+                        "arguments": {
+                          "left": 16,
+                          "right": {
+                            "type": "square",
+                            "arguments": {
+                              "value": {
+                                "type": "noise",
+                                "arguments": {
+                                  "noise": "CaveLayer",
+                                  "xzScale": 2,
+                                  "yScale": 4
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "right": {
+                        "type": "add",
+                        "arguments": {
+                          "left": {
+                            "type": "clamp",
+                            "arguments": {
+                              "value": {
+                                "type": "add",
+                                "arguments": {
+                                  "left": 0.5,
+                                  "right": {
+                                    "type": "noise",
+                                    "arguments": {
+                                      "noise": "Cheese",
+                                      "xzScale": 1,
+                                      "yScale": 0.66666666
+                                    }
+                                  }
+                                }
+                              },
+                              "min": -1,
+                              "max": 1
+                            }
+                          },
+                          "right": {
+                            "type": "clamp",
+                            "arguments": {
+                              "value": {
+                                "type": "add",
+                                "arguments": {
+                                  "left": 1.5,
+                                  "right": {
+                                    "type": "mul",
+                                    "arguments": {
+                                      "left": -0.64,
+                                      "right": "Height"
+                                    }
+                                  }
+                                }
+                              },
+                              "min": 0,
+                              "max": 0.5
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right": 999999
+                }
+              },
+              "right": {
+                "type": "add",
+                "arguments": {
+                  "left": "CaveSpaghetti2d",
+                  "right": "CaveSpaghettiRoughness"
+                }
+              }
+            }
+          },
+          "right": {
+            "type": "rangeChoice",
+            "arguments": {
+              "input": "CavePillars",
+              "inRange": -1000000,
+              "outRange": "CavePillars",
+              "min": -1000000,
+              "max": 0.03
+            }
+          }
+        }
+      },
+      "min": -1000000,
+      "max": 1.5625
+    }
+  }
+}

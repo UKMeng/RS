@@ -1,121 +1,73 @@
 ﻿{
   "type" : "sampler",
   "arguments" : {
-    "type" : "rangeChoice",
-    "arguments" : {
-      "input": "Height",
-      "inRange": {
-        "type" : "min",
+    "type": "min",
+    "arguments": {
+      "left": {
+        "type": "squeeze",
         "arguments": {
-          "left": "Height",
-          "right": {
+          "value": {
             "type": "mul",
             "arguments": {
-              "left": 5,
-              "right": "CaveEntrances"
-            }
-          }
-        }
-      },
-      "outRange": {
-        "type": "max",
-        "arguments": {
-          "left": {
-            "type": "min",
-            "arguments": {
-              "left": {
-                "type": "min",
+              "left": 0.64,
+              "right": {
+                "type": "add",
                 "arguments": {
-                  "left": {
-                    "type": "add",
+                  "left": 0.1171875,
+                  "right": {
+                    "type": "mul",
                     "arguments": {
                       "left": {
-                        "type": "mul",
+                        "type": "yClampedGradient",
                         "arguments": {
-                          "left": 4,
-                          "right": {
-                            "type": "square",
-                            "arguments": {
-                              "value": {
-                                "type": "noise",
-                                "arguments": {
-                                  "noise": "CaveLayer",
-                                  "xzScale": 1,
-                                  "yScale": 8
-                                }
-                              }
-                            }
-                          }
+                          "min": 0,
+                          "max": 24,
+                          "from": 0,
+                          "to": 1
                         }
                       },
                       "right": {
                         "type": "add",
                         "arguments": {
-                          "left": {
-                            "type": "clamp",
-                            "arguments": {
-                              "value": {
-                                "type": "add",
-                                "arguments": {
-                                  "left": 0.27,
-                                  "right": {
-                                    "type": "noise",
-                                    "arguments": {
-                                      "noise": "Cheese",
-                                      "xzScale": 1,
-                                      "yScale": 0.66666666
-                                    }
-                                  }
-                                }
-                              },
-                              "min": -1,
-                              "max": 1
-                            }
-                          },
+                          "left": -0.1171875,
                           "right": {
-                            "type": "clamp",
+                            "type": "add",
                             "arguments": {
-                              "value": {
-                                "type": "add",
+                              "left": -0.078125,
+                              "right": {
+                                "type": "mul",
                                 "arguments": {
-                                  "left": 1.5,
-                                  "right": {
-                                    "type": "mul",
+                                  "left": {
+                                    "type": "yClampedGradient",
                                     "arguments": {
-                                      "left": -0.64,
-                                      "right": "Height"
+                                      "min": 304,
+                                      "max": 320,
+                                      "from": 1,
+                                      "to": 0
+                                    }
+                                  },
+                                  "right": {
+                                    "type": "add",
+                                    "arguments": {
+                                      "left": 0.078125,
+                                      "right": "HeightWithCave"
                                     }
                                   }
                                 }
-                              },
-                              "min": 0,
-                              "max": 0.5
+                              }
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "right": "CaveEntrances"
+                  }
                 }
-              },
-              "right": 10000000
-            }
-          },
-          "right": {
-            "type": "rangeChoice",
-            "arguments": {
-              "input": "CavePillars",
-              "inRange": -1000000,
-              "outRange": "CavePillars",
-              "min": -1000000,
-              "max": 0.03
+              }
             }
           }
         }
       },
-      "min": -1000000,
-      "max": 1.5625
+      "right": 9999999
     }
   }
 }

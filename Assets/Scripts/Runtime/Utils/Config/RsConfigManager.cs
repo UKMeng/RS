@@ -65,6 +65,7 @@ namespace RS.Utils
             "CaveNoodle",
             "CaveSpaghetti2d",
             "CaveSpaghettiRoughness",
+            "CaveTest",
             "Compare",
             "Continents",
             "Depth",
@@ -85,6 +86,7 @@ namespace RS.Utils
             "SurfaceNoise",
             "Temperature",
             "Temp",
+            "tt",
             "YLimit",
         };
 

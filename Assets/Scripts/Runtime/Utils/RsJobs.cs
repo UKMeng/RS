@@ -39,6 +39,11 @@ namespace RS.Utils
             //     return Color.red;
             // }
             
+            if (v > 0.5f)
+            {
+                return Color.red;
+            }
+            
             var index = Mathf.FloorToInt(v * 255.0f);
             return viridisLUT[index];
         }
