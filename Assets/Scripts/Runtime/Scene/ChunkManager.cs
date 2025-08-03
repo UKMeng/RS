@@ -478,6 +478,7 @@ namespace RS.Scene
             var sw = Stopwatch.StartNew();
             
             var blocks = new BlockType[32 * 32 * 32];
+            var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
             var batchSampleResult = m_finalDensity.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
@@ -489,12 +490,14 @@ namespace RS.Scene
                     for (var sy = 0; sy < 32; sy++)
                     {
                         var density = batchSampleResult[sx, sy, sz];
-                        blocks[index++] = JudgeBaseBlockType(density);
+                        blocks[index] = JudgeBaseBlockType(density);
+                        finalDensity[index++] = density;
                     }
                 }
             }
 
             chunk.blocks = blocks;
+            chunk.density = finalDensity;
             chunk.status = ChunkStatus.Aquifer;
             
             sw.Stop();
@@ -508,6 +511,8 @@ namespace RS.Scene
             var offsetZ = chunk.chunkPos.z * 32;
             var sw = Stopwatch.StartNew();
             
+            // 首先判定是否是最底下的岩浆，不过现在还没实现岩浆，先跳过
+            // TODO: 不淹没洞穴的含水层判断
             
             var index = 0;
             for (var sx = 0; sx < 32; sx++)

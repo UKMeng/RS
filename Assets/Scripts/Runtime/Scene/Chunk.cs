@@ -37,6 +37,7 @@ namespace RS.Scene
     public class Chunk
     {
         public BlockType[] blocks;
+        public float[] density;
         public ChunkStatus status;
         public MeshData meshData;
         public GameObject go;
@@ -49,6 +50,7 @@ namespace RS.Scene
         {
             this.chunkPos = chunkPos;
             blocks = new BlockType[32 * 32 * 32];
+            density = new float[32 * 32 * 32];
             status = ChunkStatus.Empty;
         }
         
