@@ -56,7 +56,7 @@ namespace RS.Scene
             m_chunkManager.chunkPrefab = chunkPrefab;
 
             // 上午8点
-            m_time = new GameTime(480);
+            m_time = new GameTime(960); // 480 = 8:00
             m_tickManager.Register(m_time);
             
             // 放置Player
@@ -99,10 +99,35 @@ namespace RS.Scene
         private void UpdateDayLight()
         {
             var dayProgress = m_time.GetDayProgress();
-            // sunAngle = 0.0f时太阳从地平线升起 假设6点(dayProgress = 0.25)地平线升起，360 * 0.25 = 90的偏差
-            var sunAngle = dayProgress * 360.0f - 90.0f;
-
-            // 在x轴模拟太阳旋转运动
+            float sunAngle;
+            
+            if (dayProgress < 0.25f)
+            {
+                sunAngle = (dayProgress + 0.5f) * 360.0f - 90.0f;
+            }
+            else if (dayProgress == 0.25f)
+            {
+                // 06:00 太阳升起
+                sunAngle = 0.0f;
+                dayLight.GetComponent<Light>().colorTemperature = 5000;
+            }
+            else if (dayProgress < 0.75f)
+            {
+                sunAngle = dayProgress * 360.0f - 90.0f;
+            }
+            else if (dayProgress == 0.75f)
+            {
+                // 18:00 换成月光
+                sunAngle = 0.0f;
+                var light = dayLight.GetComponent<Light>();
+                light.colorTemperature = 20000;
+                light.intensity = 0.2f;
+            }
+            else
+            {
+                sunAngle = (dayProgress - 0.5f) * 360.0f - 90.0f;
+            }
+            
             dayLight.transform.rotation = Quaternion.Euler(sunAngle, -30.0f, 0.0f);
         }
 
