@@ -3,6 +3,7 @@
     Properties
     {
         _BaseColor("Base Color", Color) = (0.2, 0.5, 0.7, 0.5)
+        _Shininess("Shininess", Range(1, 100)) = 50
         _FogColor("Water Fog Color", Color) = (0.2, 0.5, 0.7, 1)
         _FogDensity("Water Fog Density", Range(0, 1)) = 0.1
         _NoiseTex("Noise Texture", 2D) = "white" {}
@@ -60,6 +61,7 @@
             };
 
             float4 _BaseColor;
+            float _Shininess;
             float4 _FogColor;
             float _FogDensity;
             TEXTURE2D(_NoiseTex);
@@ -179,7 +181,7 @@
 
                 float3 normal = normalize(mul(normalTS, tbn));
 
-                // float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.positionWS);
+                float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.positionWS);
 
                 float3 lightDir = normalize(_MainLightPosition.xyz);
                 float3 diffuse = max(0, dot(normal, lightDir));
@@ -188,10 +190,11 @@
 
                 float fogFactor = 1 - exp(-_FogDensity * viewDistance);
 
-                // float3 h = normalize(viewDir + lightDir);
-            
+                float3 h = normalize(viewDir + lightDir);
+                float specular = pow(max(0, dot(normal, h)), _Shininess);
+                half3 specularColor = half3(1, 1, 1) * specular;
 
-                half3 color = lerp(_BaseColor.rgb, _FogColor.rgb, fogFactor) * diffuse;
+                half3 color = lerp(_BaseColor.rgb, _FogColor.rgb, fogFactor) * diffuse + specularColor;
                 half alpha = lerp(_BaseColor.a, _FogColor.a, fogFactor);
             
                 return half4(color, alpha);
