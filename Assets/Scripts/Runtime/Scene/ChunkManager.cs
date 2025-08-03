@@ -46,6 +46,8 @@ namespace RS.Scene
         private int m_destroyDistance = 15;
         private int m_maxChunksPerFrame = 1;
 
+        private int m_seaLevel = 127;
+
         private InterpolatedSampler m_finalDensity;
 
         public void Awake()
@@ -413,18 +415,9 @@ namespace RS.Scene
                 // Aquifer阶段
                 for (var chunkY = 0; chunkY < 12; chunkY++)
                 {
-                    var chunk = chunks[chunkY];
-
-                    // 暂时把水生成关闭
-                    if (chunkY > -1)
+                    if (chunks[chunkY].status == ChunkStatus.Aquifer)
                     {
-                        chunk.status = ChunkStatus.Surface;
-                        continue;
-                    }
-                    
-                    if (chunk.status == ChunkStatus.Aquifer)
-                    {
-                        GenerateAquifer(chunk);
+                        GenerateAquifer(chunks[chunkY]);
                     }
                 }
                 
@@ -510,12 +503,12 @@ namespace RS.Scene
         
         private void GenerateAquifer(Chunk chunk)
         {
-            // var offsetX = chunk.chunkPos.x * 32;
-            // var offsetY = chunk.chunkPos.y * 32;
-            // var offsetZ = chunk.chunkPos.z * 32;
+            var offsetX = chunk.chunkPos.x * 32;
+            var offsetY = chunk.chunkPos.y * 32;
+            var offsetZ = chunk.chunkPos.z * 32;
             var sw = Stopwatch.StartNew();
             
-            // 简单按海平面判断, 目前传入的Chunk都低于海平面
+            
             var index = 0;
             for (var sx = 0; sx < 32; sx++)
             {
@@ -523,7 +516,8 @@ namespace RS.Scene
                 {
                     for (var sy = 0; sy < 32; sy++)
                     {
-                        if (chunk.blocks[index] == BlockType.Air)
+                        // 简单按海平面判断
+                        if (chunk.blocks[index] == BlockType.Air && sy + offsetY < m_seaLevel)
                         {
                             chunk.blocks[index] = BlockType.Water;
                         }
@@ -536,7 +530,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Surface;
             
             sw.Stop();
-            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
         private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
