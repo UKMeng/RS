@@ -3,6 +3,8 @@
     Properties
     {
         _BaseColor("Base Color", Color) = (0.2, 0.5, 0.7, 0.5)
+        _FogColor("Water Fog Color", Color) = (0.2, 0.5, 0.7, 1)
+        _FogDensity("Water Fog Density", Range(0, 1)) = 0.1
         _NoiseTex("Noise Texture", 2D) = "white" {}
         _WaveSpeed("Wave Speed", Range(0, 2)) = 1.0
         _WaveFrequency("Wave Frequency", Range(0, 2)) = 1.0
@@ -58,6 +60,8 @@
             };
 
             float4 _BaseColor;
+            float4 _FogColor;
+            float _FogDensity;
             TEXTURE2D(_NoiseTex);
             SAMPLER(sampler_NoiseTex);
             float _WaveSpeed;
@@ -174,13 +178,23 @@
 	            );
 
                 float3 normal = normalize(mul(normalTS, tbn));
-            
+
+                // float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.positionWS);
+
                 float3 lightDir = normalize(_MainLightPosition.xyz);
                 float3 diffuse = max(0, dot(normal, lightDir));
 
-                half3 color = _BaseColor.rgb * diffuse;
+                float viewDistance = length(_WorldSpaceCameraPos.xyz - i.positionWS);
+
+                float fogFactor = 1 - exp(-_FogDensity * viewDistance);
+
+                // float3 h = normalize(viewDir + lightDir);
             
-                return half4(color, 0.5);
+
+                half3 color = lerp(_BaseColor.rgb, _FogColor.rgb, fogFactor) * diffuse;
+                half alpha = lerp(_BaseColor.a, _FogColor.a, fogFactor);
+            
+                return half4(color, alpha);
             }
             ENDHLSL
         }

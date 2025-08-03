@@ -61,7 +61,7 @@ namespace RS.Scene
             
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(619, 90, 476);
+            var pos = new Vector3(0, 90, 0);
             m_player.Position = pos;
             m_lastPosition = new Vector3(0, 0, 0);
             
