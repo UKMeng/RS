@@ -72,6 +72,58 @@ namespace RS.GamePlay
                 var chunk = m_sceneManager.GetChunk(chunkPos);
                 chunk.ModifyBlock(blockLocalPos, BlockType.Air);
                 chunk.UpdateMesh();
+                
+                // 检查是否是边界是否需要更新邻居Chunk的mesh
+                if (blockLocalPos.y == 0)
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.down);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
+                else if (blockLocalPos.y == 31)
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.up);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
+
+                if (blockLocalPos.z == 0)
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.back);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
+                else if (blockLocalPos.z == 31)
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.forward);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
+
+                if (blockLocalPos.x == 0)
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.left);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
+                else
+                {
+                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.right);
+                    if (neighbor != null)
+                    {
+                        neighbor.UpdateMesh();
+                    }
+                }
             }
         }
 
