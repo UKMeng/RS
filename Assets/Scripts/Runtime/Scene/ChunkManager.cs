@@ -535,7 +535,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Surface;
             
             sw.Stop();
-            Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
         private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)

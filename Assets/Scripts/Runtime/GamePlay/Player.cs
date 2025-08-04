@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using RS.Item;
+using UnityEngine.InputSystem;
 
 namespace RS.GamePlay
 {
@@ -11,6 +12,7 @@ namespace RS.GamePlay
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
         private RsItem[] m_items; // 道具栏 暂定为10个栏位
+        private PlayerInput m_playerInput;
         
         public void Awake()
         {
@@ -21,6 +23,17 @@ namespace RS.GamePlay
             m_items[1] = new Block(BlockType.Leaf);
             m_handItem = m_items[0];
             m_transform = gameObject.transform;
+            m_playerInput = GetComponent<PlayerInput>();
+        }
+
+        public void OnItem1(InputValue value)
+        {
+            m_handItem = m_items[0];
+        }
+
+        public void OnItem2(InputValue value)
+        {
+            m_handItem = m_items[1];
         }
 
         public int Health
