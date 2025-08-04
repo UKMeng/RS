@@ -443,6 +443,11 @@ namespace RS.Scene
                     }
                 }
 
+                if (chunkPosXZ.x == 0 && chunkPosXZ.y == 0)
+                {
+                    PutATree(new Vector3(2, 64, 11));
+                }
+                
                 yield return null;
             }
 
@@ -593,6 +598,21 @@ namespace RS.Scene
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
         }
 
+
+        public void PutATree(Vector3 pos)
+        {
+            var blockWorldPos = Chunk.WorldPosToBlockWorldPos(pos);
+            var tree = new Tree(1, 3);
+            var changeList = tree.GetChangeList();
+
+            foreach (var change in changeList)
+            {
+                var relativePos = change.Item1;
+                var newPos = blockWorldPos + relativePos;
+                PlaceBlock(newPos, change.Item2, true);
+            }
+        }
+        
         private void NotifyNeighborUpdateMesh(Vector3Int chunkPos)
         {
             foreach (var dir in m_directions)
