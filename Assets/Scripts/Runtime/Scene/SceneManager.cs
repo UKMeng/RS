@@ -56,7 +56,7 @@ namespace RS.Scene
             m_chunkManager.chunkPrefab = chunkPrefab;
 
             // 上午8点
-            m_time = new GameTime(960); // 480 = 8:00
+            m_time = new GameTime(480); // 480 = 8:00
             m_tickManager.Register(m_time);
             
             // 放置Player
@@ -109,7 +109,9 @@ namespace RS.Scene
             {
                 // 06:00 太阳升起
                 sunAngle = 0.0f;
-                dayLight.GetComponent<Light>().colorTemperature = 5000;
+                var light = dayLight.GetComponent<Light>();
+                light.colorTemperature = 20000;
+                light.intensity = 2.0f;
             }
             else if (dayProgress < 0.75f)
             {
