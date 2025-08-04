@@ -143,6 +143,11 @@ namespace RS.Scene
             return m_time.GetTime();
         }
 
+        public void SetGameTime(uint hour, uint minute)
+        { 
+            m_time.SetTime(hour, minute);
+        }
+
         public BlockType GetBlockType(Vector3Int blockPos)
         {
             return m_chunkManager.GetBlockType(blockPos);

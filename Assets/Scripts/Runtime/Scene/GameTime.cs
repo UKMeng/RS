@@ -47,6 +47,11 @@ namespace RS.Scene
             var minute = GetMinute();
             return $"{hour:D2}:{minute:D2}";
         }
+
+        public void SetTime(uint hour, uint minute)
+        {
+            m_time = (hour * m_hourTick + minute * m_minuteTick) % m_totalTick;
+        }
         
         
         public void OnTick()
