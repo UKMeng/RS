@@ -9,10 +9,13 @@ namespace RS.Item
 {
     public class Block: Heapable
     {
+        private BlockType m_type;
         
+        public BlockType Type => m_type;
         
-        protected Block()
+        public Block(BlockType type)
         {
+            m_type = type;
         }
 
         protected Block(ushort heapCount)
@@ -37,6 +40,8 @@ namespace RS.Item
             uvTable[(int)BlockType.Dirt] = CalUVs((1, 0), (1, 0), (1, 0));
             uvTable[(int)BlockType.Grass] = CalUVs((3, 1), (1, 0), (3, 0), true);
             uvTable[(int)BlockType.Snow] = CalUVs((2, 1), (1, 0), (2, 0), true);
+            uvTable[(int)BlockType.Orc] = CalUVs((1, 1), (1, 1), (1, 1));
+            uvTable[(int)BlockType.Leaf] = CalUVs((0, 2), (0, 2), (0, 2));
             uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);

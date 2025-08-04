@@ -14,15 +14,17 @@ namespace RS.GamePlay
         public GameObject outlinePrefab;
 
         private GameObject m_outline;
+        private Player m_player;
         private SceneManager m_sceneManager;
-        private PlayerInput m_PlayerInput;
+        private PlayerInput m_playerInput;
         
 
         private void Awake()
         {
             var sceneRoot = GameObject.Find("SceneRoot");
             m_sceneManager = sceneRoot.GetComponent<SceneManager>();
-            m_PlayerInput = GetComponent<PlayerInput>();
+            m_playerInput = GetComponent<PlayerInput>();
+            m_player = GetComponent<Player>();
             m_outline = Instantiate(outlinePrefab, Vector3.down, Quaternion.identity);
             m_outline.SetActive(false);
         }
@@ -170,9 +172,18 @@ namespace RS.GamePlay
                 // var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
                 Debug.Log($"Hit Position: {pos}");
                 Debug.Log($"Block World Pos: {blockWorldPos}");
+
+                var handBlock = m_player.HandItem;
+                if (handBlock != BlockType.Air)
+                {
+                    SceneManager.Instance.PlaceBlock(blockWorldPos, handBlock);
+                }
+                
+
+                
                 // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
-                SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
-                SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
+                // SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
+                // SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
                 
                 // 放置这个block
                 // 首先获取chunk

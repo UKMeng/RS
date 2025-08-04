@@ -7,6 +7,8 @@
         Dirt,
         Grass,
         Snow,
+        Leaf,
+        Orc,
         Sand,
         Water,
     }

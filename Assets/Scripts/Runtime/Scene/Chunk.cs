@@ -258,8 +258,7 @@ namespace RS.Scene
                         var uv = Block.uvTable[(int)blocks[index]];
                         
                         // Up
-                        if ((y == 31 && (extraBlocks[upIndex] == BlockType.Air || extraBlocks[upIndex] == BlockType.Water)) 
-                            || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
+                        if ((y == 31 && IsTranslucent(extraBlocks[upIndex])) || IsTranslucent(blocks[upIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -281,8 +280,7 @@ namespace RS.Scene
                         }
                         
                         // Down
-                        if ((y == 0 && (extraBlocks[downIndex] == BlockType.Air || extraBlocks[downIndex] == BlockType.Water)) 
-                            || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
+                        if ((y == 0 && IsTranslucent(extraBlocks[downIndex])) || IsTranslucent(blocks[downIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -304,8 +302,7 @@ namespace RS.Scene
                         }
                         
                         // Front
-                        if ((z == 0 && (extraBlocks[frontIndex] == BlockType.Air || extraBlocks[frontIndex] == BlockType.Water)) 
-                            || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
+                        if ((z == 0 && IsTranslucent(extraBlocks[frontIndex])) || IsTranslucent(blocks[frontIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z));
@@ -319,7 +316,7 @@ namespace RS.Scene
                             triangles.Add(vertIndex);
                             triangles.Add(vertIndex + 3);
                             triangles.Add(vertIndex + 2);
-
+                            
                             if (y % 2 == 0)
                             {
                                 uvs.Add(uv[8]);
@@ -334,12 +331,10 @@ namespace RS.Scene
                                 uvs.Add(uv[14]);
                                 uvs.Add(uv[15]);
                             }
-                            
                         }
                         
                         // Back
-                        if ((z == 31 && (extraBlocks[backIndex] == BlockType.Air || extraBlocks[backIndex] == BlockType.Water)) 
-                            || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
+                        if ((z == 31 && IsTranslucent(extraBlocks[backIndex])) || IsTranslucent(blocks[backIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -371,8 +366,7 @@ namespace RS.Scene
                         }
                         
                         // Left
-                        if ((x == 0 && (extraBlocks[leftIndex] == BlockType.Air || extraBlocks[leftIndex] == BlockType.Water)) 
-                            || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
+                        if ((x == 0 && IsTranslucent(extraBlocks[leftIndex])) || IsTranslucent(blocks[leftIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x, elevation, z + 1));
@@ -404,8 +398,7 @@ namespace RS.Scene
                         }
                         
                         // right
-                        if ((x == 31 && (extraBlocks[rightIndex] == BlockType.Air || extraBlocks[rightIndex] == BlockType.Water)) 
-                            || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
+                        if ((x == 31 && IsTranslucent(extraBlocks[rightIndex])) || IsTranslucent(blocks[rightIndex]))
                         {
                             var vertIndex = vertices.Count;
                             vertices.Add(new Vector3(x + 1, elevation, z));
@@ -435,6 +428,18 @@ namespace RS.Scene
                                 uvs.Add(uv[15]);
                             }
                         }
+                        
+                        // leaf
+                        if (blocks[index] == BlockType.Leaf)
+                        {
+                            var pos = new Vector3(x, elevation, z);
+                            AddMoreTris(new Vector3(-0.375f, 0.3625f, -0.625f), new Vector3(1.25f, 0.3625f, 1.3625f),
+                                pos, 0, -45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                            AddMoreTris(new Vector3(-0.25f, 0.3f, -0.25625f), new Vector3(1.375f, 0.3f, 1.36875f),
+                                pos, 0, 45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                            AddMoreTris(new Vector3(0.4625f, -0.153125f, -0.3125f), new Vector3(0.4625f, 0.659375f, 1.3125f),
+                                pos, 1, 45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                        }
                     }
                 }
             }
@@ -449,6 +454,63 @@ namespace RS.Scene
             // Debug.Log($"Chunk Mesh generated in {sw.ElapsedMilliseconds} ms");
 
             return meshData;
+        }
+
+        private static void AddMoreTris(Vector3 from, Vector3 to, Vector3 pos, int mode, float angle,
+            ref List<Vector3> vertices, ref List<int> triangles, ref List<Vector2> uvs, ref Vector2[] uv)
+        {
+            var vertIndex = vertices.Count;
+            var pivot = new Vector3(pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f);
+
+            if (mode == 0)
+            {
+                var rot = Quaternion.Euler(angle, 0, 0);
+                
+                var v1 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + from.z);
+                var v2 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + to.z);
+                var v3 = new Vector3(pos.x + to.x, pos.y + from.y, pos.z + to.z);
+                var v4 = new Vector3(pos.x + to.x, pos.y + from.y, pos.z + from.z);
+
+                vertices.Add(rot * (v1 - pivot) + pivot);
+                vertices.Add(rot * (v2 - pivot) + pivot);
+                vertices.Add(rot * (v3 - pivot) + pivot);
+                vertices.Add(rot * (v4 - pivot) + pivot);
+            }
+            else if (mode == 1)
+            {
+                var rot = Quaternion.Euler(0, angle, 0);
+                
+                var v1 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + from.z);
+                var v2 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + to.z);
+                var v3 = new Vector3(pos.x + from.x, pos.y + to.y, pos.z + to.z);
+                var v4 = new Vector3(pos.x + from.x, pos.y + to.y, pos.z + from.z);
+                
+                vertices.Add(rot * (v1 - pivot) + pivot);
+                vertices.Add(rot * (v2 - pivot) + pivot);
+                vertices.Add(rot * (v3 - pivot) + pivot);
+                vertices.Add(rot * (v4 - pivot) + pivot);
+            }
+            
+
+            triangles.Add(vertIndex);
+            triangles.Add(vertIndex + 2);
+            triangles.Add(vertIndex + 1);
+            triangles.Add(vertIndex);
+            triangles.Add(vertIndex + 3);
+            triangles.Add(vertIndex + 2);
+                            
+            // 双面渲染
+            triangles.Add(vertIndex);
+            triangles.Add(vertIndex + 1);
+            triangles.Add(vertIndex + 2);
+            triangles.Add(vertIndex);
+            triangles.Add(vertIndex + 2);
+            triangles.Add(vertIndex + 3);
+                                
+            uvs.Add(uv[0]);
+            uvs.Add(uv[1]);
+            uvs.Add(uv[2]);
+            uvs.Add(uv[3]);
         }
 
 
@@ -623,6 +685,11 @@ namespace RS.Scene
             Debug.Log($"{chunkCount} chunks meshes generated in {sw.ElapsedMilliseconds} ms");
         }
 
+        private static bool IsTranslucent(BlockType type)
+        {
+            return type == BlockType.Air || type == BlockType.Leaf || type == BlockType.Water;
+        }
+
         [BurstCompile]
         private struct BuildMeshJob : IJob
         {
@@ -664,7 +731,7 @@ namespace RS.Scene
                             {
                                 // 水面只有遇到空气时才会生成面
                                 // Up
-                                if ((y == 31 && extraBlocks[upIndex] == BlockType.Air) || blocks[upIndex] == BlockType.Air)
+                                if ((y == 31 && IsTranslucent(extraBlocks[upIndex])) || blocks[upIndex] == BlockType.Air)
                                 {
                                     var vertIndex = wVertices.Length;
                                     wVertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -769,7 +836,7 @@ namespace RS.Scene
                             }
                             
 
-                            var uv = new NativeArray<Vector4>(16, Allocator.Temp);
+                            var uv = new NativeArray<Vector2>(16, Allocator.Temp);
                             var uvIndex = (int)blocks[index] * 16;
                             for (var i = 0; i < 16; i++)
                             {
@@ -777,8 +844,7 @@ namespace RS.Scene
                             }
                             
                             // Up
-                            if ((y == 31 && (extraBlocks[upIndex] == BlockType.Air || extraBlocks[upIndex] == BlockType.Water)) 
-                                || blocks[upIndex] == BlockType.Air || blocks[upIndex] == BlockType.Water)
+                            if ((y == 31 && IsTranslucent(extraBlocks[upIndex])) || IsTranslucent(blocks[upIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation + 0.5f, z));
@@ -800,8 +866,7 @@ namespace RS.Scene
                             }
                             
                             // Down
-                            if ((y == 0 && (extraBlocks[downIndex] == BlockType.Air || extraBlocks[downIndex] == BlockType.Water)) 
-                                || blocks[downIndex] == BlockType.Air || blocks[downIndex] == BlockType.Water)
+                            if ((y == 0 && IsTranslucent(extraBlocks[downIndex])) || IsTranslucent(blocks[downIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z));
@@ -823,8 +888,7 @@ namespace RS.Scene
                             }
                             
                             // Front
-                            if ((z == 0 && (extraBlocks[frontIndex] == BlockType.Air || extraBlocks[frontIndex] == BlockType.Water)) 
-                                || blocks[frontIndex] == BlockType.Air || blocks[frontIndex] == BlockType.Water)
+                            if ((z == 0 && IsTranslucent(extraBlocks[frontIndex])) || IsTranslucent(blocks[frontIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z));
@@ -856,8 +920,7 @@ namespace RS.Scene
                             }
                             
                             // Back
-                            if ((z == 31 && (extraBlocks[backIndex] == BlockType.Air || extraBlocks[backIndex] == BlockType.Water)) 
-                                || blocks[backIndex] == BlockType.Air || blocks[backIndex] == BlockType.Water)
+                            if ((z == 31 && IsTranslucent(extraBlocks[backIndex])) || IsTranslucent(blocks[backIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z + 1));
@@ -889,8 +952,7 @@ namespace RS.Scene
                             }
                             
                             // Left
-                            if ((x == 0 && (extraBlocks[leftIndex] == BlockType.Air || extraBlocks[leftIndex] == BlockType.Water)) 
-                                || blocks[leftIndex] == BlockType.Air || blocks[leftIndex] == BlockType.Water)
+                            if ((x == 0 && IsTranslucent(extraBlocks[leftIndex])) || IsTranslucent(blocks[leftIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x, elevation, z + 1));
@@ -922,8 +984,7 @@ namespace RS.Scene
                             }
                             
                             // right
-                            if ((x == 31 && (extraBlocks[rightIndex] == BlockType.Air || extraBlocks[rightIndex] == BlockType.Water)) 
-                                || blocks[rightIndex] == BlockType.Air || blocks[rightIndex] == BlockType.Water)
+                            if ((x == 31 && IsTranslucent(extraBlocks[rightIndex])) || IsTranslucent(blocks[rightIndex]))
                             {
                                 var vertIndex = vertices.Length;
                                 vertices.Add(new Vector3(x + 1, elevation, z));
@@ -953,10 +1014,79 @@ namespace RS.Scene
                                     uvs.Add(uv[15]);
                                 }
                             }
+                            
+                            // leaf
+                            if (blocks[index] == BlockType.Leaf)
+                            {
+                                var pos = new Vector3(x, elevation, z);
+                                AddMoreTris(new Vector3(-0.375f, 0.3625f, -0.625f), new Vector3(1.25f, 0.3625f, 1.3625f), 
+                                    pos, 0, -45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                                AddMoreTris(new Vector3(-0.25f, 0.3f, -0.25625f), new Vector3(1.375f, 0.3f, 1.36875f),
+                                    pos, 0, 45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                                AddMoreTris(new Vector3(0.4625f, -0.153125f, -0.3125f), new Vector3(0.4625f, 0.659375f, 1.3125f),
+                                    pos, 1, 45.0f, ref vertices, ref triangles, ref uvs, ref uv);
+                            }
+                            
                             uv.Dispose();
                         }
                     }
                 }
+            }
+            
+            private void AddMoreTris(Vector3 from, Vector3 to, Vector3 pos, int mode, float angle, ref NativeList<Vector3> vertices,
+                ref NativeList<int> triangles, ref NativeList<Vector2> uvs, ref NativeArray<Vector2> uv)
+            {
+                var vertIndex = vertices.Length;
+                var pivot = new Vector3(pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f);
+                
+                if (mode == 0)
+                {
+                    var rot = Quaternion.Euler(angle, 0, 0);
+                    
+                    var v1 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + from.z);
+                    var v2 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + to.z);
+                    var v3 = new Vector3(pos.x + to.x, pos.y + from.y, pos.z + to.z);
+                    var v4 = new Vector3(pos.x + to.x, pos.y + from.y, pos.z + from.z);
+
+                    vertices.Add(rot * (v1 - pivot) + pivot);
+                    vertices.Add(rot * (v2 - pivot) + pivot);
+                    vertices.Add(rot * (v3 - pivot) + pivot);
+                    vertices.Add(rot * (v4 - pivot) + pivot);
+                }
+                else
+                {
+                    var rot = Quaternion.Euler(0, angle, 0);
+                
+                    var v1 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + from.z);
+                    var v2 = new Vector3(pos.x + from.x, pos.y + from.y, pos.z + to.z);
+                    var v3 = new Vector3(pos.x + from.x, pos.y + to.y, pos.z + to.z);
+                    var v4 = new Vector3(pos.x + from.x, pos.y + to.y, pos.z + from.z);
+                
+                    vertices.Add(rot * (v1 - pivot) + pivot);
+                    vertices.Add(rot * (v2 - pivot) + pivot);
+                    vertices.Add(rot * (v3 - pivot) + pivot);
+                    vertices.Add(rot * (v4 - pivot) + pivot);
+                }
+
+                triangles.Add(vertIndex);
+                triangles.Add(vertIndex + 2);
+                triangles.Add(vertIndex + 1);
+                triangles.Add(vertIndex);
+                triangles.Add(vertIndex + 3);
+                triangles.Add(vertIndex + 2);
+                            
+                // 双面渲染
+                triangles.Add(vertIndex);
+                triangles.Add(vertIndex + 1);
+                triangles.Add(vertIndex + 2);
+                triangles.Add(vertIndex);
+                triangles.Add(vertIndex + 2);
+                triangles.Add(vertIndex + 3);
+                                
+                uvs.Add(uv[0]);
+                uvs.Add(uv[1]);
+                uvs.Add(uv[2]);
+                uvs.Add(uv[3]);
             }
             
             private int GetBlockIndex(int x, int y, int z)

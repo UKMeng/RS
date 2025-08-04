@@ -117,6 +117,7 @@ namespace RS.GMTool
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("血量:" + player.Health, m_labelStyle);
                 GUILayout.Label("饥饿:" + player.Hungry, m_labelStyle);
+                GUILayout.Label("手持道具" + player.HandItem, m_labelStyle);
                 GUILayout.EndHorizontal();
                 
                 GUILayout.Label("Biome:" + m_debugData.biomeType, m_labelStyle);
