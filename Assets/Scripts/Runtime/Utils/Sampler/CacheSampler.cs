@@ -11,20 +11,35 @@ namespace RS.Utils
     {
         private float[] m_cache;
         private RsSampler m_sampler;
+        private int m_startX;
+        private int m_startZ;
 
-        public Cache2DSampler(RsSampler sampler)
+        public Cache2DSampler(RsSampler sampler, Vector3Int startPos)
         {
             m_cache = new float[1028 * 1028];
             Array.Fill(m_cache, float.MinValue);
             m_sampler = sampler;
+            m_startX = startPos.x;
+            m_startZ = startPos.z;
         }
     
         public override float Sample(Vector3 position)
         {
             var posX = (int)position.x;
             var posZ = (int)position.z;
-            var ix = RsMath.Mod(posX, 1028);
-            var iz = RsMath.Mod(posZ, 1028);
+            var ix = RsMath.Mod(posX, 1024);
+            var iz = RsMath.Mod(posZ, 1024);
+            
+            if (posX >= (m_startX + 1) * 1024)
+            {
+                ix += 1024;
+            }
+
+            if (posZ >= (m_startZ + 1) * 1024)
+            {
+                iz += 1024;
+            }
+            
             var index = ix * 1028 + iz;
             
             if (m_cache[index] == float.MinValue)
@@ -67,12 +82,16 @@ namespace RS.Utils
     {
         private float[] m_cache;
         private RsSampler m_sampler;
+        private int m_startX;
+        private int m_startZ;
 
-        public FlatCacheSampler(RsSampler sampler)
+        public FlatCacheSampler(RsSampler sampler, Vector3Int startPos)
         {
             m_cache = new float[257 * 257];
             Array.Fill(m_cache, float.MinValue);
             m_sampler = sampler;
+            m_startX = startPos.x;
+            m_startZ = startPos.z;
         }
 
         public FlatCacheSampler(RsNoise noise)
@@ -86,8 +105,20 @@ namespace RS.Utils
         {
             var posX = Mathf.FloorToInt(pos.x * 0.25f);
             var posZ = Mathf.FloorToInt(pos.z * 0.25f);
-            var ix = RsMath.Mod(posX, 257);
-            var iz = RsMath.Mod(posZ, 257);
+
+            var ix = RsMath.Mod(posX, 256);
+            var iz = RsMath.Mod(posZ, 256);
+            
+            if (posX >= (m_startX + 1) * 256)
+            {
+                ix += 256;
+            }
+
+            if (posZ >= (m_startZ + 1) * 256)
+            {
+                iz += 256;
+            }
+            
             var index = ix * 257 + iz;
 
             if (m_cache[index] == float.MinValue)

@@ -48,7 +48,7 @@ namespace RS.Scene
 
         private int m_seaLevel = 127;
 
-        private InterpolatedSampler m_finalDensity;
+        // private InterpolatedSampler m_finalDensity;
 
         public void Awake()
         {
@@ -58,7 +58,7 @@ namespace RS.Scene
             m_isGeneratingChunks = false;
             
             // m_finalDensity = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
-            m_finalDensity = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
+            // m_finalDensity = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)
@@ -396,6 +396,10 @@ namespace RS.Scene
             {
                 var chunkPosXZ = m_chunkGeneratingQueue.Dequeue();
 
+                var samplerX = Mathf.FloorToInt(chunkPosXZ.x / 32.0f);
+                var samplerZ = Mathf.FloorToInt(chunkPosXZ.y / 32.0f);
+                var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
+                
                 var chunks = new Chunk[12];
                 // 目前先假定y轴上能有192m 12个chunk，创建Chunk
                 // 先放弃地下的生成
@@ -412,13 +416,7 @@ namespace RS.Scene
                 }
                 
                 // 生成Base Data
-                for (var chunkY = 3; chunkY < 12; chunkY++)
-                {
-                    if (chunks[chunkY].status == ChunkStatus.BaseData)
-                    {
-                        yield return StartCoroutine(GenerateBaseDataAsync(chunks[chunkY]));
-                    }
-                }
+                yield return StartCoroutine(GenerateBaseDataAsync(chunks, sampler));
                 
                 // Aquifer阶段
                 for (var chunkY = 3; chunkY < 12; chunkY++)
@@ -462,27 +460,37 @@ namespace RS.Scene
             m_isGeneratingChunks = false;
         }
 
-        private IEnumerator GenerateBaseDataAsync(Chunk chunk)
+        private IEnumerator GenerateBaseDataAsync(Chunk[] chunks, InterpolatedSampler sampler)
         {
+            var isRunning = true;
+            
             Task.Run(() =>
             {
                 try
                 {
-                    GenerateBaseData(chunk);
+                    for (var chunkY = 3; chunkY < 12; chunkY++)
+                    {
+                        if (chunks[chunkY].status == ChunkStatus.BaseData)
+                        {
+                            GenerateBaseData(chunks[chunkY], sampler);
+                        }
+                    }
+
+                    isRunning = false;
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Chunk Generation Error: {chunk.chunkPos} {e.Message}\n{e.StackTrace}");  
+                    Debug.LogError($"Chunk Generation Error: {chunks[0].chunkPos} {e.Message}\n{e.StackTrace}");  
                 }
             });
 
-            while (chunk.status == ChunkStatus.BaseData)
+            while (isRunning)
             {
                 yield return null;
             }
         }
         
-        private void GenerateBaseData(Chunk chunk)
+        private void GenerateBaseData(Chunk chunk, InterpolatedSampler sampler)
         {
             var offsetX = chunk.chunkPos.x * 32;
             var offsetZ = chunk.chunkPos.z * 32;
@@ -494,7 +502,7 @@ namespace RS.Scene
             var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
-            var batchSampleResult = m_finalDensity.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
+            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
             
             for (var sx = 0; sx < 32; sx++)
             {

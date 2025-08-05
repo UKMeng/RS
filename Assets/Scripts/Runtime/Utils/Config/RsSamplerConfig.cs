@@ -181,7 +181,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("value", out var value))
                     {
                         var valueSampler = ParseJTokenToSampler(value, startPos);
-                        sampler = new Cache2DSampler(valueSampler);
+                        sampler = new Cache2DSampler(valueSampler, startPos);
                     }
                     else
                     {
@@ -209,7 +209,7 @@ namespace RS.Utils
                     if (arguments.TryGetValue("value", out var value))
                     {
                         var valueSampler = ParseJTokenToSampler(value, startPos);
-                        sampler = new FlatCacheSampler(valueSampler);
+                        sampler = new FlatCacheSampler(valueSampler, startPos);
                     }
                     else
                     {
