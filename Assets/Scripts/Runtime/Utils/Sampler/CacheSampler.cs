@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace RS.Utils
@@ -9,15 +10,29 @@ namespace RS.Utils
     /// </summary>
     public class Cache2DSampler : RsSampler
     {
-        private float[] m_cache;
+        private NativeArray<float> m_cache;
         private RsSampler m_sampler;
         private int m_startX;
         private int m_startZ;
 
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+
+            m_cache.Dispose();
+        }
+
         public Cache2DSampler(RsSampler sampler, Vector3Int startPos)
         {
-            m_cache = new float[1028 * 1028];
-            Array.Fill(m_cache, 65535.0f);
+            // 1028 * 1028
+            m_cache = new NativeArray<float>(1056784, Allocator.Persistent);
+            for (var i = 0; i < m_cache.Length; i++)
+            {
+                m_cache[i] = 65535.0f;
+            }
             m_sampler = sampler;
             m_startX = startPos.x;
             m_startZ = startPos.z;
@@ -58,6 +73,14 @@ namespace RS.Utils
         private float m_lastValue;
         private RsSampler m_sampler;
 
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
+
         public CacheOnceSampler(RsSampler sampler)
         {
             m_sampler = sampler;
@@ -80,25 +103,32 @@ namespace RS.Utils
     /// </summary>
     public class FlatCacheSampler : RsSampler
     {
-        private float[] m_cache;
+        private NativeArray<float> m_cache;
         private RsSampler m_sampler;
         private int m_startX;
         private int m_startZ;
 
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+
+            m_cache.Dispose();
+        }
+
         public FlatCacheSampler(RsSampler sampler, Vector3Int startPos)
         {
-            m_cache = new float[257 * 257];
-            Array.Fill(m_cache, 65535.0f);
+            // 66049 = 257 * 257
+            m_cache = new NativeArray<float>(66049, Allocator.Persistent);
+            for (var i = 0; i < m_cache.Length; i++)
+            {
+                m_cache[i] = 65535.0f;
+            }
             m_sampler = sampler;
             m_startX = startPos.x;
             m_startZ = startPos.z;
-        }
-
-        public FlatCacheSampler(RsNoise noise)
-        {
-            m_cache = new float[257 * 257];
-            Array.Fill(m_cache, 65535.0f);
-            m_sampler = new RsSampler(noise);
         }
 
         public override float Sample(Vector3 pos)

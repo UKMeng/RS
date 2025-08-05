@@ -76,6 +76,7 @@ namespace RS.Scene
             Debug.Log("开始销毁资源");
             Block.UnInit();
             GetComponent<TickManager>().Unregister(m_time);
+            NoiseManager.Instance.Dispose();
         }
 
         public void Update()

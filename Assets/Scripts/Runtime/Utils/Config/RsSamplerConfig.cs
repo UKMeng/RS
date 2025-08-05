@@ -453,6 +453,11 @@ namespace RS.Utils
                     break;
                 }
             }
+
+            if (sampler != null)
+            {
+                sampler.BuildFromConfig = true;
+            }
             return sampler;
         }
 

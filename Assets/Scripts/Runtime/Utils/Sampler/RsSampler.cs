@@ -4,9 +4,26 @@ using RS.Utils;
 
 namespace RS.Utils
 {
-    public class RsSampler
+    public class RsSampler : IDisposable
     {
         protected RsNoise m_noise;
+        private bool m_buildFromConfig = false;
+
+        public bool BuildFromConfig
+        {
+            get
+            {
+                return m_buildFromConfig;
+            }
+            set
+            {
+                m_buildFromConfig = value;
+            }
+        }
+
+        public virtual void Dispose()
+        {
+        }
 
         public RsSampler(RsNoise noise)
         {

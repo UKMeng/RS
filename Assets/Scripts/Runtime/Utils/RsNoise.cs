@@ -1,20 +1,27 @@
 ﻿using System;
 using System.Diagnostics;
+using Unity.Collections;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Utils
 {
-    public class RsNoise
+    public class RsNoise : IDisposable
     {
-        private float[] m_amplitudes;
+        private NativeArray<float> m_amplitudes;
         private int m_firstOctave;
         private float m_gain = 0.5f;
         private float m_lacunarity = 2.0f;
         private int m_octaves;
         private float m_firstFrequency;
         private float m_firstValueFactor;
-        
+        private NativeArray<int> m_random;
+
+        public void Dispose()
+        {
+            m_random.Dispose();
+            if(m_amplitudes.IsCreated) m_amplitudes.Dispose();
+        }
         
         public RsNoise(ulong seed)
         {
@@ -29,7 +36,7 @@ namespace RS.Utils
         public RsNoise(ulong seed, float[] amplitudes, int firstOctave)
         {
             Randomize(seed);
-            m_amplitudes = amplitudes;
+            m_amplitudes = new NativeArray<float>(amplitudes, Allocator.Persistent);
             m_firstOctave = firstOctave;
             m_octaves = amplitudes.Length;
             m_firstFrequency = Mathf.Pow(2.0f, firstOctave);
@@ -210,7 +217,6 @@ namespace RS.Utils
         const int RandomSize = 256;
         const double Sqrt3 = 1.7320508075688772935;
         const double Sqrt5 = 2.2360679774997896964;
-        int[] _random;
 
         /// Skewing and unskewing factors for 2D, 3D and 4D, 
         /// some of them pre-multiplied.
@@ -373,7 +379,7 @@ namespace RS.Utils
             if (t0 > 0)
             {
                 t0 *= t0;
-                int gi0 = _random[ii + _random[jj + _random[kk]]]%12;
+                int gi0 = m_random[ii + m_random[jj + m_random[kk]]]%12;
                 n0 = t0*t0*Dot(Grad3[gi0], x0, y0, z0);
             }
 
@@ -381,7 +387,7 @@ namespace RS.Utils
             if (t1 > 0)
             {
                 t1 *= t1;
-                int gi1 = _random[ii + i1 + _random[jj + j1 + _random[kk + k1]]]%12;
+                int gi1 = m_random[ii + i1 + m_random[jj + j1 + m_random[kk + k1]]]%12;
                 n1 = t1*t1*Dot(Grad3[gi1], x1, y1, z1);
             }
 
@@ -389,7 +395,7 @@ namespace RS.Utils
             if (t2 > 0)
             {
                 t2 *= t2;
-                int gi2 = _random[ii + i2 + _random[jj + j2 + _random[kk + k2]]]%12;
+                int gi2 = m_random[ii + i2 + m_random[jj + j2 + m_random[kk + k2]]]%12;
                 n2 = t2*t2*Dot(Grad3[gi2], x2, y2, z2);
             }
 
@@ -397,7 +403,7 @@ namespace RS.Utils
             if (t3 > 0)
             {
                 t3 *= t3;
-                int gi3 = _random[ii + 1 + _random[jj + 1 + _random[kk + 1]]]%12;
+                int gi3 = m_random[ii + 1 + m_random[jj + 1 + m_random[kk + 1]]]%12;
                 n3 = t3*t3*Dot(Grad3[gi3], x3, y3, z3);
             }
 
@@ -409,7 +415,7 @@ namespace RS.Utils
 
         void Randomize(ulong seed)
         {
-            _random = new int[RandomSize * 2];
+            m_random = new NativeArray<int>(RandomSize * 2, Allocator.Persistent);
 
             if (seed != 0)
             {
@@ -421,19 +427,19 @@ namespace RS.Utils
 
                 for (int i = 0; i < Source.Length; i++)
                 {
-                    _random[i] = Source[i] ^ F[0];
-                    _random[i] ^= F[1];
-                    _random[i] ^= F[2];
-                    _random[i] ^= F[3];
+                    m_random[i] = Source[i] ^ F[0];
+                    m_random[i] ^= F[1];
+                    m_random[i] ^= F[2];
+                    m_random[i] ^= F[3];
 
-                    _random[i + RandomSize] = _random[i];
+                    m_random[i + RandomSize] = m_random[i];
                 }
 
             }
             else
             {
                 for (int i = 0; i < RandomSize; i++)
-                    _random[i + RandomSize] = _random[i] = Source[i];
+                    m_random[i + RandomSize] = m_random[i] = Source[i];
             }
         }
 

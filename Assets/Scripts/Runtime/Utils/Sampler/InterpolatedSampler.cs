@@ -15,6 +15,14 @@ namespace RS.Utils
         private const float m_cellWidth = 4.0f;
         private const float m_cellHeight = 4.0f;
 
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
+
         public InterpolatedSampler(RsSampler sampler)
         {
             m_sampler = sampler;
@@ -56,10 +64,10 @@ namespace RS.Utils
             var h = m_cellHeight;
 
             // 对所有间隔点先采样, 需各维度多一个间隔
-            // var sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
             
             var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
-
+            
             Parallel.For(0, 81, (index) =>
             {
                 var ix = index / 9;
@@ -109,8 +117,8 @@ namespace RS.Utils
             cache.Dispose();
             result.Dispose();
             
-            // sw.Stop();
-            // Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
+            sw.Stop();
+            Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
 
             return ret;
         }

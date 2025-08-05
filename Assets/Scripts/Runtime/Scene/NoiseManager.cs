@@ -26,7 +26,7 @@ namespace RS.Scene
     /// 总管噪声,随机数,采样器的类，保持随机数统一
     /// 各种噪声、随机数都通过这里来获取
     /// </summary>
-    public class NoiseManager
+    public class NoiseManager : IDisposable
     {
         private static NoiseManager s_instance;
 
@@ -70,6 +70,21 @@ namespace RS.Scene
             m_noises = new Dictionary<string, RsNoise>();
             m_samplers = new Dictionary<string, RsSampler>();
             m_cacheSampelers = new Dictionary<(string, Vector3Int), RsSampler>();
+        }
+
+        public void Dispose()
+        {
+            // Sampler和Noise都统一在这里Dispose
+            // Sampler里面包含噪声的，不在sampler的Dispose进行
+            foreach (var (_, noise) in m_noises)
+            {
+                noise.Dispose();
+            }
+
+            foreach (var (_, sampler) in m_samplers)
+            {
+                sampler.Dispose();
+            }
         }
 
         private void InitNoiseManager()

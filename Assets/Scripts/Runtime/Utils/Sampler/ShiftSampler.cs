@@ -51,6 +51,24 @@ namespace RS.Utils
 
         private float m_xzScale;
         private float m_yScale;
+        
+        public override void Dispose()
+        {
+            if (!m_samplerX.BuildFromConfig)
+            {
+                m_samplerX.Dispose();
+            }
+
+            if (!m_samplerY.BuildFromConfig)
+            {
+                m_samplerY.Dispose();
+            }
+
+            if (!m_samplerZ.BuildFromConfig)
+            {
+                m_samplerZ.Dispose();
+            }
+        }
 
         public ShiftedNoiseSampler(RsNoise noise, RsSampler samplerX, RsSampler samplerY, RsSampler samplerZ, float xzScale, float yScale)
             : base(noise)

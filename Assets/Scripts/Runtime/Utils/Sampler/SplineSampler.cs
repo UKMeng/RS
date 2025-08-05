@@ -9,6 +9,22 @@ namespace RS.Utils
         private float[] m_locations;
         private float[] m_derivatives;
         private RsSampler[] m_values;
+        
+        public override void Dispose()
+        {
+            if (!m_coordinate.BuildFromConfig)
+            {
+                m_coordinate.Dispose();
+            }
+
+            foreach (var value in m_values)
+            {
+                if (!value.BuildFromConfig)
+                {
+                    value.Dispose();
+                }
+            }
+        }
 
         /// <summary>
         /// 

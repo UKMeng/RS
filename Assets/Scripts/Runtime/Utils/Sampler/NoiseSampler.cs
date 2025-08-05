@@ -24,6 +24,15 @@ namespace RS.Utils
     {
         private RsSampler m_raritySampler;
         private int m_type;
+        
+        public override void Dispose()
+        {
+            if (!m_raritySampler.BuildFromConfig)
+            {
+                m_raritySampler.Dispose();
+            }
+        }
+        
         public WeirdScaledSampler(RsNoise noise, RsSampler raritySampler, int type)
             : base(noise)
         {

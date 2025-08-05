@@ -7,6 +7,19 @@ namespace RS.Utils
         private RsSampler m_left;
         private RsSampler m_right;
 
+        public override void Dispose()
+        {
+            if (!m_left.BuildFromConfig)
+            {
+                m_left.Dispose();
+            }
+
+            if (!m_right.BuildFromConfig)
+            {
+                m_right.Dispose();
+            }
+        }
+
         public AddSampler(RsSampler left, RsSampler right)
         {
             m_left = left;
@@ -24,6 +37,19 @@ namespace RS.Utils
         private RsSampler m_left;
         private RsSampler m_right;
 
+        public override void Dispose()
+        {
+            if (!m_left.BuildFromConfig)
+            {
+                m_left.Dispose();
+            }
+
+            if (!m_right.BuildFromConfig)
+            {
+                m_right.Dispose();
+            }
+        }
+        
         public MulSampler(RsSampler left, RsSampler right)
         {
             m_left = left;
@@ -40,6 +66,19 @@ namespace RS.Utils
         private RsSampler m_left;
         private RsSampler m_right;
 
+        public override void Dispose()
+        {
+            if (!m_left.BuildFromConfig)
+            {
+                m_left.Dispose();
+            }
+
+            if (!m_right.BuildFromConfig)
+            {
+                m_right.Dispose();
+            }
+        }
+        
         public MaxSampler(RsSampler left, RsSampler right)
         {
             m_left = left;
@@ -57,6 +96,19 @@ namespace RS.Utils
         private RsSampler m_left;
         private RsSampler m_right;
 
+        public override void Dispose()
+        {
+            if (!m_left.BuildFromConfig)
+            {
+                m_left.Dispose();
+            }
+
+            if (!m_right.BuildFromConfig)
+            {
+                m_right.Dispose();
+            }
+        }
+        
         public MinSampler(RsSampler left, RsSampler right)
         {
             m_left = left;
@@ -72,7 +124,15 @@ namespace RS.Utils
     public class AbsSampler : RsSampler
     {
         private RsSampler m_sampler;
-
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
+        
         public AbsSampler(RsSampler sampler)
         {
             m_sampler = sampler;
@@ -87,6 +147,14 @@ namespace RS.Utils
     public class SquareSampler : RsSampler
     {
         private RsSampler m_sampler;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public SquareSampler(RsSampler sampler)
         {
@@ -103,6 +171,14 @@ namespace RS.Utils
     public class CubeSampler : RsSampler
     {
         private RsSampler m_sampler;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public CubeSampler(RsSampler sampler)
         {
@@ -119,6 +195,14 @@ namespace RS.Utils
     public class HalfNegativeSampler : RsSampler
     {
         private RsSampler m_sampler;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public HalfNegativeSampler(RsSampler sampler)
         {
@@ -136,6 +220,14 @@ namespace RS.Utils
     public class QuarterNegativeSampler : RsSampler
     {
         private RsSampler m_sampler;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public QuarterNegativeSampler(RsSampler sampler)
         {
@@ -155,6 +247,14 @@ namespace RS.Utils
         private RsSampler m_sampler;
         private float m_min;
         private float m_max;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public ClampSampler(RsSampler sampler, float min, float max)
         {
@@ -194,6 +294,14 @@ namespace RS.Utils
     public class SqueezeSampler : RsSampler
     {
         private RsSampler m_sampler;
+        
+        public override void Dispose()
+        {
+            if (!m_sampler.BuildFromConfig)
+            {
+                m_sampler.Dispose();
+            }
+        }
 
         public SqueezeSampler(RsSampler sampler)
         {
@@ -209,16 +317,16 @@ namespace RS.Utils
         }
     }
 
-    public class XSampler : RsSampler
-    {
-        public XSampler()
-        {
-            
-        }
-
-        public override float Sample(Vector3 pos)
-        {
-            return pos.x;
-        }
-    }
+    // public class XSampler : RsSampler
+    // {
+    //     public XSampler()
+    //     {
+    //         
+    //     }
+    //
+    //     public override float Sample(Vector3 pos)
+    //     {
+    //         return pos.x;
+    //     }
+    // }
 }

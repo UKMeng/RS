@@ -9,6 +9,24 @@ namespace RS.Utils
         private RsSampler m_outRange;
         private float m_min; // 闭
         private float m_max; // 开
+        
+        public override void Dispose()
+        {
+            if (!m_input.BuildFromConfig)
+            {
+                m_input.Dispose();
+            }
+
+            if (!m_inRange.BuildFromConfig)
+            {
+                m_inRange.Dispose();
+            }
+
+            if (!m_outRange.BuildFromConfig)
+            {
+                m_outRange.Dispose();
+            }
+        }
 
         public RangeChoiceSampler(RsSampler input, RsSampler inRange, RsSampler outRange, float min, float max)
         {

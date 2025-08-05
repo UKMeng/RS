@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using RS.Item;
 using UnityEditor;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine;
 using RS.Scene;
 using RS.Scene.Biome;
 using RS.Utils;
+using Unity.Jobs;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Scene

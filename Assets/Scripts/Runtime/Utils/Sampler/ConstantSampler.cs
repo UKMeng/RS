@@ -6,6 +6,11 @@ namespace RS.Utils
     {
         private float m_value;
 
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
+
         public ConstantSampler(float value)
         {
             m_value = value;
