@@ -74,6 +74,7 @@ namespace RS.Utils
             "FinalDensity",
             "Height",
             "HeightWithCave",
+            "HeightWithEntrance",
             "Humidity",
             "InterTest",
             "Offset",

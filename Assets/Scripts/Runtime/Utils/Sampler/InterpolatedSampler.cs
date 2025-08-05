@@ -56,7 +56,7 @@ namespace RS.Utils
 
             // 对所有间隔点先采样, 需各维度多一个间隔
             // var sw = Stopwatch.StartNew();
-            // var cache = new float[9 * 9 * 9];
+
             var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
 
             for (var ix = 0; ix < 9; ix++)
@@ -75,7 +75,7 @@ namespace RS.Utils
 
             // sw.Stop();
             // Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
-            // var sw = Stopwatch.StartNew();
+            // sw = Stopwatch.StartNew();
 
             // 对中间点进行插值 JobSystem
             var result = new NativeArray<float>(32 * 32 * 32, Allocator.TempJob);
@@ -102,7 +102,7 @@ namespace RS.Utils
         }
 
         [BurstCompile]
-        public struct TriLerpJob : IJobParallelFor
+        private struct TriLerpJob : IJobParallelFor
         {
             [ReadOnly] public NativeArray<float> cache;
             [ReadOnly] public float w;

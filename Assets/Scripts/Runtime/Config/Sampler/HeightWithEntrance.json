@@ -1,0 +1,25 @@
+﻿{
+  "type" : "sampler",
+  "arguments" : {
+    "type" : "rangeChoice",
+    "arguments" : {
+      "input": "Height",
+      "inRange": {
+        "type" : "min",
+        "arguments": {
+          "left": "Height",
+          "right": {
+            "type": "mul",
+            "arguments": {
+              "left": 5,
+              "right": "CaveEntrances"
+            }
+          }
+        }
+      },
+      "outRange": "Height",
+      "min": -1000000,
+      "max": 1.5625
+    }
+  }
+}

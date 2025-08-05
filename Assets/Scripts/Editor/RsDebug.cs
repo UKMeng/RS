@@ -13,7 +13,7 @@ namespace RS.Scene
 {
     public class RsDebug
     {
-        [MenuItem("RSTest/Sampler Benchmark")]
+        [MenuItem("RSTest/Sampler Benchmark 1")]
         public static void SamplerBenchmark()
         {
             Debug.Log("Sample Benchmark");
@@ -26,6 +26,33 @@ namespace RS.Scene
             
             var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
 
+            GenerateChunks(0, 0, sampler);
+            
+            // for (var x = 0; x < 8; x++)
+            // {
+            //     for (var z = 0; z < 8; z++)
+            //     {
+            //         GenerateChunks(x, z, sampler);
+            //     }
+            // }
+
+            sw.Stop();
+            Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
+        }
+        
+        [MenuItem("RSTest/Sampler Benchmark 8 x 8")]
+        public static void SamplerBenchmark64()
+        {
+            Debug.Log("Sample Benchmark");
+
+            NoiseManager.Init(20250715);
+            
+            var sw = Stopwatch.StartNew();
+
+            var samplerName = "InterTest";
+            
+            var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            
             for (var x = 0; x < 8; x++)
             {
                 for (var z = 0; z < 8; z++)

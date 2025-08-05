@@ -21,6 +21,11 @@ namespace RS.Utils
         {
             return m_noise.SampleFbm3D(pos);
         }
+
+        // public virtual float[] SampleBatch(Vector3 startPos)
+        // {
+        //     
+        // }
         
         
         // public float ShiftNoise(Vector3 samplePosition, float scaleXZ, float scaleY, int firstOctave, float[] amplitudes)
