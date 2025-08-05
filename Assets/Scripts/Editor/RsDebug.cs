@@ -20,21 +20,12 @@ namespace RS.Scene
 
             NoiseManager.Init(20250715);
             
+            var samplerName = "InterTest";
+            var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            
             var sw = Stopwatch.StartNew();
 
-            var samplerName = "InterTest";
-            
-            var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
-
             GenerateChunks(0, 0, sampler);
-            
-            // for (var x = 0; x < 8; x++)
-            // {
-            //     for (var z = 0; z < 8; z++)
-            //     {
-            //         GenerateChunks(x, z, sampler);
-            //     }
-            // }
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
@@ -47,11 +38,11 @@ namespace RS.Scene
 
             NoiseManager.Init(20250715);
             
-            var sw = Stopwatch.StartNew();
-
             var samplerName = "InterTest";
             
             var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            
+            var sw = Stopwatch.StartNew();
             
             for (var x = 0; x < 8; x++)
             {
@@ -78,6 +69,7 @@ namespace RS.Scene
             }
             
             // Base Data
+            // var baseSw = Stopwatch.StartNew();
             for (var chunkY = 3; chunkY < 12; chunkY++)
             {
                 if (chunks[chunkY].status == ChunkStatus.BaseData)
@@ -85,8 +77,11 @@ namespace RS.Scene
                     GenerateBaseData(chunks[chunkY], sampler);
                 }
             }
+            // baseSw.Stop();
+            // Debug.Log($"Base Data: {baseSw.ElapsedMilliseconds}ms");
             
             // Aquifer阶段
+            // var aquiferSw = Stopwatch.StartNew();
             for (var chunkY = 3; chunkY < 12; chunkY++)
             {
                 if (chunkY == 3)
@@ -105,8 +100,12 @@ namespace RS.Scene
                 }
             }
             
+            // aquiferSw.Stop();
+            // Debug.Log($"Aquifer: {aquiferSw.ElapsedMilliseconds}ms");
             
             // 生成Surface阶段
+            // var surfaceSw = Stopwatch.StartNew();
+            
             var offsetX = x * 32;
             var offsetZ = z * 32;
             var contexts = new SurfaceContext[32 * 32];
@@ -127,6 +126,8 @@ namespace RS.Scene
                 }
             }
 
+            // surfaceSw.Stop();
+            // Debug.Log($"Surface: {surfaceSw.ElapsedMilliseconds}ms");
         }
         
         private static void GenerateBaseData(Chunk chunk, InterpolatedSampler sampler)
@@ -135,14 +136,13 @@ namespace RS.Scene
             var offsetZ = chunk.chunkPos.z * 32;
             var offsetY = chunk.chunkPos.y * 32;
             
-            // var sw = Stopwatch.StartNew();
-            
             var blocks = new BlockType[32 * 32 * 32];
             var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
             var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
-            
+
+            // var judgeSw = Stopwatch.StartNew();
             for (var sx = 0; sx < 32; sx++)
             {
                 for (var sz = 0; sz < 32; sz++)
@@ -155,13 +155,14 @@ namespace RS.Scene
                     }
                 }
             }
+            // judgeSw.Stop();
+            // Debug.Log($"Judge: {judgeSw.Elapsed.TotalMilliseconds * 1000:n3} us");
+            // Debug.Log($"Judge: {judgeSw.ElapsedMilliseconds} ms");
 
+            
             chunk.blocks = blocks;
             chunk.density = finalDensity;
             chunk.status = ChunkStatus.Aquifer;
-            
-            // sw.Stop();
-            // Debug.Log($"[ChunkManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         private static void GenerateAquifer(Chunk chunk)
