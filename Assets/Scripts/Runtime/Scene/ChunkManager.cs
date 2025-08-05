@@ -87,7 +87,9 @@ namespace RS.Scene
                 {
                     var chunkX = playerChunkPos.x + offsetX;
                     var chunkZ = playerChunkPos.z + offsetZ;
-                    var chunkPos = new Vector3Int(chunkX, 0, chunkZ);
+                    
+                    // y=0,1,2目前默认不生成，从位置3开始判断
+                    var chunkPos = new Vector3Int(chunkX, 3, chunkZ);
 
                     if (!m_chunks.TryGetValue(chunkPos, out var chunk) || chunk.status == ChunkStatus.Empty)
                     {
@@ -167,7 +169,8 @@ namespace RS.Scene
                     var chunkZ = playerChunkPos.z + offsetZ;
                     
                     // 目前先假定y轴上能有192m 12个chunk
-                    for (var chunkY = 11; chunkY > -1; chunkY--)
+                    // 先不生成地下
+                    for (var chunkY = 11; chunkY >= 3; chunkY--)
                     {
                         var chunkPos = new Vector3Int(chunkX, chunkY, chunkZ);
 
@@ -180,11 +183,12 @@ namespace RS.Scene
                         if (chunk.status == ChunkStatus.DataReady)
                         {
                             // chunk数据准备完成，还没有生成Mesh和对应GameObject
+                            InitChunkMesh(chunk);
                             // 简易剔除，只生成玩家所在平面往下2格的Chunk
-                            if (chunkY >= playerChunkPos.y - 1)
-                            {
-                                InitChunkMesh(chunk);
-                            }
+                            // if (chunkY >= playerChunkPos.y - 1)
+                            // {
+                            //     InitChunkMesh(chunk);
+                            // }
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
                         {
@@ -204,6 +208,8 @@ namespace RS.Scene
             var waterGo = chunkGo.transform.Find("Water").gameObject;
             var extraBlocks = CollectNeighborBlocks(chunk.chunkPos);
             var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32, extraBlocks);
+            
+            // TODO： 如果meshData的顶点数为空，直接跳过生成mesh
             var mesh = new Mesh();
             mesh.vertices = meshData.vertices;
             mesh.triangles = meshData.triangles;
@@ -391,7 +397,8 @@ namespace RS.Scene
 
                 var chunks = new Chunk[12];
                 // 目前先假定y轴上能有192m 12个chunk，创建Chunk
-                for (var chunkY = 0; chunkY < 12; chunkY++)
+                // 先放弃地下的生成
+                for (var chunkY = 3; chunkY < 12; chunkY++)
                 {
                     var chunkPos = new Vector3Int(chunkPosXZ.x, chunkY, chunkPosXZ.y);
                     if (!m_chunks.TryGetValue(chunkPos, out var chunk))
@@ -404,7 +411,7 @@ namespace RS.Scene
                 }
                 
                 // 生成Base Data
-                for (var chunkY = 0; chunkY < 12; chunkY++)
+                for (var chunkY = 3; chunkY < 12; chunkY++)
                 {
                     if (chunks[chunkY].status == ChunkStatus.BaseData)
                     {
@@ -413,7 +420,7 @@ namespace RS.Scene
                 }
                 
                 // Aquifer阶段
-                for (var chunkY = 0; chunkY < 12; chunkY++)
+                for (var chunkY = 3; chunkY < 12; chunkY++)
                 {
                     if (chunks[chunkY].status == ChunkStatus.Aquifer)
                     {
@@ -433,7 +440,7 @@ namespace RS.Scene
                         contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
                     }
                 }
-                for (var chunkY = 11; chunkY >= 0; chunkY--)
+                for (var chunkY = 11; chunkY >= 3; chunkY--)
                 {
                     var chunk = chunks[chunkY];
                     
