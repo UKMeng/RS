@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Unity.Collections;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Unity.Burst;
+using Unity.Jobs;
 
 namespace RS.Utils
 {
@@ -16,10 +18,12 @@ namespace RS.Utils
         private float m_firstFrequency;
         private float m_firstValueFactor;
         private NativeArray<int> m_random;
+        private NativeArray<int> m_grad3;
 
         public void Dispose()
         {
             m_random.Dispose();
+            m_grad3.Dispose();
             if(m_amplitudes.IsCreated) m_amplitudes.Dispose();
         }
         
@@ -95,30 +99,30 @@ namespace RS.Utils
             return noise;
         }
 
-        public static float[,] GenerateSimplexNoise(int width, int height, ulong seed)
-        {
-            var sw = Stopwatch.StartNew();
-            
-            var data = new float[width, height];
-
-            var noise = new RsNoise(seed);
-
-            for (var x = 0; x < width; x++)
-            {
-                for (var z = 0; z < height; z++)
-                {
-                    var point = new Vector3((float)x / width, 3.0f, (float)z / width);
-                    var val = (noise.SimplexNoiseEvaluate(point, 0.05f) + 1.0f) * 0.5f;
-                    // var val = (Fbm3D(point, 3, noise) + 1.0f) * 0.5f;
-                    data[x, z] = val;
-                }
-            }
-            
-            sw.Stop();
-            Debug.Log($"Simplex noise generated in {sw.ElapsedMilliseconds} ms");
-
-            return data;
-        }
+        // public static float[,] GenerateSimplexNoise(int width, int height, ulong seed)
+        // {
+        //     var sw = Stopwatch.StartNew();
+        //     
+        //     var data = new float[width, height];
+        //
+        //     var noise = new RsNoise(seed);
+        //
+        //     for (var x = 0; x < width; x++)
+        //     {
+        //         for (var z = 0; z < height; z++)
+        //         {
+        //             var point = new Vector3((float)x / width, 3.0f, (float)z / width);
+        //             var val = (noise.SimplexNoiseEvaluate(point, 0.05f) + 1.0f) * 0.5f;
+        //             // var val = (Fbm3D(point, 3, noise) + 1.0f) * 0.5f;
+        //             data[x, z] = val;
+        //         }
+        //     }
+        //     
+        //     sw.Stop();
+        //     Debug.Log($"Simplex noise generated in {sw.ElapsedMilliseconds} ms");
+        //
+        //     return data;
+        // }
         
         public float SampleFbm3D(Vector3 samplePosition)
         {
@@ -140,6 +144,79 @@ namespace RS.Utils
             }
             
             return result;
+        }
+
+        public float[] SampleFbm3DBatch(Vector3 startPos, int x, int y, int z)
+        {
+            var result = new NativeArray<float>(x * y * z, Allocator.TempJob);
+            var job = new SampleJob
+            {
+                startPos = startPos,
+                x = x,
+                y = y,
+                z = z,
+                firstFrequency = m_firstFrequency,
+                firstValueFactor = m_firstValueFactor,
+                octaves = m_octaves,
+                lacunarity = m_lacunarity,
+                gain = m_gain,
+                random = m_random,
+                amplitudes = m_amplitudes,
+                grad3 = m_grad3,
+                result = result
+            };
+
+            var handle = job.Schedule(x * y * z, 64);
+            handle.Complete();
+
+            var ret = result.ToArray();
+            result.Dispose();
+
+            return ret;
+        }
+        
+        [BurstCompile]
+        public struct SampleJob : IJobParallelFor
+        {
+            [ReadOnly] public Vector3 startPos;
+            [ReadOnly] public int x;
+            [ReadOnly] public int y;
+            [ReadOnly] public int z;
+            [ReadOnly] public float firstFrequency;
+            [ReadOnly] public float firstValueFactor;
+            [ReadOnly] public int octaves;
+            [ReadOnly] public float lacunarity;
+            [ReadOnly] public float gain;
+            [ReadOnly] public NativeArray<int> random;
+            [ReadOnly] public NativeArray<float> amplitudes;
+            [ReadOnly] public NativeArray<int> grad3;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                var ix = index / y / z;
+                var iz = index % (y * z) / y;
+                var iy = index % (y * z) % y;
+                
+                var val = 0.0f;
+            
+                var frequency = firstFrequency;
+                var valueFactor = firstValueFactor;
+            
+                for (var i = 0; i < octaves; i++)
+                {
+                    if (amplitudes[i] != 0.0f)
+                    {
+                        var value = SimplexNoiseEvaluate(random, grad3, startPos + new Vector3(ix, iy, iz), frequency);
+                        val += valueFactor * amplitudes[i] * value;
+                    }
+
+                    frequency *= lacunarity;
+                    valueFactor *= gain;
+                }
+                
+                result[index] = val;
+            }
         }
 
         // 之前实现的3D分形，其实实现的形状还挺好的
@@ -246,6 +323,192 @@ namespace RS.Utils
             new[] {0, -1, 1}, new[] {0, 1, -1}, new[] {0, -1, -1}
         };
 
+        private static readonly int[] tempGrad3 = new int[]
+        {
+            1, 1, 0, -1, 1, 0, 1, -1, 0,
+            -1, -1, 0, 1, 0, 1, -1, 0, 1,
+            1, 0, -1, -1, 0, -1, 0, 1, 1,
+            0, -1, 1, 0, 1, -1, 0, -1, -1
+        };
+
+        /// <summary>
+        /// Generates value, typically in range [-1 * amplitude, 1 * amplitude]
+        /// </summary>
+        public static float SimplexNoiseEvaluate(NativeArray<int> random, NativeArray<int> grad3, Vector3 point, float frequency, float amplitude = 1.0f)
+        {
+            double x = point.x * frequency;
+            double y = point.y * frequency;
+            double z = point.z * frequency;
+            double n0 = 0, n1 = 0, n2 = 0, n3 = 0;
+
+            // Noise contributions from the four corners
+            // Skew the input space to determine which simplex cell we're in
+            double s = (x + y + z)*F3;
+
+            // for 3D
+            int i = FastFloor(x + s);
+            int j = FastFloor(y + s);
+            int k = FastFloor(z + s);
+
+            double t = (i + j + k)*G3;
+
+            // The x,y,z distances from the cell origin
+            double x0 = x - (i - t);
+            double y0 = y - (j - t);
+            double z0 = z - (k - t);
+
+            // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
+            // Determine which simplex we are in.
+            // Offsets for second corner of simplex in (i,j,k)
+            int i1, j1, k1;
+
+            // coords
+            int i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+
+            if (x0 >= y0)
+            {
+                if (y0 >= z0)
+                {
+                    // X Y Z order
+                    i1 = 1;
+                    j1 = 0;
+                    k1 = 0;
+                    i2 = 1;
+                    j2 = 1;
+                    k2 = 0;
+                }
+                else if (x0 >= z0)
+                {
+                    // X Z Y order
+                    i1 = 1;
+                    j1 = 0;
+                    k1 = 0;
+                    i2 = 1;
+                    j2 = 0;
+                    k2 = 1;
+                }
+                else
+                {
+                    // Z X Y order
+                    i1 = 0;
+                    j1 = 0;
+                    k1 = 1;
+                    i2 = 1;
+                    j2 = 0;
+                    k2 = 1;
+                }
+            }
+            else
+            {
+                // x0 < y0
+                if (y0 < z0)
+                {
+                    // Z Y X order
+                    i1 = 0;
+                    j1 = 0;
+                    k1 = 1;
+                    i2 = 0;
+                    j2 = 1;
+                    k2 = 1;
+                }
+                else if (x0 < z0)
+                {
+                    // Y Z X order
+                    i1 = 0;
+                    j1 = 1;
+                    k1 = 0;
+                    i2 = 0;
+                    j2 = 1;
+                    k2 = 1;
+                }
+                else
+                {
+                    // Y X Z order
+                    i1 = 0;
+                    j1 = 1;
+                    k1 = 0;
+                    i2 = 1;
+                    j2 = 1;
+                    k2 = 0;
+                }
+            }
+
+            // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
+            // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z),
+            // and
+            // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z),
+            // where c = 1/6.
+
+            // Offsets for second corner in (x,y,z) coords
+            double x1 = x0 - i1 + G3;
+            double y1 = y0 - j1 + G3;
+            double z1 = z0 - k1 + G3;
+
+            // Offsets for third corner in (x,y,z)
+            double x2 = x0 - i2 + F3;
+            double y2 = y0 - j2 + F3;
+            double z2 = z0 - k2 + F3;
+
+            // Offsets for last corner in (x,y,z)
+            double x3 = x0 - 0.5;
+            double y3 = y0 - 0.5;
+            double z3 = z0 - 0.5;
+
+            // Work out the hashed gradient indices of the four simplex corners
+            int ii = i & 0xff;
+            int jj = j & 0xff;
+            int kk = k & 0xff;
+
+            // Calculate the contribution from the four corners
+            double t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
+            if (t0 > 0)
+            {
+                t0 *= t0;
+                int gi0 = random[ii + random[jj + random[kk]]]%12;
+                var gx = grad3[gi0 * 12 + 0];
+                var gy = grad3[gi0 * 12 + 1];
+                var gz = grad3[gi0 * 12 + 2];
+                n0 = t0*t0*Dot(gx, gy, gz, x0, y0, z0);
+            }
+
+            double t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
+            if (t1 > 0)
+            {
+                t1 *= t1;
+                int gi1 = random[ii + i1 + random[jj + j1 + random[kk + k1]]]%12;
+                var gx = grad3[gi1 * 12 + 0];
+                var gy = grad3[gi1 * 12 + 1];
+                var gz = grad3[gi1 * 12 + 2];
+                n1 = t1*t1*Dot(gx, gy, gz, x1, y1, z1);
+            }
+
+            double t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
+            if (t2 > 0)
+            {
+                t2 *= t2;
+                int gi2 = random[ii + i2 + random[jj + j2 + random[kk + k2]]]%12;
+                var gx = grad3[gi2 * 12 + 0];
+                var gy = grad3[gi2 * 12 + 1];
+                var gz = grad3[gi2 * 12 + 2];
+                n2 = t2*t2*Dot(gx, gy, gz, x2, y2, z2);
+            }
+
+            double t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
+            if (t3 > 0)
+            {
+                t3 *= t3;
+                int gi3 = random[ii + 1 + random[jj + 1 + random[kk + 1]]]%12;
+                var gx = grad3[gi3 * 12 + 0];
+                var gy = grad3[gi3 * 12 + 1];
+                var gz = grad3[gi3 * 12 + 2];
+                n3 = t3*t3*Dot(gx, gy, gz, x3, y3, z3);
+            }
+
+            // Add contributions from each corner to get the final noise value.
+            // The result is scaled to stay just inside [-1 * amplitude, 1 * amplitude]
+            return (float)(n0 + n1 + n2 + n3)*32 * amplitude;
+        }
+        
         /// <summary>
         /// Generates value, typically in range [-1 * amplitude, 1 * amplitude]
         /// </summary>
@@ -415,6 +678,7 @@ namespace RS.Utils
 
         void Randomize(ulong seed)
         {
+            m_grad3 = new NativeArray<int>(tempGrad3, Allocator.Persistent);
             m_random = new NativeArray<int>(RandomSize * 2, Allocator.Persistent);
 
             if (seed != 0)
@@ -451,6 +715,11 @@ namespace RS.Utils
         static double Dot(int[] g, double x, double y, double z)
         {
             return g[0] * x + g[1] * y + g[2] * z;
+        }
+        
+        static double Dot(int gx, int gy, int gz, double x, double y, double z)
+        {
+            return gz * x + gy * y + gz * z;
         }
 
         static double Dot(int[] g, double x, double y)

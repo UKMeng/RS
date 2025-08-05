@@ -95,8 +95,8 @@ namespace RS.Utils
             //     }
             // }
 
-            // sw.Stop();
-            // Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
+            sw.Stop();
+            Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
             // sw = Stopwatch.StartNew();
 
             // 对中间点进行插值 JobSystem
@@ -117,8 +117,8 @@ namespace RS.Utils
             cache.Dispose();
             result.Dispose();
             
-            sw.Stop();
-            Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
+            // sw.Stop();
+            // Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
 
             return ret;
         }

@@ -31,6 +31,8 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
+
+            NoiseManager.Instance.Dispose();
         }
         
         [MenuItem("RSTest/Sampler Benchmark 8 x 8")]
@@ -56,6 +58,8 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
+            
+            NoiseManager.Instance.Dispose();
         }
         
         [MenuItem("RSTest/Sampler Benchmark 32 x 32")]
@@ -81,6 +85,8 @@ namespace RS.Scene
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
+            
+            NoiseManager.Instance.Dispose();
         }
 
 
