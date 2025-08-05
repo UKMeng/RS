@@ -327,11 +327,6 @@ namespace RS.Scene
                     data[x, z].z = startZ + z;
                     data[x, z].values = vals;
                     data[x, z].biome = biome;
-
-                    if (startZ + z == 286 && (startX + x == 71 || startX + x == 72))
-                    {
-                        Debug.Log($"{startX + x} {startZ + z} : c{vals[0]} e{vals[2]} h{vals[3]} t{vals[4]} r{vals[5]} pv{vals[6]}");
-                    }
                 }
             }
 

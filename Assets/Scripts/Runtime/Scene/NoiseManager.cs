@@ -52,13 +52,13 @@ namespace RS.Scene
         private long m_seed;
         private BiomeSampler m_biomeSampler;
 
-        private RsSampler m_continents;
-        private RsSampler m_depth;
-        private RsSampler m_erosion;
-        private RsSampler m_humidity;
-        private RsSampler m_temperature;
-        private RsSampler m_ridges;
-        private RsSampler m_surfaceNoise;
+        // private RsSampler m_continents;
+        // private RsSampler m_depth;
+        // private RsSampler m_erosion;
+        // private RsSampler m_humidity;
+        // private RsSampler m_temperature;
+        // private RsSampler m_ridges;
+        // private RsSampler m_surfaceNoise;
 
         private Dictionary<string, RsNoise> m_noises;
         private Dictionary<string, RsSampler> m_samplers;
@@ -83,13 +83,13 @@ namespace RS.Scene
             // 重置配置管理器
             RsConfigManager.Reload();
             // 重置采样器与噪声缓存
-            m_continents = GetOrCreateSampler("Continents");
-            m_depth = GetOrCreateSampler("Depth");
-            m_erosion = GetOrCreateSampler("Erosion");
-            m_humidity = GetOrCreateSampler("Humidity");
-            m_temperature = GetOrCreateSampler("Temperature");
-            m_ridges = GetOrCreateSampler("Ridges");
-            m_surfaceNoise = GetOrCreateSampler("SurfaceNoise");
+            // m_continents = GetOrCreateSampler("Continents");
+            // m_depth = GetOrCreateSampler("Depth");
+            // m_erosion = GetOrCreateSampler("Erosion");
+            // m_humidity = GetOrCreateSampler("Humidity");
+            // m_temperature = GetOrCreateSampler("Temperature");
+            // m_ridges = GetOrCreateSampler("Ridges");
+            // m_surfaceNoise = GetOrCreateSampler("SurfaceNoise");
             m_biomeSampler = new BiomeSampler();
             
             sw.Stop();
@@ -135,13 +135,25 @@ namespace RS.Scene
 
         public BiomeType SampleBiome(Vector3 pos, out float[] biomeParams)
         {
+            var chunkPos = Chunk.WorldPosToChunkPos(pos);
+            var samplerX = Mathf.FloorToInt(chunkPos.x / 32.0f);
+            var samplerZ = Mathf.FloorToInt(chunkPos.z / 32.0f);
+            
+            var continents = GetOrCreateCacheSampler("Continents", new Vector3Int(samplerX, 0, samplerZ));
+            // var depth = GetOrCreateCacheSampler("Depth", new Vector3Int(samplerX, 0, samplerZ));
+            var erosion = GetOrCreateCacheSampler("Erosion", new Vector3Int(samplerX, 0, samplerZ));
+            var humidity = GetOrCreateCacheSampler("Humidity", new Vector3Int(samplerX, 0, samplerZ));
+            var temperature = GetOrCreateCacheSampler("Temperature", new Vector3Int(samplerX, 0, samplerZ));
+            var ridges = GetOrCreateCacheSampler("Ridges", new Vector3Int(samplerX, 0, samplerZ));
+            
+            
             biomeParams = new float[7];
-            biomeParams[0] = m_continents.Sample(pos);
+            biomeParams[0] = continents.Sample(pos);
             // vals[1] = m_depth.Sample(pos);
-            biomeParams[2] = m_erosion.Sample(pos);
-            biomeParams[3] = m_humidity.Sample(pos);
-            biomeParams[4] = m_temperature.Sample(pos);
-            biomeParams[5] = m_ridges.Sample(pos);
+            biomeParams[2] = erosion.Sample(pos);
+            biomeParams[3] = humidity.Sample(pos);
+            biomeParams[4] = temperature.Sample(pos);
+            biomeParams[5] = ridges.Sample(pos);
             biomeParams[6] = RsMath.RidgesFolded(biomeParams[5]);
             
             return m_biomeSampler.Sample(biomeParams);
@@ -149,8 +161,13 @@ namespace RS.Scene
 
         public SurfaceContext SampleSurface(Vector3 pos)
         {
+            var chunkPos = Chunk.WorldPosToChunkPos(pos);
+            var samplerX = Mathf.FloorToInt(chunkPos.x / 32.0f);
+            var samplerZ = Mathf.FloorToInt(chunkPos.y / 32.0f);
+            var surfaceNoiseSampler = GetOrCreateCacheSampler("SurfaceNoise", new Vector3Int(samplerX, 0, samplerZ));
+            
             var biome = SampleBiome(pos, out _);
-            var surfaceNoise = m_surfaceNoise.Sample(pos);
+            var surfaceNoise = surfaceNoiseSampler.Sample(pos);
             var surfaceDepth = Mathf.FloorToInt(6 * surfaceNoise + 6);
             
             return new SurfaceContext

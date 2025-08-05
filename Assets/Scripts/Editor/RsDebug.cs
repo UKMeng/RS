@@ -55,6 +55,32 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
         }
+        
+        [MenuItem("RSTest/Sampler Benchmark 32 x 32")]
+        public static void SamplerBenchmark1024()
+        {
+            Debug.Log("Sample Benchmark");
+
+            NoiseManager.Init(20250715);
+            
+            var samplerName = "InterTest";
+            
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
+            
+            var sw = Stopwatch.StartNew();
+            
+            for (var x = 0; x < 32; x++)
+            {
+                for (var z = 0; z < 32; z++)
+                {
+                    GenerateChunks(x, z, sampler);
+                }
+            }
+
+            sw.Stop();
+            Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
+        }
+
 
         private static void GenerateChunks(int x, int z, InterpolatedSampler sampler)
         {
