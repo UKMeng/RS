@@ -126,7 +126,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 1
-    - _WaveFrequency: 0.784
+    - _WaveFrequency: 1
     - _WaveIterations: 3
     - _WaveLacunarity: 1
     - _WavePersistence: 1

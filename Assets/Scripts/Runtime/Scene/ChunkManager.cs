@@ -443,10 +443,10 @@ namespace RS.Scene
                     }
                 }
 
-                if (chunkPosXZ.x == 0 && chunkPosXZ.y == 0)
-                {
-                    PutATree(new Vector3(2, 64, 11));
-                }
+                // if (chunkPosXZ.x == 0 && chunkPosXZ.y == 0)
+                // {
+                //     PutATree(new Vector3(2, 64, 11));
+                // }
                 
                 yield return null;
             }

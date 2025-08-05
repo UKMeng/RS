@@ -2,6 +2,7 @@
 using System.Dynamic;
 using RS.Utils;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace RS.Scene.Biome
 {
@@ -156,6 +157,12 @@ namespace RS.Scene.Biome
 
             var value = values[valueIndex];
             var index = GetIndex(value);
+
+            if (index == -1)
+            {
+                Debug.LogError($"BiomeSourceNode: {m_type} not found, value: {value}");
+            }
+            
             return m_children[index].GetBiomeType(values);
         }
 
@@ -252,54 +259,54 @@ namespace RS.Scene.Biome
             // 先硬编码区间
             var contiIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, -0.19f),
+                new BiomeInterval(-2.0f, -0.19f),
                 new BiomeInterval(-0.19f, -0.11f),
                 new BiomeInterval(-0.11f, 0.03f),
-                new BiomeInterval(0.03f, 1.0f),
+                new BiomeInterval(0.03f, 2.0f),
             };
 
             var pvIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, -0.85f),
+                new BiomeInterval(-2.0f, -0.85f),
                 new BiomeInterval(-0.85f, -0.2f),
                 new BiomeInterval(-0.2f, 0.2f),
                 new BiomeInterval(0.2f, 0.7f),
-                new BiomeInterval(0.7f, 1.0f)
+                new BiomeInterval(0.7f, 2.0f)
             };
 
             var erosionIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, -0.78f),
+                new BiomeInterval(-2.0f, -0.78f),
                 new BiomeInterval(-0.78f, -0.375f),
                 new BiomeInterval(-0.375f, -0.2225f),
                 new BiomeInterval(-0.2225f, 0.05f),
                 new BiomeInterval(0.05f, 0.45f),
                 new BiomeInterval(0.45f, 0.55f),
-                new BiomeInterval(0.55f, 1.0f)
+                new BiomeInterval(0.55f, 2.0f)
             };
 
             var tempIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, -0.45f),
+                new BiomeInterval(-2.0f, -0.45f),
                 new BiomeInterval(-0.45f, -0.15f),
                 new BiomeInterval(-0.15f, 0.2f),
                 new BiomeInterval(0.2f, 0.55f),
-                new BiomeInterval(0.55f, 1.0f),
+                new BiomeInterval(0.55f, 2.0f),
             };
 
             var humidityIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, -0.35f),
+                new BiomeInterval(-2.0f, -0.35f),
                 new BiomeInterval(-0.35f, -0.1f),
                 new BiomeInterval(-0.1f, 0.1f),
                 new BiomeInterval(0.1f, 0.3f),
-                new BiomeInterval(0.3f, 1.0f),
+                new BiomeInterval(0.3f, 2.0f),
             };
 
             var ridgesIntervals = new List<BiomeInterval>()
             {
-                new BiomeInterval(-1.0f, 0.0f),
-                new BiomeInterval(0.0f, 1.0f)
+                new BiomeInterval(-2.0f, 0.0f),
+                new BiomeInterval(0.0f, 2.0f)
             };
             
             m_root = new BiomeSourceNode("continentalness", contiIntervals);
