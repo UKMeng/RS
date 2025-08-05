@@ -62,12 +62,14 @@ namespace RS.Scene
 
         private Dictionary<string, RsNoise> m_noises;
         private Dictionary<string, RsSampler> m_samplers;
+        private Dictionary<(string, Vector3Int), RsSampler> m_cacheSampelers;
         
         private NoiseManager(long seed)
         {
             m_seed = seed;
             m_noises = new Dictionary<string, RsNoise>();
             m_samplers = new Dictionary<string, RsSampler>();
+            m_cacheSampelers = new Dictionary<(string, Vector3Int), RsSampler>();
         }
 
         private void InitNoiseManager()
@@ -100,8 +102,20 @@ namespace RS.Scene
             {
                 // Debug.Log($"[RsSamplerManager]实例化{samplerName}");
                 var config = RsConfigManager.Instance.GetSamplerConfig(samplerName);
-                sampler = config.BuildRsSampler();
+                sampler = config.BuildRsSampler(Vector3Int.zero);
                 m_samplers.Add(samplerName, sampler);
+            }
+
+            return sampler;
+        }
+
+        public RsSampler GetOrCreateCacheSampler(string samplerName, Vector3Int pos)
+        {
+            if (!m_cacheSampelers.TryGetValue((samplerName, pos), out var sampler))
+            {
+                var config = RsConfigManager.Instance.GetSamplerConfig(samplerName);
+                sampler = config.BuildRsSampler(pos);
+                m_cacheSampelers.Add((samplerName, pos), sampler);
             }
 
             return sampler;

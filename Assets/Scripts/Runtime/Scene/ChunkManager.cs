@@ -57,8 +57,8 @@ namespace RS.Scene
             m_chunkGeneratingQueue = new Queue<Vector2Int>();
             m_isGeneratingChunks = false;
             
-            // m_finalDensity = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
-            m_finalDensity = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            // m_finalDensity = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            m_finalDensity = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)

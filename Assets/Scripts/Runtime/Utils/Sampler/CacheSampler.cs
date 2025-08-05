@@ -9,12 +9,13 @@ namespace RS.Utils
     /// </summary>
     public class Cache2DSampler : RsSampler
     {
-        private Dictionary<(int, int), float> m_cache;
+        private float[] m_cache;
         private RsSampler m_sampler;
-        
+
         public Cache2DSampler(RsSampler sampler)
         {
-            m_cache = new Dictionary<(int, int), float>();
+            m_cache = new float[1028 * 1028];
+            Array.Fill(m_cache, float.MinValue);
             m_sampler = sampler;
         }
     
@@ -22,16 +23,17 @@ namespace RS.Utils
         {
             var posX = (int)position.x;
             var posZ = (int)position.z;
-            if (m_cache.TryGetValue((posX, posZ), out var val))
+            var ix = RsMath.Mod(posX, 1028);
+            var iz = RsMath.Mod(posZ, 1028);
+            var index = ix * 1028 + iz;
+            
+            if (m_cache[index] == float.MinValue)
             {
-                return val;
+                var val = m_sampler.Sample(new Vector3(posX, 0, posZ));
+                m_cache[index] = val;
             }
-            else
-            {
-                val = m_sampler.Sample(new Vector3(posX, 0, posZ));
-                m_cache.Add((posX, posZ), val);
-                return val;
-            }
+
+            return m_cache[index];
         }
     }
 
@@ -63,36 +65,38 @@ namespace RS.Utils
     /// </summary>
     public class FlatCacheSampler : RsSampler
     {
-        private Dictionary<(int, int), float> m_cache;
+        private float[] m_cache;
         private RsSampler m_sampler;
 
         public FlatCacheSampler(RsSampler sampler)
         {
-            m_cache = new Dictionary<(int, int), float>();
+            m_cache = new float[257 * 257];
+            Array.Fill(m_cache, float.MinValue);
             m_sampler = sampler;
         }
 
         public FlatCacheSampler(RsNoise noise)
         {
-            m_cache = new Dictionary<(int, int), float>();
+            m_cache = new float[257 * 257];
+            Array.Fill(m_cache, float.MinValue);
             m_sampler = new RsSampler(noise);
         }
 
         public override float Sample(Vector3 pos)
         {
-            var ix = Mathf.FloorToInt(pos.x * 0.25f);
-            var iz = Mathf.FloorToInt(pos.z * 0.25f);
+            var posX = Mathf.FloorToInt(pos.x * 0.25f);
+            var posZ = Mathf.FloorToInt(pos.z * 0.25f);
+            var ix = RsMath.Mod(posX, 257);
+            var iz = RsMath.Mod(posZ, 257);
+            var index = ix * 257 + iz;
 
-            if (m_cache.TryGetValue((ix, iz), out var val))
+            if (m_cache[index] == float.MinValue)
             {
-                return val;
+                var val = m_sampler.Sample(new Vector3(posX * 4.0f, 0, posZ * 4.0f));
+                m_cache[index] = val;
             }
-            else
-            {
-                val = m_sampler.Sample(new Vector3(ix * 4.0f, 0, iz * 4.0f));
-                m_cache.Add((ix, iz), val);
-                return val;
-            }
+
+            return m_cache[index];
         }
     }
 }

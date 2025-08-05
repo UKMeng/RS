@@ -21,7 +21,7 @@ namespace RS.Scene
             NoiseManager.Init(20250715);
             
             var samplerName = "InterTest";
-            var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
             
             var sw = Stopwatch.StartNew();
 
@@ -40,7 +40,7 @@ namespace RS.Scene
             
             var samplerName = "InterTest";
             
-            var sampler = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(0, 0, 0)) as InterpolatedSampler;
             
             var sw = Stopwatch.StartNew();
             
