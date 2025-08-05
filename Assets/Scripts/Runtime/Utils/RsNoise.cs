@@ -175,6 +175,73 @@ namespace RS.Utils
             return ret;
         }
         
+        public float[] SampleFbm3DBatch(Vector3[] posList)
+        {
+            var posArray = new NativeArray<Vector3>(posList, Allocator.TempJob);
+            
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
+            var job = new SampleJobWithMultiPos
+            {
+                posArray = posArray,
+                firstFrequency = m_firstFrequency,
+                firstValueFactor = m_firstValueFactor,
+                octaves = m_octaves,
+                lacunarity = m_lacunarity,
+                gain = m_gain,
+                random = m_random,
+                amplitudes = m_amplitudes,
+                grad3 = m_grad3,
+                result = result
+            };
+
+            var handle = job.Schedule(posList.Length, 64);
+            handle.Complete();
+
+            var ret = result.ToArray();
+            result.Dispose();
+            posArray.Dispose();
+
+            return ret;
+        }
+        
+        [BurstCompile]
+        public struct SampleJobWithMultiPos : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<Vector3> posArray;
+            [ReadOnly] public float firstFrequency;
+            [ReadOnly] public float firstValueFactor;
+            [ReadOnly] public int octaves;
+            [ReadOnly] public float lacunarity;
+            [ReadOnly] public float gain;
+            [ReadOnly] public NativeArray<int> random;
+            [ReadOnly] public NativeArray<float> amplitudes;
+            [ReadOnly] public NativeArray<int> grad3;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                var val = 0.0f;
+            
+                var frequency = firstFrequency;
+                var valueFactor = firstValueFactor;
+                var pos = posArray[index];
+            
+                for (var i = 0; i < octaves; i++)
+                {
+                    if (amplitudes[i] != 0.0f)
+                    {
+                        var value = SimplexNoiseEvaluate(random, grad3, pos, frequency);
+                        val += valueFactor * amplitudes[i] * value;
+                    }
+
+                    frequency *= lacunarity;
+                    valueFactor *= gain;
+                }
+                
+                result[index] = val;
+            }
+        }
+        
         [BurstCompile]
         public struct SampleJob : IJobParallelFor
         {
@@ -202,12 +269,13 @@ namespace RS.Utils
             
                 var frequency = firstFrequency;
                 var valueFactor = firstValueFactor;
+                var pos = startPos + new Vector3(ix, iy, iz);
             
                 for (var i = 0; i < octaves; i++)
                 {
                     if (amplitudes[i] != 0.0f)
                     {
-                        var value = SimplexNoiseEvaluate(random, grad3, startPos + new Vector3(ix, iy, iz), frequency);
+                        var value = SimplexNoiseEvaluate(random, grad3, pos, frequency);
                         val += valueFactor * amplitudes[i] * value;
                     }
 

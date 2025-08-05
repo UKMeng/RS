@@ -44,6 +44,11 @@ namespace RS.Utils
             return m_noise.SampleFbm3DBatch(startPos, x, y, z);
         }
 
+        public virtual float[] SampleBatch(Vector3[] posList)
+        {
+            return m_noise.SampleFbm3DBatch(posList);
+        }
+
         
         
         
