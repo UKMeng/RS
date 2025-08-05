@@ -416,7 +416,14 @@ namespace RS.Scene
                 }
                 
                 // 生成Base Data
-                yield return StartCoroutine(GenerateBaseDataAsync(chunks, sampler));
+                // yield return StartCoroutine(GenerateBaseDataAsync(chunks, sampler));
+                for (var chunkY = 3; chunkY < 12; chunkY++)
+                {
+                    if (chunks[chunkY].status == ChunkStatus.BaseData)
+                    {
+                        GenerateBaseData(chunks[chunkY], sampler);
+                    }
+                }
                 
                 // Aquifer阶段
                 for (var chunkY = 3; chunkY < 12; chunkY++)

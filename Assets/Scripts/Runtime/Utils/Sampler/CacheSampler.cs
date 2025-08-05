@@ -17,7 +17,7 @@ namespace RS.Utils
         public Cache2DSampler(RsSampler sampler, Vector3Int startPos)
         {
             m_cache = new float[1028 * 1028];
-            Array.Fill(m_cache, float.MinValue);
+            Array.Fill(m_cache, 65535.0f);
             m_sampler = sampler;
             m_startX = startPos.x;
             m_startZ = startPos.z;
@@ -42,7 +42,7 @@ namespace RS.Utils
             
             var index = ix * 1028 + iz;
             
-            if (m_cache[index] == float.MinValue)
+            if (m_cache[index] > 65534.0f)
             {
                 var val = m_sampler.Sample(new Vector3(posX, 0, posZ));
                 m_cache[index] = val;
@@ -88,7 +88,7 @@ namespace RS.Utils
         public FlatCacheSampler(RsSampler sampler, Vector3Int startPos)
         {
             m_cache = new float[257 * 257];
-            Array.Fill(m_cache, float.MinValue);
+            Array.Fill(m_cache, 65535.0f);
             m_sampler = sampler;
             m_startX = startPos.x;
             m_startZ = startPos.z;
@@ -97,7 +97,7 @@ namespace RS.Utils
         public FlatCacheSampler(RsNoise noise)
         {
             m_cache = new float[257 * 257];
-            Array.Fill(m_cache, float.MinValue);
+            Array.Fill(m_cache, 65535.0f);
             m_sampler = new RsSampler(noise);
         }
 
@@ -121,7 +121,7 @@ namespace RS.Utils
             
             var index = ix * 257 + iz;
 
-            if (m_cache[index] == float.MinValue)
+            if (m_cache[index] > 65534.0f)
             {
                 var val = m_sampler.Sample(new Vector3(posX * 4.0f, 0, posZ * 4.0f));
                 m_cache[index] = val;

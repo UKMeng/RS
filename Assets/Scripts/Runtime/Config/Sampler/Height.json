@@ -1,32 +1,27 @@
 ﻿{
   "type" : "sampler",
   "arguments" : {
-    "type": "cacheOnce",
-    "arguments": {
-      "value": {
-        "type" : "add",
-        "arguments" : {
-          "left": {
-            "type": "mul",
+    "type" : "add",
+    "arguments" : {
+      "left": {
+        "type": "mul",
+        "arguments": {
+          "left": 4,
+          "right": {
+            "type": "quarterNegative",
             "arguments": {
-              "left": 4,
-              "right": {
-                "type": "quarterNegative",
+              "value": {
+                "type": "mul",
                 "arguments": {
-                  "value": {
-                    "type": "mul",
-                    "arguments": {
-                      "left": "Depth",
-                      "right": "Factor"
-                    }
-                  }
+                  "left": "Depth",
+                  "right": "Factor"
                 }
               }
             }
-          },
-          "right": "Base3D"
+          }
         }
-      }
+      },
+      "right": "Base3D"
     }
   }
 }
