@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -32,7 +35,7 @@ namespace RS.Utils
             var fx = Mathf.Floor(pos.x / w) * w;
             var fy = Mathf.Floor(pos.y / h) * h;
             var fz = Mathf.Floor(pos.z / w) * w;
-            
+
             var c000 = m_sampler.Sample(new Vector3(fx, fy, fz));
             var c100 = m_sampler.Sample(new Vector3(fx + w, fy, fz));
             var c010 = m_sampler.Sample(new Vector3(fx, fy + h, fz));
@@ -41,18 +44,20 @@ namespace RS.Utils
             var c101 = m_sampler.Sample(new Vector3(fx + w, fy, fz + w));
             var c011 = m_sampler.Sample(new Vector3(fx, fy + h, fz + w));
             var c111 = m_sampler.Sample(new Vector3(fx + w, fy + h, fz + w));
-            
+
             // 三线性插值
             return RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
         }
 
-        public float[,,] SampleBatch(Vector3 startPos)
+        public float[] SampleBatch(Vector3 startPos)
         {
             var w = m_cellWidth;
             var h = m_cellHeight;
 
             // 对所有间隔点先采样, 需各维度多一个间隔
-            var cache = new float[9, 9, 9];
+            // var sw = Stopwatch.StartNew();
+            // var cache = new float[9 * 9 * 9];
+            var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
 
             for (var ix = 0; ix < 9; ix++)
             {
@@ -63,44 +68,73 @@ namespace RS.Utils
                         var fx = startPos.x + ix * w;
                         var fy = startPos.y + iy * h;
                         var fz = startPos.z + iz * w;
-                        cache[ix, iy, iz] = m_sampler.Sample(new Vector3(fx, fy, fz));
+                        cache[ix * 81 + iz * 9 + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
                     }
                 }
             }
-            
-            // 对中间点进行插值
-            var result = new float[32, 32, 32];
-            for (var ix = 0; ix < 32; ix++)
+
+            // sw.Stop();
+            // Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
+            // var sw = Stopwatch.StartNew();
+
+            // 对中间点进行插值 JobSystem
+            var result = new NativeArray<float>(32 * 32 * 32, Allocator.TempJob);
+            var job = new TriLerpJob
             {
-                for (var iz = 0; iz < 32; iz++)
-                {
-                    for (var iy = 0; iy < 32; iy++)
-                    {
-                        var tx = (ix % w) / w;
-                        var ty = (iy % h) / h;
-                        var tz = (iz % w) / w;
+                cache = cache,
+                w = m_cellWidth,
+                h = m_cellHeight,
+                result = result
+            };
 
-                        var fx = Mathf.FloorToInt(ix / w);
-                        var fy = Mathf.FloorToInt(iy / h);
-                        var fz = Mathf.FloorToInt(iz / w);
-                        
-                        var c000 = cache[fx, fy, fz];
-                        var c100 = cache[fx + 1, fy, fz];
-                        var c010 = cache[fx, fy + 1, fz];
-                        var c110 = cache[fx + 1, fy + 1, fz];
-                        var c001 = cache[fx, fy, fz + 1];
-                        var c101 = cache[fx + 1, fy, fz + 1];
-                        var c011 = cache[fx, fy + 1, fz + 1];
-                        var c111 = cache[fx + 1, fy + 1, fz + 1];
-                        
-                        // 三线性插值
-                        result[ix, iy, iz] = RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
-                    }
-                }
-            }
+            var handle = job.Schedule(32 * 32 * 32, 64);
+            handle.Complete();
 
-            return result;
+            var ret = result.ToArray();
+
+            cache.Dispose();
+            result.Dispose();
+            
+            // sw.Stop();
+            // Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
+
+            return ret;
         }
-        
+
+        [BurstCompile]
+        public struct TriLerpJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> cache;
+            [ReadOnly] public float w;
+            [ReadOnly] public float h;
+            [WriteOnly] public NativeArray<float> result;
+
+            public void Execute(int index)
+            {
+                var ix = index / (32 * 32);
+                var iy = index % 32;
+                var iz = (index / 32) % 32;
+                
+                var tx = (ix % w) / w;
+                var ty = (iy % h) / h;
+                var tz = (iz % w) / w;
+                
+                var fx = Mathf.FloorToInt(ix / w);
+                var fy = Mathf.FloorToInt(iy / h);
+                var fz = Mathf.FloorToInt(iz / w);
+
+                var c000 = cache[fx * 81 + fy + fz * 9];
+                var c100 = cache[(fx + 1) * 81 + fy + fz * 9];
+                var c010 = cache[fx * 81 + (fy + 1) + fz * 9];
+                var c110 = cache[(fx + 1) * 81 + (fy + 1) + fz * 9];
+                var c001 = cache[fx * 81 + fy + (fz + 1) * 9];
+                var c101 = cache[(fx + 1) * 81 + fy + (fz + 1) * 9];
+                var c011 = cache[fx * 81 + fy + 1 + (fz + 1) * 9];
+                var c111 = cache[(fx + 1) * 81 + fy + 1 + (fz + 1) * 9];
+                
+                result[index] = RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
+            }
+        }
+
     }
 }

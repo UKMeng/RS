@@ -41,9 +41,9 @@ namespace RS.Scene
         private Queue<Vector2Int> m_chunkGeneratingQueue;
         private bool m_isGeneratingChunks;
         
-        private int m_loadDistance = 6;
-        private int m_deactivateDistance = 10;
-        private int m_destroyDistance = 15;
+        private int m_loadDistance = 10;
+        private int m_deactivateDistance = 15;
+        private int m_destroyDistance = 20;
         private int m_maxChunksPerFrame = 1;
 
         private int m_seaLevel = 127;
@@ -57,7 +57,8 @@ namespace RS.Scene
             m_chunkGeneratingQueue = new Queue<Vector2Int>();
             m_isGeneratingChunks = false;
             
-            m_finalDensity = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
+            // m_finalDensity = RsConfigManager.Instance.GetSamplerConfig("InterTest").BuildRsSampler() as InterpolatedSampler;
+            m_finalDensity = NoiseManager.Instance.GetOrCreateSampler("InterTest") as InterpolatedSampler;
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)
@@ -501,7 +502,7 @@ namespace RS.Scene
                 {
                     for (var sy = 0; sy < 32; sy++)
                     {
-                        var density = batchSampleResult[sx, sy, sz];
+                        var density = batchSampleResult[sx * 1024 + sy + sz * 32];
                         blocks[index] = JudgeBaseBlockType(density);
                         finalDensity[index++] = density;
                     }
