@@ -1,22 +1,11 @@
 ﻿{
   "type": "sampler",
   "arguments": {
-    "type": "mul",
+    "type": "noise",
     "arguments": {
-      "left": 16,
-      "right": {
-        "type": "square",
-        "arguments": {
-          "value": {
-            "type": "noise",
-            "arguments": {
-              "noise": "CaveLayer",
-              "xzScale": 2,
-              "yScale": 16
-            }
-          }
-        }
-      }
+      "noise": "Erosion",
+      "xzScale": 1,
+      "yScale": 1
     }
   }
 }

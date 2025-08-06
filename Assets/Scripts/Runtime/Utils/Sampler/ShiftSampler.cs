@@ -20,6 +20,25 @@ namespace RS.Utils
             var shiftPos = new Vector3(pos.x * 0.25f, 0, pos.z * 0.25f);
             return m_noise.SampleFbm3D(shiftPos) * 4.0f;
         }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var shiftPosList = new Vector3[posList.Length];
+            for (int i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                shiftPosList[i] = new Vector3(pos.x * 0.25f, 0, pos.z * 0.25f);
+            }
+            
+            var sampleResult = base.SampleBatch(shiftPosList);
+            
+            for (var i = 0; i < sampleResult.Length; i++)
+            {
+                sampleResult[i] *= 4.0f;
+            }
+
+            return sampleResult;
+        }
     }
     
     /// <summary>
@@ -37,6 +56,25 @@ namespace RS.Utils
         {
             var shiftPos = new Vector3(pos.z * 0.25f, pos.x * 0.25f, 0);
             return m_noise.SampleFbm3D(shiftPos) * 4.0f;
+        }
+        
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var shiftPosList = new Vector3[posList.Length];
+            for (int i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                shiftPosList[i] = new Vector3(pos.z * 0.25f, pos.x * 0.25f, 0);
+            }
+            
+            var sampleResult = base.SampleBatch(shiftPosList);
+            
+            for (var i = 0; i < sampleResult.Length; i++)
+            {
+                sampleResult[i] *= 4.0f;
+            }
+
+            return sampleResult;
         }
     }
 
@@ -90,6 +128,24 @@ namespace RS.Utils
                 new Vector3(pos.x * m_xzScale + offsetX , 
                                         pos.y * m_yScale + offsetY,
                                         pos.z * m_xzScale + offsetZ));
+        }
+        
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var offsetX = m_samplerX.SampleBatch(posList);
+            var offsetY = m_samplerY.SampleBatch(posList);
+            var offsetZ = m_samplerZ.SampleBatch(posList);
+            
+            var shiftPosList = new Vector3[posList.Length];
+            for (int i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                shiftPosList[i] = new Vector3(pos.x * m_xzScale + offsetX[i], 
+                                              pos.y * m_yScale + offsetY[i],
+                                              pos.z * m_xzScale + offsetZ[i]);
+            }
+            
+            return base.SampleBatch(shiftPosList);
         }
     }
 }

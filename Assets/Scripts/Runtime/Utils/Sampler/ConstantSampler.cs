@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -19,6 +20,13 @@ namespace RS.Utils
         public override float Sample(Vector3 pos)
         {
             return m_value;
+        }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var result = new float[posList.Length];
+            Array.Fill(result, m_value);
+            return result;
         }
     }
 }

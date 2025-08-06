@@ -38,6 +38,7 @@ namespace RS.Utils
             "Erosion",
             "Humidity",
             "Jagged",
+            "MainNoise",
             "Offset",
             "Pillar",
             "PillarRareness",

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 namespace RS.Utils
 {
@@ -17,6 +18,20 @@ namespace RS.Utils
         public override float Sample(Vector3 pos)
         {
             return base.Sample(new Vector3(pos.x * m_xzScale, pos.y * m_yScale, pos.z * m_xzScale));
+        }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var scaledPosList = new Vector3[posList.Length];
+            
+            for (var i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                scaledPosList[i] = new Vector3(pos.x * m_xzScale, pos.y * m_yScale, pos.z * m_xzScale);
+            }
+
+            var result = base.SampleBatch(scaledPosList);
+            return result;
         }
     }
 
@@ -53,6 +68,41 @@ namespace RS.Utils
             }
 
             return rarity * Mathf.Abs(base.Sample(pos / rarity));
+        }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var rarityList = m_raritySampler.SampleBatch(posList);
+            if (m_type == 1)
+            {
+                for (var i = 0; i < rarityList.Length; i++)
+                {
+                    rarityList[i] = RarityMapperType1(rarityList[i]);
+                }
+            }
+            else
+            {
+                for (var i = 0; i < rarityList.Length; i++)
+                {
+                    rarityList[i] = RarityMapperType2(rarityList[i]);
+                }
+            }
+            
+            var scaledPosList = new Vector3[posList.Length];
+            for (var i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                scaledPosList[i] = pos / rarityList[i];
+            }
+
+            var sampleResult = base.SampleBatch(scaledPosList);
+
+            for (var i = 0; i < posList.Length; i++)
+            {
+                sampleResult[i] = rarityList[i] * Mathf.Abs(sampleResult[i]);
+            }
+
+            return sampleResult;
         }
 
         private float RarityMapperType1(float rarity)

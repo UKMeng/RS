@@ -65,6 +65,68 @@ namespace RS.Utils
 
             return m_cache[index];
         }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var result = new float[posList.Length];
+            var sampleList = new List<Vector3>();
+            var indexList = new List<int>();
+
+            var dict = new Dictionary<int, List<int>>();
+            
+            for (var i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                var posX = (int)pos.x;
+                var posZ = (int)pos.z;
+                var ix = RsMath.Mod(posX, 1024);
+                var iz = RsMath.Mod(posZ, 1024);
+            
+                if (posX >= (m_startX + 1) * 1024)
+                {
+                    ix += 1024;
+                }
+
+                if (posZ >= (m_startZ + 1) * 1024)
+                {
+                    iz += 1024;
+                }
+            
+                var index = ix * 1028 + iz;
+            
+                if (m_cache[index] > 65534.0f)
+                {
+                    if (dict.TryGetValue(index, out var toSampleIndex))
+                    {
+                        toSampleIndex.Add(i);
+                    }
+                    else
+                    {
+                        dict[index] = new List<int>() { i };
+                        sampleList.Add(new Vector3(posX, 0, posZ));
+                        indexList.Add(index);
+                    }
+                }
+                else
+                {
+                    result[i] = m_cache[index];
+                }
+            }
+
+            var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
+            for (var i = 0; i < sampleList.Count; i++)
+            {
+                var index = indexList[i];
+                var toSampleIndex = dict[index];
+                m_cache[index] = sampleResult[i];
+                for (var j = 0; j < toSampleIndex.Count; j++)
+                {
+                    result[toSampleIndex[j]] = sampleResult[i];
+                }
+            }
+
+            return result;
+        }
     }
 
     public class CacheOnceSampler : RsSampler
@@ -95,6 +157,12 @@ namespace RS.Utils
             }
 
             return m_lastValue;
+        }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            // 批量时这个缓存失效 可能要想想其他Cache手段
+            return m_sampler.SampleBatch(posList);
         }
     }
     
@@ -158,6 +226,69 @@ namespace RS.Utils
             }
 
             return m_cache[index];
+        }
+        
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            var result = new float[posList.Length];
+            var sampleList = new List<Vector3>();
+            var indexList = new List<int>();
+
+            var dict = new Dictionary<int, List<int>>();
+            
+            for (var i = 0; i < posList.Length; i++)
+            {
+                var pos = posList[i];
+                var posX = Mathf.FloorToInt(pos.x * 0.25f);
+                var posZ = Mathf.FloorToInt(pos.z * 0.25f);
+
+                var ix = RsMath.Mod(posX, 256);
+                var iz = RsMath.Mod(posZ, 256);
+            
+                if (posX >= (m_startX + 1) * 256)
+                {
+                    ix += 256;
+                }
+
+                if (posZ >= (m_startZ + 1) * 256)
+                {
+                    iz += 256;
+                }
+            
+                var index = ix * 257 + iz;
+            
+                if (m_cache[index] > 65534.0f)
+                {
+                    if (dict.TryGetValue(index, out var toSampleIndex))
+                    {
+                        toSampleIndex.Add(i);
+                    }
+                    else
+                    {
+                        dict[index] = new List<int>() { i };
+                        sampleList.Add(new Vector3(posX * 4.0f, 0, posZ * 4.0f));
+                        indexList.Add(index);
+                    }
+                }
+                else
+                {
+                    result[i] = m_cache[index];
+                }
+            }
+
+            var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
+            for (var i = 0; i < sampleList.Count; i++)
+            {
+                var index = indexList[i];
+                var toSampleIndex = dict[index];
+                m_cache[index] = sampleResult[i];
+                for (var j = 0; j < toSampleIndex.Count; j++)
+                {
+                    result[toSampleIndex[j]] = sampleResult[i];
+                }
+            }
+
+            return result;
         }
     }
 }

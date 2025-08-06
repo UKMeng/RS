@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Vector3 = UnityEngine.Vector3;
 
 namespace RS.Utils
 {
@@ -58,29 +61,50 @@ namespace RS.Utils
             return RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
         }
 
-        public float[] SampleBatch(Vector3 startPos)
+        public override float[] SampleBatch(Vector3 startPos, int x, int y, int z)
         {
             var w = m_cellWidth;
             var h = m_cellHeight;
-
+            
             // 对所有间隔点先采样, 需各维度多一个间隔
-            var sw = Stopwatch.StartNew();
+            // var sw = Stopwatch.StartNew();
             
-            var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
+            var posList = new List<Vector3>();
             
-            Parallel.For(0, 81, (index) =>
+            // 全批量采样 JobSystem
+            for (var ix = 0; ix < 9; ix++)
             {
-                var ix = index / 9;
-                var iz = index % 9;
-                for (var iy = 0; iy < 9; iy++)
+                for (var iz = 0; iz < 9; iz++)
                 {
-                    var fx = startPos.x + ix * w;
-                    var fy = startPos.y + iy * h;
-                    var fz = startPos.z + iz * w;
-                    cache[ix * 81 + iz * 9 + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
+                    for (var iy = 0; iy < 9; iy++)
+                    {
+                        var fx = startPos.x + ix * w;
+                        var fy = startPos.y + iy * h;
+                        var fz = startPos.z + iz * w;
+                        posList.Add(new Vector3(fx, fy, fz));
+                    }
                 }
-            });
+            }
+
+            var sampleResult = m_sampler.SampleBatch(posList.ToArray());
+            var cache = new NativeArray<float>(sampleResult, Allocator.TempJob);
             
+            // 并行单次采样
+            // var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
+            // Parallel.For(0, 81, (index) =>
+            // {
+            //     var ix = index / 9;
+            //     var iz = index % 9;
+            //     for (var iy = 0; iy < 9; iy++)
+            //     {
+            //         var fx = startPos.x + ix * w;
+            //         var fy = startPos.y + iy * h;
+            //         var fz = startPos.z + iz * w;
+            //         cache[ix * 81 + iz * 9 + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
+            //     }
+            // });
+            
+            // 串行单次采样
             // for (var ix = 0; ix < 9; ix++)
             // {
             //     for (var iz = 0; iz < 9; iz++)
@@ -95,8 +119,8 @@ namespace RS.Utils
             //     }
             // }
 
-            sw.Stop();
-            Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
+            // sw.Stop();
+            // Debug.Log($"SampleBatch: {sw.ElapsedMilliseconds}ms");
             // sw = Stopwatch.StartNew();
 
             // 对中间点进行插值 JobSystem

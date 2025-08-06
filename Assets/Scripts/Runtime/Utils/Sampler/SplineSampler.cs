@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RS.Utils
@@ -81,6 +82,110 @@ namespace RS.Utils
             var m1 = (x - x1) * ((x - x0) / h) * ((x - x0) / h);
             
             return y0 * h0 + y1 * h1 + dy0 * m0 + dy1 * m1;
+        }
+
+        public override float[] SampleBatch(Vector3[] posList)
+        {
+            // var result = new float[posList.Length];
+            // for (var i = 0; i < posList.Length; i++)
+            // {
+            //     result[i] = Sample(posList[i]);
+            // }
+            //
+            // return result;
+
+            var coords = m_coordinate.SampleBatch(posList);
+            var pointCount = m_values.Length;
+            
+            var front = new int[posList.Length];
+            var back = new int[posList.Length];
+            
+            // 用来存每个value采样器需要采的坐标
+            var indexToSample = new List<Vector3>[pointCount];
+            for (var i = 0; i < pointCount; i++)
+            {
+                indexToSample[i] = new List<Vector3>();
+            }
+            
+            for (var i = 0; i < posList.Length; i++)
+            {
+                // 二分查找最接近的位置
+                var xPos = Array.BinarySearch(m_locations, coords[i]);
+                xPos = xPos < 0 ? ~xPos - 1 : xPos;
+            
+                if (xPos < 0)
+                {
+                    front[i] = 0;
+                    back[i] = 0;
+                    indexToSample[0].Add(posList[i]);
+                }
+                else if (xPos >= m_values.Length - 1)
+                {
+                    front[i] = pointCount - 1;
+                    back[i] = pointCount - 1;
+                    indexToSample[pointCount - 1].Add(posList[i]);
+                }
+                else
+                {
+                    front[i] = xPos;
+                    back[i] = xPos + 1;
+                    indexToSample[xPos].Add(posList[i]);
+                    indexToSample[xPos + 1].Add(posList[i]);
+                }
+            }
+            
+            var sampleResult = new float[pointCount][];
+            for (var i = 0; i < pointCount; i++)
+            {
+                sampleResult[i] = m_values[i].SampleBatch(indexToSample[i].ToArray());
+            }
+            
+            var sampleCount = new int[pointCount];
+            Array.Fill(sampleCount, 0);
+            
+            var result = new float[posList.Length];
+            for (var i = 0; i < posList.Length; i++)
+            {
+                if (front[i] == back[i])
+                {
+                    if (front[i] == 0)
+                    {
+                        var sampleIndex = sampleCount[0]++;
+                        var val = sampleResult[0][sampleIndex];
+                        result[i] = val + m_derivatives[0] * (coords[i] - m_locations[0]);
+                    }
+                    else
+                    {
+                        var sampleIndex = sampleCount[pointCount - 1]++;
+                        var val = sampleResult[pointCount - 1][sampleIndex];
+                        result[i] = val + m_derivatives[pointCount - 1] * (coords[i] - m_locations[pointCount - 1]);
+                    }
+                }
+                else
+                {
+                    var f = front[i];
+                    var b = back[i];
+                    var x = coords[i];
+                    var x0 = m_locations[f];
+                    var x1 = m_locations[b];
+                    var frontIndex = sampleCount[f]++;
+                    var backIndex = sampleCount[b]++;
+                    var y0 = sampleResult[f][frontIndex];
+                    var y1 = sampleResult[b][backIndex];
+                    var dy0 = m_derivatives[f];
+                    var dy1 = m_derivatives[b];
+            
+                    var h = x1 - x0;
+                    var h0 = (1 + 2 * (x - x0) / h) * ((x - x1) / h) * ((x - x1) / h);
+                    var h1 = (1 - 2 * (x - x1) / h) * ((x - x0) / h) * ((x - x0) / h);
+                    var m0 = (x - x0) * ((x - x1) / h) * ((x - x1) / h);
+                    var m1 = (x - x1) * ((x - x0) / h) * ((x - x0) / h);
+            
+                    result[i] = y0 * h0 + y1 * h1 + dy0 * m0 + dy1 * m1;
+                }
+            }
+            
+            return result;
         }
     }
 }

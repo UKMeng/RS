@@ -509,7 +509,7 @@ namespace RS.Scene
             var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
-            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
+            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ), 32, 32, 32);
             
             for (var sx = 0; sx < 32; sx++)
             {

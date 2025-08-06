@@ -533,9 +533,9 @@ namespace RS.Utils
             {
                 t0 *= t0;
                 int gi0 = random[ii + random[jj + random[kk]]]%12;
-                var gx = grad3[gi0 * 12 + 0];
-                var gy = grad3[gi0 * 12 + 1];
-                var gz = grad3[gi0 * 12 + 2];
+                var gx = grad3[gi0 * 3 + 0];
+                var gy = grad3[gi0 * 3 + 1];
+                var gz = grad3[gi0 * 3 + 2];
                 n0 = t0*t0*Dot(gx, gy, gz, x0, y0, z0);
             }
 
@@ -544,9 +544,9 @@ namespace RS.Utils
             {
                 t1 *= t1;
                 int gi1 = random[ii + i1 + random[jj + j1 + random[kk + k1]]]%12;
-                var gx = grad3[gi1 * 12 + 0];
-                var gy = grad3[gi1 * 12 + 1];
-                var gz = grad3[gi1 * 12 + 2];
+                var gx = grad3[gi1 * 3 + 0];
+                var gy = grad3[gi1 * 3 + 1];
+                var gz = grad3[gi1 * 3 + 2];
                 n1 = t1*t1*Dot(gx, gy, gz, x1, y1, z1);
             }
 
@@ -555,9 +555,9 @@ namespace RS.Utils
             {
                 t2 *= t2;
                 int gi2 = random[ii + i2 + random[jj + j2 + random[kk + k2]]]%12;
-                var gx = grad3[gi2 * 12 + 0];
-                var gy = grad3[gi2 * 12 + 1];
-                var gz = grad3[gi2 * 12 + 2];
+                var gx = grad3[gi2 * 3 + 0];
+                var gy = grad3[gi2 * 3 + 1];
+                var gz = grad3[gi2 * 3 + 2];
                 n2 = t2*t2*Dot(gx, gy, gz, x2, y2, z2);
             }
 
@@ -566,9 +566,9 @@ namespace RS.Utils
             {
                 t3 *= t3;
                 int gi3 = random[ii + 1 + random[jj + 1 + random[kk + 1]]]%12;
-                var gx = grad3[gi3 * 12 + 0];
-                var gy = grad3[gi3 * 12 + 1];
-                var gz = grad3[gi3 * 12 + 2];
+                var gx = grad3[gi3 * 3 + 0];
+                var gy = grad3[gi3 * 3 + 1];
+                var gz = grad3[gi3 * 3 + 2];
                 n3 = t3*t3*Dot(gx, gy, gz, x3, y3, z3);
             }
 
@@ -787,7 +787,7 @@ namespace RS.Utils
         
         static double Dot(int gx, int gy, int gz, double x, double y, double z)
         {
-            return gz * x + gy * y + gz * z;
+            return gx * x + gy * y + gz * z;
         }
 
         static double Dot(int[] g, double x, double y)

@@ -15,6 +15,58 @@ namespace RS.Scene
 {
     public class RsDebug
     {
+        [MenuItem("RSTest/Sampler Batch Sample Test")]
+        public static void BatchSampleTest()
+        {
+            // var testPoint = new Vector3[4];
+            //
+            // for (var x = 0; x < 2; x++)
+            // {
+            //     for (var z = 0; z < 2; z++)
+            //     {
+            //         testPoint[x * 2 + z] = new Vector3(x * 4, 0, z * 4);
+            //     }
+            // }
+
+            var testPoint = new Vector3[1] { new Vector3(4, 0, 4) };
+
+            
+            var singleRes = SingleSample("tt", testPoint);
+            var batchRes = BatchSample("tt", testPoint);
+            
+            
+            for (var i = 0; i < testPoint.Length; i++)
+            {
+                Debug.Log($"Single: {singleRes[i]}, Batch: {batchRes[i]}");
+            }
+        }
+
+        private static float[] SingleSample(string samplerName, Vector3[] posList)
+        {
+            NoiseManager.Init(20250715);
+
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler(samplerName, new Vector3Int(0, 0, 0));
+            var result = new float[posList.Length];
+            for (var i = 0; i < posList.Length; i++)
+            {
+                result[i] = sampler.Sample(posList[i]);
+            }
+            
+            NoiseManager.Instance.Dispose();
+            return result;
+        }
+
+        private static float[] BatchSample(string samplerName, Vector3[] posList)
+        {
+            NoiseManager.Init(20250715);
+            
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler(samplerName, new Vector3Int(0, 0, 0));
+            var result = sampler.SampleBatch(posList);
+            
+            NoiseManager.Instance.Dispose();
+            return result;
+        }
+        
         [MenuItem("RSTest/Sampler Benchmark 1")]
         public static void SamplerBenchmark()
         {
@@ -174,7 +226,7 @@ namespace RS.Scene
             var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
-            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ));
+            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ), 32, 32, 32);
 
             // var judgeSw = Stopwatch.StartNew();
             for (var sx = 0; sx < 32; sx++)
