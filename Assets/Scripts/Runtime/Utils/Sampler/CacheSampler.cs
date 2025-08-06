@@ -66,9 +66,9 @@ namespace RS.Utils
             return m_cache[index];
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
-            var result = new float[posList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             var sampleList = new List<Vector3>();
             var indexList = new List<int>();
 
@@ -113,18 +113,22 @@ namespace RS.Utils
                 }
             }
 
-            var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
-            for (var i = 0; i < sampleList.Count; i++)
+            if (sampleList.Count > 0)
             {
-                var index = indexList[i];
-                var toSampleIndex = dict[index];
-                m_cache[index] = sampleResult[i];
-                for (var j = 0; j < toSampleIndex.Count; j++)
+                var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
+                for (var i = 0; i < sampleList.Count; i++)
                 {
-                    result[toSampleIndex[j]] = sampleResult[i];
+                    var index = indexList[i];
+                    var toSampleIndex = dict[index];
+                    m_cache[index] = sampleResult[i];
+                    for (var j = 0; j < toSampleIndex.Count; j++)
+                    {
+                        result[toSampleIndex[j]] = sampleResult[i];
+                    }
                 }
+                sampleResult.Dispose();
             }
-
+            
             return result;
         }
     }
@@ -159,7 +163,7 @@ namespace RS.Utils
             return m_lastValue;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             // 批量时这个缓存失效 可能要想想其他Cache手段
             return m_sampler.SampleBatch(posList);
@@ -228,9 +232,9 @@ namespace RS.Utils
             return m_cache[index];
         }
         
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
-            var result = new float[posList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             var sampleList = new List<Vector3>();
             var indexList = new List<int>();
 
@@ -276,18 +280,23 @@ namespace RS.Utils
                 }
             }
 
-            var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
-            for (var i = 0; i < sampleList.Count; i++)
+            if (sampleList.Count > 0)
             {
-                var index = indexList[i];
-                var toSampleIndex = dict[index];
-                m_cache[index] = sampleResult[i];
-                for (var j = 0; j < toSampleIndex.Count; j++)
+                var sampleResult = m_sampler.SampleBatch(sampleList.ToArray());
+                for (var i = 0; i < sampleList.Count; i++)
                 {
-                    result[toSampleIndex[j]] = sampleResult[i];
+                    var index = indexList[i];
+                    var toSampleIndex = dict[index];
+                    m_cache[index] = sampleResult[i];
+                    for (var j = 0; j < toSampleIndex.Count; j++)
+                    {
+                        result[toSampleIndex[j]] = sampleResult[i];
+                    }
                 }
-            }
 
+                sampleResult.Dispose();
+            }
+            
             return result;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RS.Utils
@@ -20,7 +21,7 @@ namespace RS.Utils
             return base.Sample(new Vector3(pos.x * m_xzScale, pos.y * m_yScale, pos.z * m_xzScale));
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var scaledPosList = new Vector3[posList.Length];
             
@@ -70,7 +71,7 @@ namespace RS.Utils
             return rarity * Mathf.Abs(base.Sample(pos / rarity));
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var rarityList = m_raritySampler.SampleBatch(posList);
             if (m_type == 1)
@@ -101,6 +102,8 @@ namespace RS.Utils
             {
                 sampleResult[i] = rarityList[i] * Mathf.Abs(sampleResult[i]);
             }
+
+            rarityList.Dispose();
 
             return sampleResult;
         }

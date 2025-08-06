@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Collections;
 using UnityEngine;
 
 namespace RS.Utils
@@ -22,11 +23,11 @@ namespace RS.Utils
             return m_value;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
-            var result = new float[posList.Length];
-            Array.Fill(result, m_value);
-            return result;
+            var temp = new float[posList.Length];
+            Array.Fill(temp, m_value);
+            return new NativeArray<float>(temp, Allocator.TempJob);
         }
     }
 }

@@ -146,7 +146,7 @@ namespace RS.Utils
             return result;
         }
 
-        public float[] SampleFbm3DBatch(Vector3 startPos, int x, int y, int z)
+        public NativeArray<float>  SampleFbm3DBatch(Vector3 startPos, int x, int y, int z)
         {
             var result = new NativeArray<float>(x * y * z, Allocator.TempJob);
             var job = new SampleJob
@@ -169,13 +169,10 @@ namespace RS.Utils
             var handle = job.Schedule(x * y * z, 64);
             handle.Complete();
 
-            var ret = result.ToArray();
-            result.Dispose();
-
-            return ret;
+            return result;
         }
         
-        public float[] SampleFbm3DBatch(Vector3[] posList)
+        public NativeArray<float>  SampleFbm3DBatch(Vector3[] posList)
         {
             var posArray = new NativeArray<Vector3>(posList, Allocator.TempJob);
             
@@ -196,12 +193,10 @@ namespace RS.Utils
 
             var handle = job.Schedule(posList.Length, 64);
             handle.Complete();
-
-            var ret = result.ToArray();
-            result.Dispose();
+            
             posArray.Dispose();
 
-            return ret;
+            return result;
         }
         
         [BurstCompile]

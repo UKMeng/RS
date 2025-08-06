@@ -51,7 +51,6 @@ namespace RS.Scene
             {
                 result[i] = sampler.Sample(posList[i]);
             }
-            
             NoiseManager.Instance.Dispose();
             return result;
         }
@@ -62,9 +61,10 @@ namespace RS.Scene
             
             var sampler = NoiseManager.Instance.GetOrCreateCacheSampler(samplerName, new Vector3Int(0, 0, 0));
             var result = sampler.SampleBatch(posList);
-            
+            var ret = result.ToArray();
             NoiseManager.Instance.Dispose();
-            return result;
+            result.Dispose();
+            return ret;
         }
         
         [MenuItem("RSTest/Sampler Benchmark 1")]
@@ -241,6 +241,8 @@ namespace RS.Scene
                     }
                 }
             }
+
+            batchSampleResult.Dispose();
             // judgeSw.Stop();
             // Debug.Log($"Judge: {judgeSw.Elapsed.TotalMilliseconds * 1000:n3} us");
             // Debug.Log($"Judge: {judgeSw.ElapsedMilliseconds} ms");

@@ -34,37 +34,34 @@ namespace RS.Utils
             return m_left.Sample(pos) + m_right.Sample(pos);
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
             
-            var left = new NativeArray<float>(leftList, Allocator.TempJob);
-            var right = new NativeArray<float>(rightList, Allocator.TempJob);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
 
             var job = new AddJob()
             {
-                left = left,
-                right = right,
+                left = leftList,
+                right = rightList,
                 result = result
             };
             
             var handle = job.Schedule(posList.Length, 64);
             handle.Complete();
             
-            var ret = result.ToArray();
-            
-            left.Dispose();
-            right.Dispose();
-            result.Dispose();
-            
             // for (int i = 0; i < leftList.Length; i++)
             // {
             //     result[i] = leftList[i] + rightList[i];
             // }
+
             
-            return ret;
+            leftList.Dispose();
+            rightList.Dispose();
+
+            
+            return result;
         }
 
         [BurstCompile]
@@ -110,17 +107,44 @@ namespace RS.Utils
             return m_left.Sample(pos) * m_right.Sample(pos);
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
-            var result = new float[leftList.Length];
-            for (int i = 0; i < leftList.Length; i++)
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
+            
+            var job = new MulJob()
             {
-                result[i] = leftList[i] * rightList[i];
-            }
+                left = leftList,
+                right = rightList,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 64);
+            handle.Complete();
+            
+            // for (int i = 0; i < leftList.Length; i++)
+            // {
+            //     result[i] = leftList[i] * rightList[i];
+            // }
+            
+            leftList.Dispose();
+            rightList.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct MulJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> left;
+            [ReadOnly] public NativeArray<float> right;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = left[index] * right[index];
+            }
         }
     }
     public class MaxSampler : RsSampler
@@ -152,15 +176,18 @@ namespace RS.Utils
             return Mathf.Max(m_left.Sample(pos), m_right.Sample(pos));
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
-            var result = new float[leftList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < leftList.Length; i++)
             {
                 result[i] = Mathf.Max(leftList[i], rightList[i]);
             }
+            
+            leftList.Dispose();
+            rightList.Dispose();
 
             return result;
         }
@@ -195,15 +222,18 @@ namespace RS.Utils
             return Mathf.Min(m_left.Sample(pos), m_right.Sample(pos));
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
-            var result = new float[leftList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < leftList.Length; i++)
             {
                 result[i] = Mathf.Min(leftList[i], rightList[i]);
             }
+            
+            leftList.Dispose();
+            rightList.Dispose();
 
             return result;
         }
@@ -231,14 +261,16 @@ namespace RS.Utils
             return Mathf.Abs(m_sampler.Sample(pos));
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = Mathf.Abs(list[i]);
             }
+            
+            list.Dispose();
 
             return result;
         }
@@ -267,14 +299,16 @@ namespace RS.Utils
             return value * value;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = list[i] * list[i];
             }
+            
+            list.Dispose();
 
             return result;
         }
@@ -303,15 +337,17 @@ namespace RS.Utils
             return value * value * value;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = list[i] * list[i] * list[i];
             }
 
+            list.Dispose();
+            
             return result;
         }
     }
@@ -340,14 +376,16 @@ namespace RS.Utils
             return value < 0 ? value * 0.5f : value;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = list[i] < 0 ? list[i] * 0.5f : list[i];
             }
+            
+            list.Dispose();
 
             return result;
         }
@@ -377,14 +415,16 @@ namespace RS.Utils
             return value < 0 ? value * 0.25f : value;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = list[i] < 0 ? list[i] * 0.25f : list[i];
             }
+            
+            list.Dispose();
 
             return result;
         }
@@ -417,14 +457,16 @@ namespace RS.Utils
             return RsMath.Clamp(value, m_min, m_max);
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var list = m_sampler.SampleBatch(posList);
-            var result = new float[list.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < list.Length; i++)
             {
                 result[i] = RsMath.Clamp(list[i], m_min, m_max);
             }
+            
+            list.Dispose();
 
             return result;
         }
@@ -450,14 +492,14 @@ namespace RS.Utils
             return RsMath.ClampedMap(pos.y, m_min, m_max, m_from, m_to);
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
-            var result = new float[posList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < posList.Length; i++)
             {
                 result[i] = RsMath.ClampedMap(posList[i].y, m_min, m_max, m_from, m_to);
             }
-
+            
             return result;
         }
     }
@@ -487,9 +529,9 @@ namespace RS.Utils
             return val * 0.5f - val * val * val / 24.0f;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
-            var result = new float[posList.Length];
+            var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
             for (int i = 0; i < posList.Length; i++)
             {
                 var val = m_sampler.Sample(posList[i]);

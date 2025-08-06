@@ -523,6 +523,8 @@ namespace RS.Scene
                     }
                 }
             }
+            
+            batchSampleResult.Dispose();
 
             chunk.blocks = blocks;
             chunk.density = finalDensity;

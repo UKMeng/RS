@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using RS.Utils;
+using Unity.Collections;
 
 namespace RS.Utils
 {
@@ -39,12 +40,12 @@ namespace RS.Utils
             return m_noise.SampleFbm3D(pos);
         }
 
-        public virtual float[] SampleBatch(Vector3 startPos, int x, int y, int z)
+        public virtual NativeArray<float> SampleBatch(Vector3 startPos, int x, int y, int z)
         {
             return m_noise.SampleFbm3DBatch(startPos, x, y, z);
         }
 
-        public virtual float[] SampleBatch(Vector3[] posList)
+        public virtual NativeArray<float> SampleBatch(Vector3[] posList)
         {
             return m_noise.SampleFbm3DBatch(posList);
         }

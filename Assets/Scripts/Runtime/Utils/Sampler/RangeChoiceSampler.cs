@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace RS.Utils
@@ -49,7 +50,7 @@ namespace RS.Utils
             return m_inRange.Sample(pos);
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var inputResult = m_input.SampleBatch(posList);
             var inRangeIndex = new List<int>();
@@ -72,19 +73,33 @@ namespace RS.Utils
                 }
             }
 
-            var inRangeResult = m_inRange.SampleBatch(inRangePosList.ToArray());
-            var outRangeResult = m_outRange.SampleBatch(outRangePosList.ToArray());
-            var result = new float[inputResult.Length];
-            for (var i = 0; i < inRangeIndex.Count; i++)
+            NativeArray<float> inRangeResult;
+            NativeArray<float> outRangeResult;
+
+            var result = new NativeArray<float>(inputResult.Length, Allocator.TempJob);
+            if (inRangePosList.Count > 0)
             {
-                result[inRangeIndex[i]] = inRangeResult[i];
+                inRangeResult = m_inRange.SampleBatch(inRangePosList.ToArray());
+                for (var i = 0; i < inRangeIndex.Count; i++)
+                {
+                    result[inRangeIndex[i]] = inRangeResult[i];
+                }
+                inRangeResult.Dispose();
             }
 
-            for (var i = 0; i < outRangeIndex.Count; i++)
-            {
-                result[outRangeIndex[i]] = outRangeResult[i];
-            }
 
+            if (outRangePosList.Count > 0)
+            {
+                outRangeResult = m_outRange.SampleBatch(outRangePosList.ToArray());
+                for (var i = 0; i < outRangeIndex.Count; i++)
+                {
+                    result[outRangeIndex[i]] = outRangeResult[i];
+                }
+                outRangeResult.Dispose();
+            }
+            
+            inputResult.Dispose();
+            
             return result;
         }
     }

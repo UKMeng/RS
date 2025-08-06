@@ -61,7 +61,7 @@ namespace RS.Utils
             return RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
         }
 
-        public override float[] SampleBatch(Vector3 startPos, int x, int y, int z)
+        public override NativeArray<float> SampleBatch(Vector3 startPos, int x, int y, int z)
         {
             var w = m_cellWidth;
             var h = m_cellHeight;
@@ -86,8 +86,7 @@ namespace RS.Utils
                 }
             }
 
-            var sampleResult = m_sampler.SampleBatch(posList.ToArray());
-            var cache = new NativeArray<float>(sampleResult, Allocator.TempJob);
+            var cache = m_sampler.SampleBatch(posList.ToArray());
             
             // 并行单次采样
             // var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
@@ -135,16 +134,13 @@ namespace RS.Utils
 
             var handle = job.Schedule(32 * 32 * 32, 64);
             handle.Complete();
-
-            var ret = result.ToArray();
-
+            
             cache.Dispose();
-            result.Dispose();
             
             // sw.Stop();
             // Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
 
-            return ret;
+            return result;
         }
 
         [BurstCompile]

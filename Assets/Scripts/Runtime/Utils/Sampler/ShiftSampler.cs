@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using RS.Utils;
+using Unity.Collections;
 
 namespace RS.Utils
 {
@@ -21,7 +22,7 @@ namespace RS.Utils
             return m_noise.SampleFbm3D(shiftPos) * 4.0f;
         }
 
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var shiftPosList = new Vector3[posList.Length];
             for (int i = 0; i < posList.Length; i++)
@@ -58,7 +59,7 @@ namespace RS.Utils
             return m_noise.SampleFbm3D(shiftPos) * 4.0f;
         }
         
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var shiftPosList = new Vector3[posList.Length];
             for (int i = 0; i < posList.Length; i++)
@@ -130,7 +131,7 @@ namespace RS.Utils
                                         pos.z * m_xzScale + offsetZ));
         }
         
-        public override float[] SampleBatch(Vector3[] posList)
+        public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var offsetX = m_samplerX.SampleBatch(posList);
             var offsetY = m_samplerY.SampleBatch(posList);
