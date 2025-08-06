@@ -1,9 +1,11 @@
-﻿using RS.GamePlay;
+﻿using System.Collections;
+using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 using RS.GMTool;
+using UnityEngine.UI;
 
 namespace RS.Scene
 {
@@ -35,26 +37,77 @@ namespace RS.Scene
         private TickManager m_tickManager;
         private GameTime m_time;
         
-        public void Start()
+        // 场景初始化与进度条相关
+        private int m_mapSize;
+        private bool m_isLoading = true;
+        private Slider m_loadingSlider;
+
+        public void Awake()
         {
             s_instance = this;
+            seed = GameSettingTransfer.seed;
+            m_mapSize = GameSettingTransfer.mapSize;
             
             var player = GameObject.Find("Player");
-
             m_player = player.GetComponent<Player>();
             GetComponent<GMToolWindow>().player = m_player;
+
+            var Canvas = GameObject.Find("Canvas");
+            m_loadingSlider = Canvas.GetComponentInChildren<Slider>();
             
             // 初始化Block UV
             Block.Init();
             
             // 初始化噪声
             NoiseManager.Init(seed);
-
+            
             m_tickManager = gameObject.AddComponent<TickManager>();
             
             m_chunkManager = gameObject.AddComponent<ChunkManager>();
             m_chunkManager.chunkPrefab = chunkPrefab;
+        }
+        
+        public void Start()
+        {
+            // 初始化场景，需要有一个加载页面的UI
+            m_isLoading = true;
+            // 初始化场景，协程传递参数给进度条
+            StartCoroutine(InitSceneData());
+        }
 
+        private IEnumerator InitSceneData()
+        {
+            var m_dataReady = false;
+
+            while (!m_dataReady)
+            {
+                // TODO: 场景数据生成，返回进度条数值
+                var batchChunkSize = m_mapSize / 32 / 8;
+                // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
+                var startPos = new Vector3Int(0, 0, 0);
+
+                // base data阶段，其实可以分帧处理不同阶段？
+                for (var x = 0; x < batchChunkSize; x++)
+                {
+                    for (var z = 0; z < batchChunkSize; z++)
+                    {
+                        var chunkPosXZ = startPos + new Vector3Int(x * 8, 0, z * 8);
+                        m_chunkManager.GenerateChunksBatchBaseData(chunkPosXZ);
+
+                        // m_loadingSlider.value = (float) i / batchChunkSize;
+                        yield return null;
+                    }
+                }
+                
+                // aquifer
+                // surface
+                
+                m_dataReady = true;
+                yield return null;
+            }
+            
+            // 数据加载完成，更新游戏内时间，spawn玩家
+            m_isLoading = false;
             // 上午8点
             m_time = new GameTime(480); // 480 = 8:00
             m_tickManager.Register(m_time);
@@ -65,7 +118,7 @@ namespace RS.Scene
             m_player.Position = pos;
             m_lastPosition = new Vector3(0, 0, 0);
             
-            Debug.Log($"[SceneManager]初始化完毕");
+            Debug.Log($"[SceneManager]场景数据准备完毕");
         }
 
         /// <summary>
@@ -81,6 +134,12 @@ namespace RS.Scene
 
         public void Update()
         {
+            if (m_isLoading)
+            {
+                // 数据加载中，显示进度条UI
+                return;
+            }
+            
             // 生成Chunk的数据不需要每次都执行
             if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
             {

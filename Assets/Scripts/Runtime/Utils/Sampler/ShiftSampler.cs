@@ -1,7 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using RS.Utils;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Jobs;
 
 namespace RS.Utils
 {
@@ -24,7 +26,21 @@ namespace RS.Utils
 
         public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
+            // var input = new NativeArray<Vector3>(posList, Allocator.TempJob);
+            //
+            // var shiftPosList = new NativeArray<Vector3>(posList.Length, Allocator.TempJob);
+            //
+            // var job = new shiftPosJob()
+            // {
+            //     posList = input,
+            //     shiftPosList = shiftPosList
+            // };
+            //
+            // var handler = job.Schedule(posList.Length, 256);
+            // handler.Complete();
+            
             var shiftPosList = new Vector3[posList.Length];
+            
             for (int i = 0; i < posList.Length; i++)
             {
                 var pos = posList[i];
@@ -38,7 +54,23 @@ namespace RS.Utils
                 sampleResult[i] *= 4.0f;
             }
 
+            // shiftPosList.Dispose();
+            // input.Dispose();
+            
             return sampleResult;
+        }
+
+        [BurstCompile]
+        private struct shiftPosJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<Vector3> posList;
+            [WriteOnly] public NativeArray<Vector3> shiftPosList;
+
+            public void Execute(int index)
+            {
+                var pos = posList[index];
+                shiftPosList[index] = new Vector3(pos.x * 0.25f, 0, pos.z * 0.25f);
+            }
         }
     }
     
@@ -68,14 +100,43 @@ namespace RS.Utils
                 shiftPosList[i] = new Vector3(pos.z * 0.25f, pos.x * 0.25f, 0);
             }
             
+            // var input = new NativeArray<Vector3>(posList, Allocator.TempJob);
+            //
+            // var shiftPosList = new NativeArray<Vector3>(posList.Length, Allocator.TempJob);
+            //
+            // var job = new shiftPosJob()
+            // {
+            //     posList = input,
+            //     shiftPosList = shiftPosList
+            // };
+            //
+            // var handler = job.Schedule(posList.Length, 256);
+            // handler.Complete();
+            
             var sampleResult = base.SampleBatch(shiftPosList);
             
             for (var i = 0; i < sampleResult.Length; i++)
             {
                 sampleResult[i] *= 4.0f;
             }
+            
+            // shiftPosList.Dispose();
+            // input.Dispose();
 
             return sampleResult;
+        }
+        
+        [BurstCompile]
+        private struct shiftPosJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<Vector3> posList;
+            [WriteOnly] public NativeArray<Vector3> shiftPosList;
+
+            public void Execute(int index)
+            {
+                var pos = posList[index];
+                shiftPosList[index] = new Vector3(pos.x * 0.25f, 0, pos.z * 0.25f);
+            }
         }
     }
 

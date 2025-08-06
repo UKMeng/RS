@@ -71,6 +71,28 @@ namespace RS.Scene
             return chunk;
         }
 
+        public void GenerateChunksBatchBaseData(Vector3Int startChunkPos)
+        {
+            var samplerX = Mathf.FloorToInt(startChunkPos.x / 32.0f);
+            var samplerZ = Mathf.FloorToInt(startChunkPos.y / 32.0f);
+            
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
+            
+            // 批量采样base data
+            var batchSampleResult = sampler.SampleBatch(startChunkPos, 256, 288, 256);
+
+            for (var x = 0; x < 8; x++)
+            {
+                for (var z = 0; z < 8; z++)
+                {
+                       // TODO
+                }
+            }
+            
+            
+            batchSampleResult.Dispose();
+        }
+
         public void GenerateNewChunk(Vector3 playerPos)
         {
             var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);

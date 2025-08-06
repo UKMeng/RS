@@ -103,18 +103,6 @@ namespace RS.Utils
             // }
             //
             // return result;
-
-            // coords批量采 3876ms
-            // var coords = m_coordinate.SampleBatch(posList);
-            //
-            // var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            // for (var i = 0; i < posList.Length; i++)
-            // {
-            //     result[i] = SampleSingle(posList[i], coords[i]);
-            // }
-            //
-            // coords.Dispose();
-            // return result;
             
             // 全部批采样 3551ms
             var coords = m_coordinate.SampleBatch(posList);
@@ -136,11 +124,23 @@ namespace RS.Utils
             
             var sampleCount = new int[pointCount];
             Array.Fill(sampleCount, 0);
+
+            var xPosList = new NativeArray<int>(posList.Length, Allocator.TempJob);
+            var bsJob = new BinarySearchJob()
+            {
+                locations = m_locations,
+                coords = coords,
+                result = xPosList
+            };
+
+            var handler = bsJob.Schedule(posList.Length, 256);
+            handler.Complete();
             
             for (var i = 0; i < posList.Length; i++)
             {
                 // 二分查找最接近的位置
-                var xPos = BinarySearch(m_locations, coords[i]);
+                // var xPos = BinarySearch(m_locations, coords[i]);
+                var xPos = xPosList[i];
             
                 if (xPos < 0)
                 {
@@ -211,55 +211,8 @@ namespace RS.Utils
 
             var handle = hermiteJob.Schedule(posList.Length, 16);
             handle.Complete();
-            
-            // var sampleCount = new int[pointCount];
-            // Array.Fill(sampleCount, 0);
-            // for (var i = 0; i < posList.Length; i++)
-            // {
-            //     if (front[i] == back[i])
-            //     {
-            //         if (front[i] == 0)
-            //         {
-            //             var sampleIndex = sampleCount[0]++;
-            //             var val = sampleResult[0][sampleIndex];
-            //             result[i] = val + m_derivatives[0] * (coords[i] - m_locations[0]);
-            //         }
-            //         else
-            //         {
-            //             var sampleIndex = sampleCount[pointCount - 1]++;
-            //             var val = sampleResult[pointCount - 1][sampleIndex];
-            //             result[i] = val + m_derivatives[pointCount - 1] * (coords[i] - m_locations[pointCount - 1]);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         var f = front[i];
-            //         var b = back[i];
-            //         var x = coords[i];
-            //         var x0 = m_locations[f];
-            //         var x1 = m_locations[b];
-            //         var frontIndex = sampleCount[f]++;
-            //         var backIndex = sampleCount[b]++;
-            //         var y0 = sampleResult[f][frontIndex];
-            //         var y1 = sampleResult[b][backIndex];
-            //         var dy0 = m_derivatives[f];
-            //         var dy1 = m_derivatives[b];
-            //
-            //         var h = x1 - x0;
-            //         var h0 = (1 + 2 * (x - x0) / h) * ((x - x1) / h) * ((x - x1) / h);
-            //         var h1 = (1 - 2 * (x - x1) / h) * ((x - x0) / h) * ((x - x0) / h);
-            //         var m0 = (x - x0) * ((x - x1) / h) * ((x - x1) / h);
-            //         var m1 = (x - x1) * ((x - x0) / h) * ((x - x0) / h);
-            //
-            //         result[i] = y0 * h0 + y1 * h1 + dy0 * m0 + dy1 * m1;
-            //     }
-            // }
-            
-            // foreach (var res in sampleResult)
-            // {
-            //     res.Dispose();
-            // }
 
+            xPosList.Dispose();
             sampleResult.Dispose();
             sampleOffset.Dispose();
             sampleIndices.Dispose();
@@ -292,6 +245,41 @@ namespace RS.Utils
             }
 
             return low - 1;
+        }
+
+        [BurstCompile]
+        private struct BinarySearchJob : IJobParallelFor
+        {
+            [ReadOnly][NativeDisableParallelForRestriction] public NativeArray<float> locations;
+            [ReadOnly] public NativeArray<float> coords;
+            [WriteOnly] public NativeArray<int> result;
+
+            public void Execute(int index)
+            {
+                var target = coords[index];
+                
+                var low = 0;
+                var high = locations.Length - 1;
+                while (low <= high)
+                {
+                    var mid = (low + high) >> 1;
+                    if (locations[mid] < target)
+                    {
+                        low = mid + 1;
+                    }
+                    else if (locations[mid] > target)
+                    {
+                        high = mid - 1;
+                    }
+                    else
+                    {
+                        result[index] = mid;
+                        return;
+                    }
+                }
+
+                result[index] = low - 1;
+            }
         }
 
         [BurstCompile]
