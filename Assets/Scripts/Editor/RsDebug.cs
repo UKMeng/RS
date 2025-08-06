@@ -158,13 +158,26 @@ namespace RS.Scene
             
             var sw = Stopwatch.StartNew();
             
-            for (var x = 0; x < 32; x++)
+            // var batchSampleResult = sampler.SampleBatch(new Vector3(0, 96, 0), 1024, 288, 1024);
+            // batchSampleResult.Dispose();
+            
+            for (var x = 0; x < 4; x++)
             {
-                for (var z = 0; z < 32; z++)
+                for (var z = 0; z < 4; z++)
                 {
-                    GenerateChunks(x, z, sampler);
+                    var batchSampleResult = sampler.SampleBatch(new Vector3(x * 256, 96, x * 256), 256, 288, 256);
+            
+                    batchSampleResult.Dispose();
                 }
             }
+            
+            // for (var x = 0; x < 32; x++)
+            // {
+            //     for (var z = 0; z < 32; z++)
+            //     {
+            //         GenerateChunks(x, z, sampler);
+            //     }
+            // }
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");

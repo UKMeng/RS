@@ -73,8 +73,6 @@ namespace RS.Utils
             // var sw = Stopwatch.StartNew();
             
             var posList = new List<Vector3>();
-            
-            // 全批量采样 JobSystem
             for (var ix = 0; ix < txz; ix++)
             {
                 for (var iz = 0; iz < txz; iz++)
@@ -88,7 +86,8 @@ namespace RS.Utils
                     }
                 }
             }
-
+            
+            // 全批量采样 JobSystem
             var cache = m_sampler.SampleBatch(posList.ToArray());
             
             // 并行单次采样
@@ -107,6 +106,7 @@ namespace RS.Utils
             // });
             
             // 串行单次采样
+            // var cache = m_sampler.SampleBatch(posList.ToArray());
             // for (var ix = 0; ix < 9; ix++)
             // {
             //     for (var iz = 0; iz < 9; iz++)
@@ -140,7 +140,7 @@ namespace RS.Utils
                 result = result
             };
 
-            var handle = job.Schedule(x * y * z, 64);
+            var handle = job.Schedule(x * y * z, 32);
             handle.Complete();
             
             cache.Dispose();

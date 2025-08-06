@@ -48,7 +48,7 @@ namespace RS.Utils
                 result = result
             };
             
-            var handle = job.Schedule(posList.Length, 64);
+            var handle = job.Schedule(posList.Length, 256);
             handle.Complete();
             
             // for (int i = 0; i < leftList.Length; i++)
@@ -120,7 +120,7 @@ namespace RS.Utils
                 result = result
             };
             
-            var handle = job.Schedule(posList.Length, 64);
+            var handle = job.Schedule(posList.Length, 256);
             handle.Complete();
             
             // for (int i = 0; i < leftList.Length; i++)
@@ -181,15 +181,39 @@ namespace RS.Utils
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < leftList.Length; i++)
+            
+            var job = new MaxJob()
             {
-                result[i] = Mathf.Max(leftList[i], rightList[i]);
-            }
+                left = leftList,
+                right = rightList,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < leftList.Length; i++)
+            // {
+            //     result[i] = Mathf.Max(leftList[i], rightList[i]);
+            // }
             
             leftList.Dispose();
             rightList.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct MaxJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> left;
+            [ReadOnly] public NativeArray<float> right;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = Mathf.Max(left[index], right[index]);
+            }
         }
     }
 
@@ -227,15 +251,39 @@ namespace RS.Utils
             var leftList = m_left.SampleBatch(posList);
             var rightList = m_right.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < leftList.Length; i++)
+            
+            var job = new MinJob()
             {
-                result[i] = Mathf.Min(leftList[i], rightList[i]);
-            }
+                left = leftList,
+                right = rightList,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < leftList.Length; i++)
+            // {
+            //     result[i] = Mathf.Min(leftList[i], rightList[i]);
+            // }
             
             leftList.Dispose();
             rightList.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct MinJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> left;
+            [ReadOnly] public NativeArray<float> right;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = Mathf.Min(left[index], right[index]);
+            }
         }
     }
 
@@ -265,14 +313,36 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            
+            var job = new AbsJob()
             {
-                result[i] = Mathf.Abs(list[i]);
-            }
+                input = list,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = Mathf.Abs(list[i]);
+            // }
             
             list.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct AbsJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = Mathf.Abs(input[index]);
+            }
         }
     }
 
@@ -303,14 +373,36 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            
+            var job = new SquareJob()
             {
-                result[i] = list[i] * list[i];
-            }
+                input = list,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = list[i] * list[i];
+            // }
             
             list.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct SquareJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = input[index] * input[index];
+            }
         }
     }
 
@@ -341,14 +433,35 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            var job = new CubeJob()
             {
-                result[i] = list[i] * list[i] * list[i];
-            }
+                input = list,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = list[i] * list[i] * list[i];
+            // }
 
             list.Dispose();
             
             return result;
+        }
+        
+        [BurstCompile]
+        private struct CubeJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = input[index] * input[index] * input[index];
+            }
         }
     }
     
@@ -380,14 +493,36 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            
+            var job = new HalfNegativeJob()
             {
-                result[i] = list[i] < 0 ? list[i] * 0.5f : list[i];
-            }
+                input = list,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = list[i] < 0 ? list[i] * 0.5f : list[i];
+            // }
             
             list.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct HalfNegativeJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = input[index] < 0 ? input[index] * 0.5f : input[index];
+            }
         }
     }
 
@@ -419,14 +554,36 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            
+            var job = new QuarterNegativeJob()
             {
-                result[i] = list[i] < 0 ? list[i] * 0.25f : list[i];
-            }
+                input = list,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = list[i] < 0 ? list[i] * 0.25f : list[i];
+            // }
             
             list.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct QuarterNegativeJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+            
+            public void Execute(int index)
+            {
+                result[index] = input[index] < 0 ? input[index] * 0.25f : input[index];
+            }
         }
     }
 
@@ -461,14 +618,40 @@ namespace RS.Utils
         {
             var list = m_sampler.SampleBatch(posList);
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < list.Length; i++)
+            
+            var job = new ClampJob()
             {
-                result[i] = RsMath.Clamp(list[i], m_min, m_max);
-            }
+                input = list,
+                min = m_min,
+                max = m_max,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < list.Length; i++)
+            // {
+            //     result[i] = RsMath.Clamp(list[i], m_min, m_max);
+            // }
             
             list.Dispose();
 
             return result;
+        }
+        
+        [BurstCompile]
+        private struct ClampJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [ReadOnly] public float min;
+            [ReadOnly] public float max;
+            [WriteOnly] public NativeArray<float> result;
+
+            public void Execute(int index)
+            {
+                result[index] = RsMath.Clamp(input[index], min, max);
+            }
         }
     }
 
@@ -495,12 +678,52 @@ namespace RS.Utils
         public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
+            
+            var input = new NativeArray<float>(posList.Length, Allocator.TempJob);
+            
             for (int i = 0; i < posList.Length; i++)
             {
-                result[i] = RsMath.ClampedMap(posList[i].y, m_min, m_max, m_from, m_to);
+                input[i] = posList[i].y;
             }
             
+            var job = new YClampJob()
+            {
+                input = input,
+                min = m_min,
+                max = m_max,
+                from = m_from,
+                to = m_to,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            
+            // for (int i = 0; i < posList.Length; i++)
+            // {
+            //     result[i] = RsMath.ClampedMap(posList[i].y, m_min, m_max, m_from, m_to);
+            // }
+
+            input.Dispose();
+            
             return result;
+        }
+        
+        [BurstCompile]
+        private struct YClampJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [ReadOnly] public float min;
+            [ReadOnly] public float max;
+            [ReadOnly] public float from;
+            [ReadOnly] public float to;
+            [WriteOnly] public NativeArray<float> result;
+
+            public void Execute(int index)
+            {
+                result[index] = RsMath.ClampedMap(input[index], min, max, from, to);
+            }
         }
     }
 
@@ -532,15 +755,42 @@ namespace RS.Utils
         public override NativeArray<float> SampleBatch(Vector3[] posList)
         {
             var result = new NativeArray<float>(posList.Length, Allocator.TempJob);
-            for (int i = 0; i < posList.Length; i++)
-            {
-                var val = m_sampler.Sample(posList[i]);
-                val = RsMath.Clamp(val, -1.0f, 1.0f);
-                
-                result[i] = val * 0.5f - val * val * val / 24.0f;
-            }
 
+            var sampleResult = m_sampler.SampleBatch(posList);
+            
+            var job = new SqueezeJob()
+            {
+                input = sampleResult,
+                result = result
+            };
+            
+            var handle = job.Schedule(posList.Length, 256);
+            handle.Complete();
+            
+            // for (int i = 0; i < posList.Length; i++)
+            // {
+            //     var val = m_sampler.Sample(posList[i]);
+            //     val = RsMath.Clamp(val, -1.0f, 1.0f);
+            //     
+            //     result[i] = val * 0.5f - val * val * val / 24.0f;
+            // }
+
+            sampleResult.Dispose();
             return result;
+        }
+        
+        [BurstCompile]
+        private struct SqueezeJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> input;
+            [WriteOnly] public NativeArray<float> result;
+
+            public void Execute(int index)
+            {
+                var val = input[index];
+                val = RsMath.Clamp(val, -1.0f, 1.0f);
+                result[index] = val * 0.5f - val * val * val / 24.0f;
+            }
         }
     }
 

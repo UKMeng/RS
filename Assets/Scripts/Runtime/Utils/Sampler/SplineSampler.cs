@@ -209,7 +209,7 @@ namespace RS.Utils
                 result = result,
             };
 
-            var handle = hermiteJob.Schedule(posList.Length, 64);
+            var handle = hermiteJob.Schedule(posList.Length, 16);
             handle.Complete();
             
             // var sampleCount = new int[pointCount];
