@@ -79,7 +79,15 @@ namespace RS.Scene
             
             var sw = Stopwatch.StartNew();
 
-            GenerateChunks(0, 0, sampler);
+            for (var i = 3; i < 12; i++)
+            {
+                var batchSampleResult = sampler.SampleBatch(new Vector3(0, i * 32, 0), 32, 32, 32);
+            
+                batchSampleResult.Dispose();
+            }
+            
+            
+            // GenerateChunks(0, 0, sampler);
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
@@ -100,13 +108,36 @@ namespace RS.Scene
             
             var sw = Stopwatch.StartNew();
             
-            for (var x = 0; x < 8; x++)
-            {
-                for (var z = 0; z < 8; z++)
-                {
-                    GenerateChunks(x, z, sampler);
-                }
-            }
+            var batchSampleResult = sampler.SampleBatch(new Vector3(0, 96, 0), 256, 288, 256);
+            
+            batchSampleResult.Dispose();
+            
+            // for (var x = 0; x < 8; x++)
+            // {
+            //     for (var z = 0; z < 8; z++)
+            //     {
+            //         var batchSampleResult = sampler.SampleBatch(new Vector3(x * 32, 96, z * 32), 32, 288, 32);
+            //
+            //         batchSampleResult.Dispose();
+            //         
+            //         // for (var y = 3; y < 12; y++)
+            //         // {
+            //         //     var batchSampleResult = sampler.SampleBatch(new Vector3(x * 32, y * 32, z * 32), 32, 32, 32);
+            //         //
+            //         //     batchSampleResult.Dispose();
+            //         // }
+            //     }
+            // }
+            
+            
+            
+            // for (var x = 0; x < 8; x++)
+            // {
+            //     for (var z = 0; z < 8; z++)
+            //     {
+            //         GenerateChunks(x, z, sampler);
+            //     }
+            // }
 
             sw.Stop();
             Debug.Log($"{samplerName} Sampler Benchmark: {sw.ElapsedMilliseconds}ms");
@@ -168,23 +199,23 @@ namespace RS.Scene
             
             // Aquifer阶段
             // var aquiferSw = Stopwatch.StartNew();
-            for (var chunkY = 3; chunkY < 12; chunkY++)
-            {
-                if (chunkY == 3)
-                {
-                    if (chunks[chunkY].status == ChunkStatus.Aquifer)
-                    {
-                        GenerateAquifer(chunks[chunkY]);
-                    }
-                }
-                else
-                {
-                    if (chunks[chunkY].status == ChunkStatus.Aquifer)
-                    {
-                        chunks[chunkY].status = ChunkStatus.Surface;
-                    }
-                }
-            }
+            // for (var chunkY = 3; chunkY < 12; chunkY++)
+            // {
+            //     if (chunkY == 3)
+            //     {
+            //         if (chunks[chunkY].status == ChunkStatus.Aquifer)
+            //         {
+            //             GenerateAquifer(chunks[chunkY]);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         if (chunks[chunkY].status == ChunkStatus.Aquifer)
+            //         {
+            //             chunks[chunkY].status = ChunkStatus.Surface;
+            //         }
+            //     }
+            // }
             
             // aquiferSw.Stop();
             // Debug.Log($"Aquifer: {aquiferSw.ElapsedMilliseconds}ms");
@@ -192,25 +223,25 @@ namespace RS.Scene
             // 生成Surface阶段
             // var surfaceSw = Stopwatch.StartNew();
             
-            var offsetX = x * 32;
-            var offsetZ = z * 32;
-            var contexts = new SurfaceContext[32 * 32];
-            for (var sx = 0; sx < 32; sx++)
-            {
-                for (var sz = 0; sz < 32; sz++)
-                {
-                    contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
-                }
-            }
-            for (var chunkY = 11; chunkY >= 3; chunkY--)
-            {
-                var chunk = chunks[chunkY];
-                    
-                if (chunk.status == ChunkStatus.Surface)
-                {
-                    GenerateSurface(chunk, contexts);
-                }
-            }
+            // var offsetX = x * 32;
+            // var offsetZ = z * 32;
+            // var contexts = new SurfaceContext[32 * 32];
+            // for (var sx = 0; sx < 32; sx++)
+            // {
+            //     for (var sz = 0; sz < 32; sz++)
+            //     {
+            //         contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
+            //     }
+            // }
+            // for (var chunkY = 11; chunkY >= 3; chunkY--)
+            // {
+            //     var chunk = chunks[chunkY];
+            //         
+            //     if (chunk.status == ChunkStatus.Surface)
+            //     {
+            //         GenerateSurface(chunk, contexts);
+            //     }
+            // }
 
             // surfaceSw.Stop();
             // Debug.Log($"Surface: {surfaceSw.ElapsedMilliseconds}ms");
@@ -222,35 +253,35 @@ namespace RS.Scene
             var offsetZ = chunk.chunkPos.z * 32;
             var offsetY = chunk.chunkPos.y * 32;
             
-            var blocks = new BlockType[32 * 32 * 32];
-            var finalDensity = new float[32 * 32 * 32];
-            var index = 0;
+            // var blocks = new BlockType[32 * 32 * 32];
+            // var finalDensity = new float[32 * 32 * 32];
+            // var index = 0;
             
             var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ), 32, 32, 32);
 
             // var judgeSw = Stopwatch.StartNew();
-            for (var sx = 0; sx < 32; sx++)
-            {
-                for (var sz = 0; sz < 32; sz++)
-                {
-                    for (var sy = 0; sy < 32; sy++)
-                    {
-                        var density = batchSampleResult[sx * 1024 + sy + sz * 32];
-                        blocks[index] = density > 0 ? BlockType.Stone : BlockType.Air;
-                        finalDensity[index++] = density;
-                    }
-                }
-            }
+            // for (var sx = 0; sx < 32; sx++)
+            // {
+            //     for (var sz = 0; sz < 32; sz++)
+            //     {
+            //         for (var sy = 0; sy < 32; sy++)
+            //         {
+            //             var density = batchSampleResult[sx * 1024 + sy + sz * 32];
+            //             blocks[index] = density > 0 ? BlockType.Stone : BlockType.Air;
+            //             finalDensity[index++] = density;
+            //         }
+            //     }
+            // }
 
             batchSampleResult.Dispose();
             // judgeSw.Stop();
             // Debug.Log($"Judge: {judgeSw.Elapsed.TotalMilliseconds * 1000:n3} us");
             // Debug.Log($"Judge: {judgeSw.ElapsedMilliseconds} ms");
 
-            
-            chunk.blocks = blocks;
-            chunk.density = finalDensity;
-            chunk.status = ChunkStatus.Aquifer;
+            //
+            // chunk.blocks = blocks;
+            // chunk.density = finalDensity;
+            // chunk.status = ChunkStatus.Aquifer;
         }
         
         private static void GenerateAquifer(Chunk chunk)

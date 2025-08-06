@@ -65,6 +65,9 @@ namespace RS.Utils
         {
             var w = m_cellWidth;
             var h = m_cellHeight;
+
+            var txz = x / (int)w + 1;
+            var ty = y / (int)h + 1;
             
             // 对所有间隔点先采样, 需各维度多一个间隔
             // var sw = Stopwatch.StartNew();
@@ -72,11 +75,11 @@ namespace RS.Utils
             var posList = new List<Vector3>();
             
             // 全批量采样 JobSystem
-            for (var ix = 0; ix < 9; ix++)
+            for (var ix = 0; ix < txz; ix++)
             {
-                for (var iz = 0; iz < 9; iz++)
+                for (var iz = 0; iz < txz; iz++)
                 {
-                    for (var iy = 0; iy < 9; iy++)
+                    for (var iy = 0; iy < ty; iy++)
                     {
                         var fx = startPos.x + ix * w;
                         var fy = startPos.y + iy * h;
@@ -123,16 +126,21 @@ namespace RS.Utils
             // sw = Stopwatch.StartNew();
 
             // 对中间点进行插值 JobSystem
-            var result = new NativeArray<float>(32 * 32 * 32, Allocator.TempJob);
+            var result = new NativeArray<float>(x * y * z, Allocator.TempJob);
             var job = new TriLerpJob
             {
                 cache = cache,
                 w = m_cellWidth,
                 h = m_cellHeight,
+                t = ty,
+                tt = ty * txz,
+                yz = y * z,
+                y = y,
+                z = z,
                 result = result
             };
 
-            var handle = job.Schedule(32 * 32 * 32, 64);
+            var handle = job.Schedule(x * y * z, 64);
             handle.Complete();
             
             cache.Dispose();
@@ -149,13 +157,18 @@ namespace RS.Utils
             [ReadOnly] public NativeArray<float> cache;
             [ReadOnly] public float w;
             [ReadOnly] public float h;
+            [ReadOnly] public int t;
+            [ReadOnly] public int tt;
+            [ReadOnly] public int yz;
+            [ReadOnly] public int y;
+            [ReadOnly] public int z;
             [WriteOnly] public NativeArray<float> result;
 
             public void Execute(int index)
             {
-                var ix = index / (32 * 32);
-                var iy = index % 32;
-                var iz = (index / 32) % 32;
+                var ix = index / yz;
+                var iy = index % y;
+                var iz = (index / y) % z;
                 
                 var tx = (ix % w) / w;
                 var ty = (iy % h) / h;
@@ -165,14 +178,14 @@ namespace RS.Utils
                 var fy = Mathf.FloorToInt(iy / h);
                 var fz = Mathf.FloorToInt(iz / w);
 
-                var c000 = cache[fx * 81 + fy + fz * 9];
-                var c100 = cache[(fx + 1) * 81 + fy + fz * 9];
-                var c010 = cache[fx * 81 + (fy + 1) + fz * 9];
-                var c110 = cache[(fx + 1) * 81 + (fy + 1) + fz * 9];
-                var c001 = cache[fx * 81 + fy + (fz + 1) * 9];
-                var c101 = cache[(fx + 1) * 81 + fy + (fz + 1) * 9];
-                var c011 = cache[fx * 81 + fy + 1 + (fz + 1) * 9];
-                var c111 = cache[(fx + 1) * 81 + fy + 1 + (fz + 1) * 9];
+                var c000 = cache[fx * tt + fy + fz * t];
+                var c100 = cache[(fx + 1) * tt + fy + fz * t];
+                var c010 = cache[fx * tt + (fy + 1) + fz * t];
+                var c110 = cache[(fx + 1) * tt + (fy + 1) + fz * t];
+                var c001 = cache[fx * tt + fy + (fz + 1) * t];
+                var c101 = cache[(fx + 1) * tt + fy + (fz + 1) * t];
+                var c011 = cache[fx * tt + fy + 1 + (fz + 1) * t];
+                var c111 = cache[(fx + 1) * tt + fy + 1 + (fz + 1) * t];
                 
                 result[index] = RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
             }
