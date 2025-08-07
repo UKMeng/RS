@@ -60,6 +60,14 @@ namespace RS.GamePlay
 
             if (Physics.Raycast(ray, out var hitInfo, rayDistance))
             {
+                if (hitInfo.collider.gameObject.name == "Chest")
+                {
+                    var chest = hitInfo.collider.transform.parent.gameObject.GetComponent<Chest>();
+                    chest.Open();
+                    Debug.Log("Hit a Chest");
+                }
+                
+                
                 var pos = hitInfo.point;
                 var normal = hitInfo.normal;
                 var blockPos = RsMath.GetBlockMinCorner(pos, normal);
