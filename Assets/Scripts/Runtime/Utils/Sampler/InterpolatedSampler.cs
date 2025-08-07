@@ -61,7 +61,7 @@ namespace RS.Utils
             return RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
         }
 
-        public override NativeArray<float> SampleBatch(Vector3 startPos, int x, int y, int z)
+        public override NativeArray<float> SampleBatch(Vector3 startChunkPos, int x, int y, int z)
         {
             var w = m_cellWidth;
             var h = m_cellHeight;
@@ -71,6 +71,8 @@ namespace RS.Utils
             
             // 对所有间隔点先采样, 需各维度多一个间隔
             // var sw = Stopwatch.StartNew();
+
+            var startPos = new Vector3(startChunkPos.x * 32, startChunkPos.y * 32, startChunkPos.z * 32);
             
             var posList = new List<Vector3>();
             for (var ix = 0; ix < txz; ix++)

@@ -216,6 +216,8 @@ namespace RS.Scene
                     }
                 }
             }
+
+            var toGenerateMesh = new List<Chunk>();
             
             for (var offsetX = -m_loadDistance; offsetX < m_loadDistance + 1; offsetX++)
             {
@@ -248,8 +250,8 @@ namespace RS.Scene
                             
                             // 创建Chunk的GameObject
                             InitChunkGameObject(chunk);
-                            // 告知TickManager准备生成Mesh
-                            SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                            // 使用JobSystem批量生成Mesh
+                            toGenerateMesh.Add(chunk);
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
                         {
@@ -259,6 +261,11 @@ namespace RS.Scene
                         }
                     }
                 }
+            }
+
+            if (toGenerateMesh.Count > 0)
+            {
+                Chunk.BuildMeshUsingJobSystem(toGenerateMesh);
             }
         }
 
