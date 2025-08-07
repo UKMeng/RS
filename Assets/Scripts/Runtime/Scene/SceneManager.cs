@@ -24,6 +24,7 @@ namespace RS.Scene
         }
         
         public GameObject chunkPrefab;
+        public GameObject chestPrefab;
 
         public GameObject dayLight;
         
@@ -46,14 +47,15 @@ namespace RS.Scene
         private Slider m_loadingSlider;
         
         // 地图相关
-        private GameObject m_mapUI;
+        private Map m_map;
 
         public void Awake()
         {
             s_instance = this;
             
-            m_mapUI = GameObject.Find("MapUI");
-            m_mapUI.SetActive(false);
+            var mapUI = GameObject.Find("MapUI");
+            m_map = mapUI.GetComponent<Map>();
+            mapUI.SetActive(false);
             
             seed = GameSettingTransfer.seed;
             m_mapSize = GameSettingTransfer.mapSize;
@@ -94,7 +96,7 @@ namespace RS.Scene
             // 场景数据生成，返回进度条数值
             var batchChunkSize = m_mapSize / 32 / 8;
             // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
-            var startPos = new Vector3Int(0, 0, 0);
+            var startChunkPos = new Vector3Int(0, 0, 0);
 
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
             
@@ -105,7 +107,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchBaseData(chunkPos);
 
                     // 进度条更新
@@ -121,7 +123,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchAquifer(chunkPos);
 
                     // 进度条更新
@@ -137,7 +139,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchSurface(chunkPos);
 
                     // 进度条更新
@@ -149,8 +151,8 @@ namespace RS.Scene
             } 
             
             // 地图生成
-            var mapTexture = m_chunkManager.GenerateMap(startPos, m_mapSize);
-            m_mapUI.GetComponentInChildren<RawImage>().texture = mapTexture;
+            var mapTexture = m_chunkManager.GenerateMap(startChunkPos, m_mapSize);
+            m_map.SetMapTexture(mapTexture);
 
             sw.Stop();
             Debug.Log($"[SceneManager]场景数据生成完毕，耗时: {sw.ElapsedMilliseconds} ms");
@@ -166,11 +168,20 @@ namespace RS.Scene
             
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = m_chunkManager.ChooseASpwanPos(startPos, m_mapSize);
+            var playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
+            Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
+
+            var chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
+            Debug.Log($"[SceneManager] 宝箱位置: {chestPos}");
+            // 先放置宝箱在面前
+            Instantiate(chestPrefab, chestPos, Quaternion.identity);
+
+            var chestMarkPos = new Vector2((chestPos.x - startChunkPos.x * 32) / m_mapSize,
+                (chestPos.z - startChunkPos.z * 32) / m_mapSize);
             
-            Debug.Log($"[SceneManager] 玩家初始位置: {pos}");
+            m_map.AddMark(0, chestMarkPos);
             
-            m_player.Position = pos;
+            m_player.Position = playerPos;
             m_lastPosition = new Vector3(0, 0, 0);
             
             m_chunkManager.UpdateChunkStatus(m_player.Position);
@@ -284,7 +295,7 @@ namespace RS.Scene
         {
             if (!m_isLoading)
             {
-                m_mapUI.SetActive(!m_mapUI.activeSelf);
+                m_map.Toggle();
             }
         }
     }

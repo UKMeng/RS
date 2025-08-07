@@ -343,13 +343,15 @@ namespace RS.Scene
             }
         }
 
-        public Vector3 ChooseASpwanPos(Vector3Int startChunkPos, int mapSize)
+        public Vector3 ChoosePlayerPos(Vector3Int startChunkPos, int mapSize)
         {
             var chunkSize = mapSize / 32;
 
-            while (true)
+            var totalChance = 10;
+            
+            while (totalChance > 0)
             {
-                /// 这个是用种子固定要随机的数值应该已经取完了，所以后续随便用也没事
+                // 这个是用种子固定要随机的数值应该已经取完了，所以后续随便用也没事
                 var chunkX = startChunkPos.x + RsRandom.Instance.NextInt(0, chunkSize);
                 var chunkZ = startChunkPos.z + RsRandom.Instance.NextInt(0, chunkSize);
 
@@ -374,8 +376,63 @@ namespace RS.Scene
                     }
                 }
 
+                totalChance--;
             }
             
+            Debug.LogError($"[ChunkManager] Can't find a possible player position");
+            return Vector3.zero;
+        }
+
+        public Vector3 ChooseChestPos(Vector3Int startChunkPos, Vector3 playerPos, int mapSize)
+        {
+            // 宝箱位置 应该有几个限制条件
+            // 1. 不得超出地图范围
+            // 2. 离玩家要有chunkSize / 2的距离
+            // 3. 不得在水中
+            // 4. 暂时先放在xz位置的最顶端
+
+            var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
+            var chunkSize = mapSize / 32;
+            var minChunkDistance = chunkSize / 2;
+            
+            var totalChance = 10;
+            
+            while (totalChance > 0)
+            {
+                var chunkX = startChunkPos.x + RsRandom.Instance.NextInt(0, chunkSize);
+                var chunkZ = startChunkPos.z + RsRandom.Instance.NextInt(0, chunkSize);
+
+                if (chunkX - playerChunkPos.x + chunkZ - playerChunkPos.z < minChunkDistance)
+                {
+                    continue;
+                }
+                
+                var bottomChunk = GetChunk(new Vector3Int(chunkX, 3, chunkZ));
+                
+                var topBlocks = bottomChunk.topBlocks;
+                var topBlockHeights = bottomChunk.topBlockHeights;
+                
+                // 5次机会选不中就换Chunk
+                var chance = 5;
+
+                while (chance > 0)
+                {
+                    chance--;
+                    var sx = RsRandom.Instance.NextInt(0, 32);
+                    var sz = RsRandom.Instance.NextInt(0, 32);
+                    var index = sx * 32 + sz;
+                    if (topBlocks[index] != BlockType.Water)
+                    {
+                        var height = topBlockHeights[index];
+                        return new Vector3(chunkX * 32 + sx, height / 2.0f + 0.5f, chunkZ * 32 + sz);
+                    }
+                }
+
+                totalChance--;
+            }
+            
+            Debug.LogError($"[ChunkManager] Can't find a possible chest position");
+            return Vector3.zero;
         }
         
         public void GenerateNewChunk(Vector3 playerPos)
