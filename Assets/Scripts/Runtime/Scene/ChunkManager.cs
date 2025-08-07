@@ -12,6 +12,7 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 
 namespace RS.Scene
@@ -340,6 +341,41 @@ namespace RS.Scene
                 colorArray[index] = blockColorArray[(int)type]; 
 
             }
+        }
+
+        public Vector3 ChooseASpwanPos(Vector3Int startChunkPos, int mapSize)
+        {
+            var chunkSize = mapSize / 32;
+
+            while (true)
+            {
+                /// 这个是用种子固定要随机的数值应该已经取完了，所以后续随便用也没事
+                var chunkX = startChunkPos.x + RsRandom.Instance.NextInt(0, chunkSize);
+                var chunkZ = startChunkPos.z + RsRandom.Instance.NextInt(0, chunkSize);
+
+                var bottomChunk = GetChunk(new Vector3Int(chunkX, 3, chunkZ));
+                
+                var topBlocks = bottomChunk.topBlocks;
+                var topBlockHeights = bottomChunk.topBlockHeights;
+                
+                // 5次机会选不中就换Chunk
+                var chance = 5;
+
+                while (chance > 0)
+                {
+                    chance--;
+                    var sx = RsRandom.Instance.NextInt(0, 32);
+                    var sz = RsRandom.Instance.NextInt(0, 32);
+                    var index = sx * 32 + sz;
+                    if (topBlocks[index] != BlockType.Water)
+                    {
+                        var height = topBlockHeights[index];
+                        return new Vector3(chunkX * 32 + sx, height / 2.0f, chunkZ * 32 + sz);
+                    }
+                }
+
+            }
+            
         }
         
         public void GenerateNewChunk(Vector3 playerPos)

@@ -166,7 +166,10 @@ namespace RS.Scene
             
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(10, 180, 10);
+            var pos = m_chunkManager.ChooseASpwanPos(startPos, m_mapSize);
+            
+            Debug.Log($"[SceneManager] 玩家初始位置: {pos}");
+            
             m_player.Position = pos;
             m_lastPosition = new Vector3(0, 0, 0);
             
