@@ -74,7 +74,7 @@ namespace RS.Scene
         public void GenerateChunksBatchBaseData(Vector3Int startChunkPos)
         {
             var samplerX = Mathf.FloorToInt(startChunkPos.x / 32.0f);
-            var samplerZ = Mathf.FloorToInt(startChunkPos.y / 32.0f);
+            var samplerZ = Mathf.FloorToInt(startChunkPos.z / 32.0f);
             
             var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
             
@@ -89,14 +89,14 @@ namespace RS.Scene
             {
                 for (var z = 0; z < 8; z++)
                 {
-                    for (var y = 3; y < 12; y++)
+                    for (var y = 0; y < 9; y++)
                     {
                         var chunkPos = startChunkPos + new Vector3Int(x, y, z);
                         var chunk = new Chunk(chunkPos);
 
                         var offsetX = x * 32;
                         var offsetZ = z * 32;
-                        var offsetY = (y - 3) * 32;
+                        var offsetY = y * 32;
                         var index = 0;
                         
                         for (var sx = 0; sx < 32; sx++)
@@ -113,7 +113,7 @@ namespace RS.Scene
                         }
 
                         // offset += 32768;
-                        chunk.status = ChunkStatus.DataReady;
+                        chunk.status = ChunkStatus.Aquifer;
                         m_chunks[chunkPos] = chunk;
                     }
                 }
@@ -126,6 +126,35 @@ namespace RS.Scene
             batchSampleResult.Dispose();
         }
 
+        public void GenerateChunksBatchAquifer(Vector3Int startChunkPos)
+        {
+            var sw = Stopwatch.StartNew();
+            
+            for (var x = 0; x < 8; x++)
+            {
+                for (var z = 0; z < 8; z++)
+                {
+                    for (var y = 0; y < 9; y++)
+                    {
+                        var chunkPos = startChunkPos + new Vector3Int(x, y, z);
+                        var chunk = m_chunks[chunkPos];
+                        
+                        if (chunk.status == ChunkStatus.Aquifer)
+                        {
+                            GenerateAquifer(chunk);
+                        }
+
+                        // offset += 32768;
+                        chunk.status = ChunkStatus.DataReady;
+                    }
+                }
+            }
+            
+            sw.Stop();
+            Debug.Log($"Deal with aquifer {sw.ElapsedMilliseconds} ms");
+        }
+        
+        
         public void GenerateNewChunk(Vector3 playerPos)
         {
             var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
@@ -613,7 +642,7 @@ namespace RS.Scene
             var offsetX = chunk.chunkPos.x * 32;
             var offsetY = chunk.chunkPos.y * 32;
             var offsetZ = chunk.chunkPos.z * 32;
-            var sw = Stopwatch.StartNew();
+            // var sw = Stopwatch.StartNew();
             
             // 首先判定是否是最底下的岩浆，不过现在还没实现岩浆，先跳过
             // TODO: 不淹没洞穴的含水层判断
@@ -638,7 +667,7 @@ namespace RS.Scene
             
             chunk.status = ChunkStatus.Surface;
             
-            sw.Stop();
+            // sw.Stop();
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 

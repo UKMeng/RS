@@ -86,7 +86,7 @@ namespace RS.Scene
                 // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
                 var startPos = new Vector3Int(0, 0, 0);
 
-                var totalProgress = 64 * batchChunkSize * batchChunkSize;
+                var totalProgress = 64 * batchChunkSize * batchChunkSize * 2;
                 
 
                 // base data阶段，其实可以分帧处理不同阶段？
@@ -95,8 +95,8 @@ namespace RS.Scene
                 {
                     for (var z = 0; z < batchChunkSize; z++)
                     {
-                        var chunkPosXZ = startPos + new Vector3Int(x * 8, 0, z * 8);
-                        m_chunkManager.GenerateChunksBatchBaseData(chunkPosXZ);
+                        var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                        m_chunkManager.GenerateChunksBatchBaseData(chunkPos);
 
                         // 进度条更新
                         progress += 64;
@@ -107,6 +107,21 @@ namespace RS.Scene
                 }
                 
                 // aquifer
+                for (var x = 0; x < batchChunkSize; x++)
+                {
+                    for (var z = 0; z < batchChunkSize; z++)
+                    {
+                        var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                        m_chunkManager.GenerateChunksBatchAquifer(chunkPos);
+
+                        // 进度条更新
+                        progress += 64;
+                        m_loadingSlider.value = (float) progress / totalProgress;
+                        Debug.Log($"加载进度: {m_loadingSlider.value}" );
+                        yield return null;
+                    }
+                }
+                
                 // surface
                 m_dataReady = true;
             }
