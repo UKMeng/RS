@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using RS.Scene.Biome;
 using RS.Utils;
 using RS.Item;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using Debug = UnityEngine.Debug;
@@ -79,12 +82,55 @@ namespace RS.Scene
             var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
             
             // 批量采样base data
+            var sampleSw = Stopwatch.StartNew();
+            
             var batchSampleResult = sampler.SampleBatch(startChunkPos, 256, 288, 256);
-            //
-            // var offset = 0;
+            
+            sampleSw.Stop();
+            Debug.Log($"batch sample time: {sampleSw.ElapsedMilliseconds}ms");
             
             var sw = Stopwatch.StartNew();
+
+            var blocksList = new List<NativeArray<BlockType>>();
+            var densityList = new List<NativeArray<float>>();
+            var jobHandles = new NativeArray<JobHandle>(576, Allocator.Temp);
             
+            var index = 0;
+            for (var x = 0; x < 8; x++)
+            {
+                for (var z = 0; z < 8; z++)
+                {
+                    for (var y = 0; y < 9; y++)
+                    {
+                        var offsetX = x * 32;
+                        var offsetZ = z * 32;
+                        var offsetY = y * 32;
+                        
+                        
+                        var blocks = new NativeArray<BlockType>(32768, Allocator.TempJob);
+                        var density = new NativeArray<float>(32768, Allocator.TempJob);
+                        
+                        blocksList.Add(blocks);
+                        densityList.Add(density);
+
+                        var job = new JudgeBaseBlockJob()
+                        {
+                            blocks = blocks,
+                            density = density,
+                            batchSampleResult = batchSampleResult,
+                            offsetX = offsetX,
+                            offsetY = offsetY,
+                            offsetZ = offsetZ,
+                        };
+                        
+                        jobHandles[index++] = job.Schedule(32768, 64);
+                    }
+                }
+            }
+            
+            JobHandle.CompleteAll(jobHandles);
+
+            index = 0;
             for (var x = 0; x < 8; x++)
             {
                 for (var z = 0; z < 8; z++)
@@ -93,37 +139,53 @@ namespace RS.Scene
                     {
                         var chunkPos = startChunkPos + new Vector3Int(x, y, z);
                         var chunk = new Chunk(chunkPos);
-
-                        var offsetX = x * 32;
-                        var offsetZ = z * 32;
-                        var offsetY = y * 32;
-                        var index = 0;
                         
-                        for (var sx = 0; sx < 32; sx++)
-                        {
-                            for (var sz = 0; sz < 32; sz++)
-                            {
-                                for (var sy = 0; sy < 32; sy++)
-                                {
-                                    var density = batchSampleResult[(offsetX + sx) * 73728 + offsetY + sy + (offsetZ + sz) * 288];
-                                    chunk.blocks[index] = JudgeBaseBlockType(density);
-                                    chunk.density[index++] = density;
-                                }
-                            }
-                        }
-
-                        // offset += 32768;
+                        chunk.blocks = blocksList[index].ToArray();
+                        chunk.density = densityList[index++].ToArray();
+                        
                         chunk.status = ChunkStatus.Aquifer;
                         m_chunks[chunkPos] = chunk;
                     }
                 }
             }
-            
+
             sw.Stop();
             Debug.Log($"Deal with sampled data {sw.ElapsedMilliseconds} ms");
+
+            foreach (var block in blocksList)
+            {
+                block.Dispose();
+            }
+
+            foreach (var density in densityList)
+            {
+                density.Dispose();
+            }
             
-            
+            jobHandles.Dispose();
             batchSampleResult.Dispose();
+        }
+
+        [BurstCompile]
+        private struct JudgeBaseBlockJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<float> batchSampleResult;
+            [ReadOnly] public int offsetX;
+            [ReadOnly] public int offsetY;
+            [ReadOnly] public int offsetZ;
+            [WriteOnly] public NativeArray<float> density;
+            [WriteOnly] public NativeArray<BlockType> blocks;
+
+            public void Execute(int index)
+            {
+                var sx = index / 1024;
+                var sz = index % 1024 / 32;
+                var sy = index % 32;
+                
+                var d = batchSampleResult[(offsetX + sx) * 73728 + offsetY + sy + (offsetZ + sz) * 288];
+                blocks[index] = JudgeBaseBlockType(d);
+                density[index] = d;
+            }
         }
 
         public void GenerateChunksBatchAquifer(Vector3Int startChunkPos)
@@ -639,10 +701,15 @@ namespace RS.Scene
         
         private void GenerateAquifer(Chunk chunk)
         {
-            var offsetX = chunk.chunkPos.x * 32;
+            // var offsetX = chunk.chunkPos.x * 32;
             var offsetY = chunk.chunkPos.y * 32;
-            var offsetZ = chunk.chunkPos.z * 32;
+            // var offsetZ = chunk.chunkPos.z * 32;
             // var sw = Stopwatch.StartNew();
+
+            if (offsetY > m_seaLevel)
+            {
+                return;
+            }
             
             // 首先判定是否是最底下的岩浆，不过现在还没实现岩浆，先跳过
             // TODO: 不淹没洞穴的含水层判断
@@ -825,7 +892,7 @@ namespace RS.Scene
             return BlockType.Stone;
         }
         
-        private BlockType JudgeBaseBlockType(float density)
+        private static BlockType JudgeBaseBlockType(float density)
         {
             return density > 0 ? BlockType.Stone : BlockType.Air;
         }

@@ -123,6 +123,9 @@ namespace RS.Scene
                 }
                 
                 // surface
+                
+                
+                
                 m_dataReady = true;
             }
             
