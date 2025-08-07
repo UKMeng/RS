@@ -6,6 +6,8 @@ namespace RS.Utils
     public class RsColor
     {
         public static Color Unknown = Color.deepPink;
+        
+        // Biome
         public static Color Ocean = new Color(0.0f, 0.0f, 0.6f);
         public static Color River = new Color(0.0f, 0.0f, 1.0f);
         public static Color SnowPlain = new Color(1.0f, 1.0f, 1.0f);
@@ -16,6 +18,18 @@ namespace RS.Utils
         public static Color BadLand = Color.orangeRed;
         public static Color StoneShore = Color.grey;
         public static Color Beach = new Color(0.8f, 0.8f, 0.6f);
+        
+        
+        // Block
+        public static Color Stone = Color.grey;
+        public static Color Dirt = Color.brown;
+        public static Color Grass = new Color(0.0f, 0.7f, 0.0f);
+        public static Color Snow = new Color(1.0f, 1.0f, 1.0f);
+        public static Color Leaf = new Color(0.0f, 0.5f, 0.0f);
+        public static Color Orc = Color.rosyBrown;
+        public static Color Sand = new Color(0.8f, 0.8f, 0.6f);
+        public static Color Water = new Color(0.0f, 0.0f, 1.0f);
+        
 
         public static Color GetColorFromString(string s)
         {

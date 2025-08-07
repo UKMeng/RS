@@ -37,6 +37,7 @@ namespace RS.Scene
     public class Chunk
     {
         public BlockType[] blocks;
+        public BlockType[] topBlocks; // y轴上仅最下面的Chunk持有
         public float[] density;
         public ChunkStatus status;
         public MeshData meshData;

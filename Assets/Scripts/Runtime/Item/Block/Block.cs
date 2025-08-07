@@ -1,14 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RS.Utils;
 using Unity.Collections;
 using UnityEngine;
 
 
 namespace RS.Item
 {
+    public enum BlockType
+    {
+        Air,
+        Stone,
+        Dirt,
+        Grass,
+        Snow,
+        Leaf,
+        Orc,
+        Sand,
+        Water,
+    }
+    
     public class Block: Heapable
     {
+        public static readonly Color[] BlockColors =
+        {
+            RsColor.Unknown,
+            RsColor.Stone,
+            RsColor.Dirt,
+            RsColor.Grass,
+            RsColor.Snow,
+            RsColor.Leaf,
+            RsColor.Orc,
+            RsColor.Sand,
+            RsColor.Water,
+            
+        };
+        
         private BlockType m_type;
         
         public BlockType Type => m_type;

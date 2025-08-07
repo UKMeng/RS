@@ -13,7 +13,7 @@ namespace RS.UI
         {
             m_slider.onValueChanged.AddListener((v) =>
             {
-                m_sliderValue.text = $"资源加载中 {v:P}";
+                m_sliderValue.text = $"地图生成中 {v:P}";
             });
         }
     }

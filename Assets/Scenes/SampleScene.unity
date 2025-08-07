@@ -374,7 +374,6 @@ GameObject:
   - component: {fileID: 205094973}
   - component: {fileID: 205094972}
   - component: {fileID: 205094971}
-  - component: {fileID: 205094970}
   m_Layer: 5
   m_Name: MapUI
   m_TagString: Untagged
@@ -382,20 +381,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &205094970
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 205094969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f4644a354134b508d407e5e58686b78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_slider: {fileID: 0}
-  m_sliderValue: {fileID: 0}
 --- !u!114 &205094971
 MonoBehaviour:
   m_ObjectHideFlags: 0

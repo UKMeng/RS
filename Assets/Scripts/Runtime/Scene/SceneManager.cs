@@ -149,6 +149,9 @@ namespace RS.Scene
                     }
                 } 
                 
+                // 地图生成
+                var mapTexture = m_chunkManager.GenerateMap(startPos, m_mapSize);
+                m_mapUI.GetComponentInChildren<RawImage>().texture = mapTexture;
                 
                 
                 m_dataReady = true;

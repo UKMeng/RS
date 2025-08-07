@@ -234,7 +234,8 @@ namespace RS.Scene
                             contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
                         }
                     }
-                    
+
+                    var topBlocks = new BlockType[32 * 32];
                     for (var y = 8; y >= 0; y--)
                     {
                         var chunkPos = startChunkPos + new Vector3Int(x, y, z);
@@ -242,11 +243,16 @@ namespace RS.Scene
                         
                         if (chunk.status == ChunkStatus.Surface)
                         {
-                            GenerateSurface(chunk, contexts);
+                            GenerateSurface(chunk, contexts, topBlocks);
                         }
 
                         // offset += 32768;
                         chunk.status = ChunkStatus.DataReady;
+
+                        if (y == 0)
+                        {
+                            chunk.topBlocks = topBlocks;
+                        }
                     }
                 }
             }
@@ -254,7 +260,85 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"Deal with Surface {sw.ElapsedMilliseconds} ms");
         }
-        
+
+        public Texture2D GenerateMap(Vector3Int startPos, int size)
+        {
+            var sw = Stopwatch.StartNew();
+
+            // 类似于Biome Map的生成方法
+            var colorArray = new NativeArray<Color>(size * size, Allocator.TempJob);
+            var blockColorArray = new NativeArray<Color>(Block.BlockColors, Allocator.TempJob);
+            var chunkSize = size / 32;
+            var chunkStartPos = Chunk.WorldPosToChunkPos(startPos);
+            
+            var topBlocksArray = new NativeArray<BlockType>(size * size, Allocator.TempJob);
+
+            var index = 0;
+            for (var x = 0; x < chunkSize; x++)
+            {
+                for (var z = 0; z < chunkSize; z++)
+                {
+                    var chunkPos = chunkStartPos + new Vector3Int(x, 3, z);
+                    var topBlocks = GetChunk(chunkPos).topBlocks;
+                    NativeArray<BlockType>.Copy(topBlocks, 0, topBlocksArray, index, 1024);
+                    index += 1024;
+                }
+            }
+            
+            var job = new ColorSampleJob()
+            {
+                topBlocks = topBlocksArray,
+                blockColorArray = blockColorArray,
+                size = size,
+                chunkSize = chunkSize,
+                colorArray = colorArray,
+            };
+            
+            var handle = job.Schedule(topBlocksArray.Length, 256);
+            handle.Complete();
+
+            var texture = new Texture2D(size, size);
+            texture.SetPixels(colorArray.ToArray());
+            texture.Apply();
+
+            colorArray.Dispose();
+            blockColorArray.Dispose();
+            
+            sw.Stop();
+            Debug.Log($"Generate Map {sw.ElapsedMilliseconds} ms");
+            return texture;
+        }
+
+        [BurstCompile]
+        private struct ColorSampleJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<BlockType> topBlocks;
+            [ReadOnly] public NativeArray<Color> blockColorArray;
+            [ReadOnly] public int size;
+            [ReadOnly] public int chunkSize;
+            [WriteOnly] public NativeArray<Color> colorArray;
+
+            public void Execute(int index)
+            {
+                // row-major 填充
+                // 以左下角为坐标原点
+                var x = index % size;
+                
+                var z = index / size;
+                
+                var chunkX = x / 32;
+                var chunkZ = z / 32;
+                var chunkIndex = chunkX * chunkSize + chunkZ;
+                
+                var ix = x % 32;
+                var iz = z % 32;
+                
+                var type = topBlocks[chunkIndex * 1024 + ix * 32 + iz];
+                
+                colorArray[index] = blockColorArray[(int)type]; 
+
+            }
+        }
         
         public void GenerateNewChunk(Vector3 playerPos)
         {
@@ -650,13 +734,20 @@ namespace RS.Scene
                         contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
                     }
                 }
+                
+                var topBlocks = new BlockType[32 * 32];
                 for (var chunkY = 11; chunkY >= 3; chunkY--)
                 {
                     var chunk = chunks[chunkY];
                     
                     if (chunk.status == ChunkStatus.Surface)
                     {
-                        GenerateSurface(chunk, contexts);
+                        GenerateSurface(chunk, contexts, topBlocks);
+                    }
+                    
+                    if (chunkY == 3)
+                    {
+                        chunk.topBlocks = topBlocks;
                     }
                 }
 
@@ -777,7 +868,7 @@ namespace RS.Scene
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
-        private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
+        private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts, BlockType[] topBlocks)
         {
             // var offsetX = chunk.chunkPos.x * 32;
             // var offsetZ = chunk.chunkPos.z * 32;
@@ -789,15 +880,28 @@ namespace RS.Scene
             {
                 for (var sz = 0; sz < 32; sz++)
                 {
-                    var context = contexts[sx * 32 + sz];
+                    var isTop = false;
+                    var blockIndex = sx * 32 + sz;
+                    if (topBlocks[blockIndex] == BlockType.Air)
+                    {
+                        isTop = true;
+                    }
+                    var context = contexts[blockIndex];
                     var index = Chunk.GetBlockIndex(sx, 31, sz);
                     for (var sy = 31; sy >= 0; sy--)
                     {
                         if (chunk.blocks[index] == BlockType.Stone)
                         {
-                            chunk.blocks[index] = JudgeSurfaceBlockType(ref context);
+                            var type = JudgeSurfaceBlockType(ref context);
+                            chunk.blocks[index] = type;
                             context.stoneDepthAbove++;
                             context.waterHeight++;
+
+                            if (isTop)
+                            {
+                                topBlocks[blockIndex] = type;
+                                isTop = false;
+                            }
                         }
                         else if (chunk.blocks[index] == BlockType.Air)
                         {
@@ -813,6 +917,12 @@ namespace RS.Scene
                             else
                             {
                                 context.waterHeight++;
+                            }
+                            
+                            if (isTop)
+                            {
+                                topBlocks[blockIndex] = BlockType.Water;
+                                isTop = false;
                             }
                         }
 
