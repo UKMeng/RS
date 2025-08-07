@@ -40,6 +40,7 @@ namespace RS.Scene
         // 场景初始化与进度条相关
         private int m_mapSize;
         private bool m_isLoading = true;
+        private GameObject m_loadingUI;
         private Slider m_loadingSlider;
 
         public void Awake()
@@ -52,8 +53,8 @@ namespace RS.Scene
             m_player = player.GetComponent<Player>();
             GetComponent<GMToolWindow>().player = m_player;
 
-            var Canvas = GameObject.Find("Canvas");
-            m_loadingSlider = Canvas.GetComponentInChildren<Slider>();
+            m_loadingUI = GameObject.Find("LoadingUI");
+            m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
             
             // 初始化Block UV
             Block.Init();
@@ -145,6 +146,9 @@ namespace RS.Scene
             
             // 数据加载完成，更新游戏内时间，spawn玩家
             m_isLoading = false;
+            m_loadingUI.SetActive(false);
+            Destroy(m_loadingUI);
+            
             // 上午8点
             m_time = new GameTime(480); // 480 = 8:00
             m_tickManager.Register(m_time);
