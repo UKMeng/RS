@@ -207,13 +207,52 @@ namespace RS.Scene
                         }
 
                         // offset += 32768;
-                        chunk.status = ChunkStatus.DataReady;
+                        chunk.status = ChunkStatus.Surface;
                     }
                 }
             }
             
             sw.Stop();
             Debug.Log($"Deal with aquifer {sw.ElapsedMilliseconds} ms");
+        }
+        
+        public void GenerateChunksBatchSurface(Vector3Int startChunkPos)
+        {
+            var sw = Stopwatch.StartNew();
+            
+            for (var x = 0; x < 8; x++)
+            {
+                var offsetX = (startChunkPos.x + x) * 32;
+                for (var z = 0; z < 8; z++)
+                {
+                    var offsetZ = (startChunkPos.z + z) * 32;
+                    var contexts = new SurfaceContext[32 * 32];
+                    for (var sx = 0; sx < 32; sx++)
+                    {
+                        for (var sz = 0; sz < 32; sz++)
+                        {
+                            contexts[sx * 32 + sz] = NoiseManager.Instance.SampleSurface(new Vector3(offsetX + sx, 0, offsetZ + sz));
+                        }
+                    }
+                    
+                    for (var y = 8; y >= 0; y--)
+                    {
+                        var chunkPos = startChunkPos + new Vector3Int(x, y, z);
+                        var chunk = m_chunks[chunkPos];
+                        
+                        if (chunk.status == ChunkStatus.Surface)
+                        {
+                            GenerateSurface(chunk, contexts);
+                        }
+
+                        // offset += 32768;
+                        chunk.status = ChunkStatus.DataReady;
+                    }
+                }
+            }
+            
+            sw.Stop();
+            Debug.Log($"Deal with Surface {sw.ElapsedMilliseconds} ms");
         }
         
         
@@ -732,7 +771,7 @@ namespace RS.Scene
                 }
             }
             
-            chunk.status = ChunkStatus.Surface;
+            // chunk.status = ChunkStatus.Surface;
             
             // sw.Stop();
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
