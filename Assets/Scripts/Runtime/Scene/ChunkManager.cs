@@ -80,14 +80,47 @@ namespace RS.Scene
             
             // 批量采样base data
             var batchSampleResult = sampler.SampleBatch(startChunkPos, 256, 288, 256);
-
+            //
+            // var offset = 0;
+            
+            var sw = Stopwatch.StartNew();
+            
             for (var x = 0; x < 8; x++)
             {
                 for (var z = 0; z < 8; z++)
                 {
-                       // TODO
+                    for (var y = 3; y < 12; y++)
+                    {
+                        var chunkPos = startChunkPos + new Vector3Int(x, y, z);
+                        var chunk = new Chunk(chunkPos);
+
+                        var offsetX = x * 32;
+                        var offsetZ = z * 32;
+                        var offsetY = (y - 3) * 32;
+                        var index = 0;
+                        
+                        for (var sx = 0; sx < 32; sx++)
+                        {
+                            for (var sz = 0; sz < 32; sz++)
+                            {
+                                for (var sy = 0; sy < 32; sy++)
+                                {
+                                    var density = batchSampleResult[(offsetX + sx) * 73728 + offsetY + sy + (offsetZ + sz) * 288];
+                                    chunk.blocks[index] = JudgeBaseBlockType(density);
+                                    chunk.density[index++] = density;
+                                }
+                            }
+                        }
+
+                        // offset += 32768;
+                        chunk.status = ChunkStatus.DataReady;
+                        m_chunks[chunkPos] = chunk;
+                    }
                 }
             }
+            
+            sw.Stop();
+            Debug.Log($"Deal with sampled data {sw.ElapsedMilliseconds} ms");
             
             
             batchSampleResult.Dispose();
@@ -206,12 +239,17 @@ namespace RS.Scene
                         if (chunk.status == ChunkStatus.DataReady)
                         {
                             // chunk数据准备完成，还没有生成Mesh和对应GameObject
-                            InitChunkMesh(chunk);
+                            // InitChunkMesh(chunk);
                             // 简易剔除，只生成玩家所在平面往下2格的Chunk
                             // if (chunkY >= playerChunkPos.y - 1)
                             // {
                             //     InitChunkMesh(chunk);
                             // }
+                            
+                            // 创建Chunk的GameObject
+                            InitChunkGameObject(chunk);
+                            // 告知TickManager准备生成Mesh
+                            SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
                         {
@@ -222,6 +260,13 @@ namespace RS.Scene
                     }
                 }
             }
+        }
+
+        private void InitChunkGameObject(Chunk chunk)
+        {
+            var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
+            var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
+            chunk.go = chunkGo;
         }
 
         private void InitChunkMesh(Chunk chunk)

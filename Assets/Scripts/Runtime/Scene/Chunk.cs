@@ -663,6 +663,8 @@ namespace RS.Scene
             
                 var waterMc = waterGo.GetComponent<MeshCollider>();
                 waterMc.sharedMesh = waterMesh;
+
+                chunks[i].status = ChunkStatus.Loaded;
             }
 
 

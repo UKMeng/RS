@@ -87,6 +87,7 @@ namespace RS.Scene
                 var startPos = new Vector3Int(0, 0, 0);
 
                 // base data阶段，其实可以分帧处理不同阶段？
+                var index = 0;
                 for (var x = 0; x < batchChunkSize; x++)
                 {
                     for (var z = 0; z < batchChunkSize; z++)
@@ -94,16 +95,15 @@ namespace RS.Scene
                         var chunkPosXZ = startPos + new Vector3Int(x * 8, 0, z * 8);
                         m_chunkManager.GenerateChunksBatchBaseData(chunkPosXZ);
 
-                        // m_loadingSlider.value = (float) i / batchChunkSize;
+                        m_loadingSlider.value = (float) index++ / batchChunkSize / batchChunkSize;
+                        Debug.Log($"加载进度: {m_loadingSlider.value}" );
                         yield return null;
                     }
                 }
                 
                 // aquifer
                 // surface
-                
                 m_dataReady = true;
-                yield return null;
             }
             
             // 数据加载完成，更新游戏内时间，spawn玩家
@@ -114,9 +114,11 @@ namespace RS.Scene
             
             // 放置Player
             // TODO: 后续位置要虽然随机但是要放在一个平地上
-            var pos = new Vector3(60, 90, 700);
+            var pos = new Vector3(10, 90, 10);
             m_player.Position = pos;
             m_lastPosition = new Vector3(0, 0, 0);
+            
+            m_chunkManager.UpdateChunkStatus(m_player.Position);
             
             Debug.Log($"[SceneManager]场景数据准备完毕");
         }
@@ -141,11 +143,11 @@ namespace RS.Scene
             }
             
             // 生成Chunk的数据不需要每次都执行
-            if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
-            {
-                m_chunkManager.GenerateNewChunk(m_player.Position);
-                m_lastPosition = m_player.Position;
-            }
+            // if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
+            // {
+            //     m_chunkManager.GenerateNewChunk(m_player.Position);
+            //     m_lastPosition = m_player.Position;
+            // }
 
             m_chunkManager.UpdateChunkStatus(m_player.Position);
             UpdateDayLight();
