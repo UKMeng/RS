@@ -5,6 +5,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 using RS.GMTool;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace RS.Scene
@@ -42,10 +43,17 @@ namespace RS.Scene
         private bool m_isLoading = true;
         private GameObject m_loadingUI;
         private Slider m_loadingSlider;
+        
+        // 地图相关
+        private GameObject m_mapUI;
 
         public void Awake()
         {
             s_instance = this;
+            
+            m_mapUI = GameObject.Find("MapUI");
+            m_mapUI.SetActive(false);
+            
             seed = GameSettingTransfer.seed;
             m_mapSize = GameSettingTransfer.mapSize;
             
@@ -55,7 +63,9 @@ namespace RS.Scene
 
             m_loadingUI = GameObject.Find("LoadingUI");
             m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
+
             
+
             // 初始化Block UV
             Block.Init();
             
@@ -265,7 +275,13 @@ namespace RS.Scene
         {
             m_tickManager.UpdateChunkMeshOnTick(chunk);
         }
-        
-        
+
+        public void OnToggleMap(InputValue value)
+        {
+            if (!m_isLoading)
+            {
+                m_mapUI.SetActive(!m_mapUI.activeSelf);
+            }
+        }
     }
 }
