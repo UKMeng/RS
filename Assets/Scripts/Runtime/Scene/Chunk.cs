@@ -38,6 +38,7 @@ namespace RS.Scene
     {
         public BlockType[] blocks;
         public BlockType[] topBlocks; // y轴上仅最下面的Chunk持有
+        public int[] topBlockHeights;
         public float[] density;
         public ChunkStatus status;
         public MeshData meshData;
@@ -598,11 +599,25 @@ namespace RS.Scene
             // 处理生成数据
             for (var i = 0; i < chunkCount; i++)
             {
+                var chunk = chunks[i];
+                
                 var vertices = verticesList[i];
                 var triangles = trianglesList[i];
                 var uvs = uvsList[i];
                 var waterVertices = waterVerticesList[i];
                 var waterTriangles = waterTrianglesList[i];
+
+                // 不生成mesh
+                if (vertices.Length == 0 && waterVertices.Length == 0)
+                {
+                    if (chunk.go != null)
+                    {
+                        chunk.go.SetActive(false);
+                    }
+                    // 其实和Loaded状态不同，但是暂时当作一样，可能会在卸载时出现问题，需要注意
+                    chunk.status = ChunkStatus.Loaded;
+                    continue;
+                }
                 
                 var verticesArray = new Vector3[vertices.Length];
                 var vertexIndex = 0;
@@ -639,32 +654,39 @@ namespace RS.Scene
                     waterTrianglesArray[waterTriangleIndex++] = waterTriangle;
                 }
                 
+                var go = chunks[i].go;
+                go.SetActive(true);
+                var waterGo = go.transform.Find("Water").gameObject;
 
                 var mesh = new Mesh();
                 mesh.vertices = verticesArray;
                 mesh.triangles = trianglesArray;
                 mesh.uv = uvArray;
                 mesh.RecalculateNormals();
-
-                var waterMesh = new Mesh();
-                waterMesh.vertices = waterVerticesArray;
-                waterMesh.triangles = waterTrianglesArray;
-                waterMesh.RecalculateNormals();
-                    
-                var go = chunks[i].go;
-                var waterGo = go.transform.Find("Water").gameObject;
+                
                 var chunkTf = go.GetComponent<MeshFilter>();
                 chunkTf.mesh = mesh;
                     
                 var chunkMc = go.GetComponent<MeshCollider>();
                 chunkMc.sharedMesh = mesh;
-            
-                var waterTf = waterGo.GetComponent<MeshFilter>();
-                waterTf.mesh = waterMesh;
-            
-                var waterMc = waterGo.GetComponent<MeshCollider>();
-                waterMc.sharedMesh = waterMesh;
 
+                if (waterVertices.Length == 0)
+                {
+                    waterGo.SetActive(false);
+                }
+                else
+                {
+                    var waterMesh = new Mesh();
+                    waterMesh.vertices = waterVerticesArray;
+                    waterMesh.triangles = waterTrianglesArray;
+                    waterMesh.RecalculateNormals();
+                    var waterTf = waterGo.GetComponent<MeshFilter>();
+                    waterTf.mesh = waterMesh;
+            
+                    var waterMc = waterGo.GetComponent<MeshCollider>();
+                    waterMc.sharedMesh = waterMesh;
+                }
+                
                 chunks[i].status = ChunkStatus.Loaded;
             }
 

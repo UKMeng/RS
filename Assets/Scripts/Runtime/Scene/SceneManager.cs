@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
@@ -88,74 +89,71 @@ namespace RS.Scene
 
         private IEnumerator InitSceneData()
         {
-            var m_dataReady = false;
+            var sw = Stopwatch.StartNew();
+            
+            // 场景数据生成，返回进度条数值
+            var batchChunkSize = m_mapSize / 32 / 8;
+            // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
+            var startPos = new Vector3Int(0, 0, 0);
 
-            while (!m_dataReady)
+            var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
+            
+
+            // base data阶段，其实可以分帧处理不同阶段？
+            var progress = 0;
+            for (var x = 0; x < batchChunkSize; x++)
             {
-                // TODO: 场景数据生成，返回进度条数值
-                var batchChunkSize = m_mapSize / 32 / 8;
-                // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
-                var startPos = new Vector3Int(0, 0, 0);
-
-                var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
-                
-
-                // base data阶段，其实可以分帧处理不同阶段？
-                var progress = 0;
-                for (var x = 0; x < batchChunkSize; x++)
+                for (var z = 0; z < batchChunkSize; z++)
                 {
-                    for (var z = 0; z < batchChunkSize; z++)
-                    {
-                        var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
-                        m_chunkManager.GenerateChunksBatchBaseData(chunkPos);
+                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    m_chunkManager.GenerateChunksBatchBaseData(chunkPos);
 
-                        // 进度条更新
-                        progress += 64;
-                        m_loadingSlider.value = (float) progress / totalProgress;
-                        Debug.Log($"加载进度: {m_loadingSlider.value}" );
-                        yield return null;
-                    }
+                    // 进度条更新
+                    progress += 64;
+                    m_loadingSlider.value = (float) progress / totalProgress;
+                    Debug.Log($"加载进度: {m_loadingSlider.value}" );
+                    yield return null;
                 }
-                
-                // aquifer
-                for (var x = 0; x < batchChunkSize; x++)
-                {
-                    for (var z = 0; z < batchChunkSize; z++)
-                    {
-                        var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
-                        m_chunkManager.GenerateChunksBatchAquifer(chunkPos);
-
-                        // 进度条更新
-                        progress += 64;
-                        m_loadingSlider.value = (float) progress / totalProgress;
-                        Debug.Log($"加载进度: {m_loadingSlider.value}" );
-                        yield return null;
-                    }
-                }
-                
-                // surface
-                for (var x = 0; x < batchChunkSize; x++)
-                {
-                    for (var z = 0; z < batchChunkSize; z++)
-                    {
-                        var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
-                        m_chunkManager.GenerateChunksBatchSurface(chunkPos);
-
-                        // 进度条更新
-                        progress += 64;
-                        m_loadingSlider.value = (float) progress / totalProgress;
-                        Debug.Log($"加载进度: {m_loadingSlider.value}" );
-                        yield return null;
-                    }
-                } 
-                
-                // 地图生成
-                var mapTexture = m_chunkManager.GenerateMap(startPos, m_mapSize);
-                m_mapUI.GetComponentInChildren<RawImage>().texture = mapTexture;
-                
-                
-                m_dataReady = true;
             }
+            
+            // aquifer
+            for (var x = 0; x < batchChunkSize; x++)
+            {
+                for (var z = 0; z < batchChunkSize; z++)
+                {
+                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    m_chunkManager.GenerateChunksBatchAquifer(chunkPos);
+
+                    // 进度条更新
+                    progress += 64;
+                    m_loadingSlider.value = (float) progress / totalProgress;
+                    Debug.Log($"加载进度: {m_loadingSlider.value}" );
+                    yield return null;
+                }
+            }
+            
+            // surface
+            for (var x = 0; x < batchChunkSize; x++)
+            {
+                for (var z = 0; z < batchChunkSize; z++)
+                {
+                    var chunkPos = startPos + new Vector3Int(x * 8, 3, z * 8);
+                    m_chunkManager.GenerateChunksBatchSurface(chunkPos);
+
+                    // 进度条更新
+                    progress += 64;
+                    m_loadingSlider.value = (float) progress / totalProgress;
+                    Debug.Log($"加载进度: {m_loadingSlider.value}" );
+                    yield return null;
+                }
+            } 
+            
+            // 地图生成
+            var mapTexture = m_chunkManager.GenerateMap(startPos, m_mapSize);
+            m_mapUI.GetComponentInChildren<RawImage>().texture = mapTexture;
+
+            sw.Stop();
+            Debug.Log($"[SceneManager]场景数据生成完毕，耗时: {sw.ElapsedMilliseconds} ms");
             
             // 数据加载完成，更新游戏内时间，spawn玩家
             m_isLoading = false;

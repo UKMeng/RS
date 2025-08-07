@@ -236,6 +236,7 @@ namespace RS.Scene
                     }
 
                     var topBlocks = new BlockType[32 * 32];
+                    var topBlockHeights = new int[32 * 32];
                     for (var y = 8; y >= 0; y--)
                     {
                         var chunkPos = startChunkPos + new Vector3Int(x, y, z);
@@ -243,7 +244,7 @@ namespace RS.Scene
                         
                         if (chunk.status == ChunkStatus.Surface)
                         {
-                            GenerateSurface(chunk, contexts, topBlocks);
+                            GenerateSurface(chunk, contexts, topBlocks, topBlockHeights);
                         }
 
                         // offset += 32768;
@@ -252,6 +253,7 @@ namespace RS.Scene
                         if (y == 0)
                         {
                             chunk.topBlocks = topBlocks;
+                            chunk.topBlockHeights = topBlockHeights;
                         }
                     }
                 }
@@ -736,18 +738,20 @@ namespace RS.Scene
                 }
                 
                 var topBlocks = new BlockType[32 * 32];
+                var topBlockHeights = new int[32 * 32];
                 for (var chunkY = 11; chunkY >= 3; chunkY--)
                 {
                     var chunk = chunks[chunkY];
                     
                     if (chunk.status == ChunkStatus.Surface)
                     {
-                        GenerateSurface(chunk, contexts, topBlocks);
+                        GenerateSurface(chunk, contexts, topBlocks, topBlockHeights);
                     }
                     
                     if (chunkY == 3)
                     {
                         chunk.topBlocks = topBlocks;
+                        chunk.topBlockHeights = topBlockHeights;
                     }
                 }
 
@@ -868,11 +872,11 @@ namespace RS.Scene
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
-        private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts, BlockType[] topBlocks)
+        private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts, BlockType[] topBlocks, int[] topBlockHeights)
         {
             // var offsetX = chunk.chunkPos.x * 32;
             // var offsetZ = chunk.chunkPos.z * 32;
-            // var offsetY = chunk.chunkPos.y * 32;
+            var offsetY = chunk.chunkPos.y * 32;
             
             var sw = Stopwatch.StartNew();
             
@@ -900,6 +904,7 @@ namespace RS.Scene
                             if (isTop)
                             {
                                 topBlocks[blockIndex] = type;
+                                topBlockHeights[blockIndex] = offsetY + sy;
                                 isTop = false;
                             }
                         }
@@ -922,6 +927,7 @@ namespace RS.Scene
                             if (isTop)
                             {
                                 topBlocks[blockIndex] = BlockType.Water;
+                                topBlockHeights[blockIndex] = offsetY + sy;
                                 isTop = false;
                             }
                         }
