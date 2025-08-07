@@ -275,6 +275,7 @@ namespace RS.Scene
             var chunkStartPos = Chunk.WorldPosToChunkPos(startPos);
             
             var topBlocksArray = new NativeArray<BlockType>(size * size, Allocator.TempJob);
+            var topHeightsArray = new NativeArray<int>(size * size, Allocator.TempJob);
 
             var index = 0;
             for (var x = 0; x < chunkSize; x++)
@@ -282,8 +283,11 @@ namespace RS.Scene
                 for (var z = 0; z < chunkSize; z++)
                 {
                     var chunkPos = chunkStartPos + new Vector3Int(x, 3, z);
-                    var topBlocks = GetChunk(chunkPos).topBlocks;
+                    var chunk = GetChunk(chunkPos);
+                    var topBlocks = chunk.topBlocks;
+                    var topHeights = chunk.topBlockHeights;
                     NativeArray<BlockType>.Copy(topBlocks, 0, topBlocksArray, index, 1024);
+                    NativeArray<int>.Copy(topHeights, 0, topHeightsArray, index, 1024);
                     index += 1024;
                 }
             }
@@ -291,6 +295,7 @@ namespace RS.Scene
             var job = new ColorSampleJob()
             {
                 topBlocks = topBlocksArray,
+                topHeightsArray = topHeightsArray,
                 blockColorArray = blockColorArray,
                 size = size,
                 chunkSize = chunkSize,
@@ -306,6 +311,8 @@ namespace RS.Scene
 
             colorArray.Dispose();
             blockColorArray.Dispose();
+            topBlocksArray.Dispose();
+            topHeightsArray.Dispose();
             
             sw.Stop();
             Debug.Log($"Generate Map {sw.ElapsedMilliseconds} ms");
@@ -316,6 +323,7 @@ namespace RS.Scene
         private struct ColorSampleJob : IJobParallelFor
         {
             [ReadOnly] public NativeArray<BlockType> topBlocks;
+            [ReadOnly] public NativeArray<int> topHeightsArray;
             [ReadOnly] public NativeArray<Color> blockColorArray;
             [ReadOnly] public int size;
             [ReadOnly] public int chunkSize;
@@ -337,6 +345,14 @@ namespace RS.Scene
                 var iz = z % 32;
                 
                 var type = topBlocks[chunkIndex * 1024 + ix * 32 + iz];
+
+                if (type == BlockType.Grass)
+                {
+                    var height = topHeightsArray[chunkIndex * 1024 + ix * 32 + iz];
+                    var colorOffset = 1.0f + (height - 127) / 50.0f;
+                    colorArray[index] = blockColorArray[(int)type] * colorOffset;
+                    return;
+                }
                 
                 colorArray[index] = blockColorArray[(int)type]; 
 
