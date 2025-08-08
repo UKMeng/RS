@@ -77,7 +77,7 @@ namespace RS.Scene
 
                     var topK = new List<Chunk>(maxHeap.Values);
                     Chunk.BuildMeshUsingJobSystem(topK);
-
+                    
                     foreach (var chunk in topK)
                     {
                         m_toUpdateChunks.Remove(chunk);

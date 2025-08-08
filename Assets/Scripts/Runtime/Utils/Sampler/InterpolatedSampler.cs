@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
@@ -17,6 +18,13 @@ namespace RS.Utils
         private RsSampler m_sampler;
         private const float m_cellWidth = 4.0f;
         private const float m_cellHeight = 4.0f;
+
+        private float[] m_result;
+
+        public float[] GetSampleResult()
+        {
+            return m_result;
+        }
 
         public override void Dispose()
         {
@@ -60,6 +68,113 @@ namespace RS.Utils
             // 三线性插值
             return RsMath.TriLerp(tx, ty, tz, c000, c100, c010, c110, c001, c101, c011, c111);
         }
+        
+        public IEnumerator SampleAsync(Vector3 startPos, float w, float h, int txz, int ty, NativeArray<float> cache)
+        {
+            var batchSize = 8;
+            var tt1 = txz * txz;
+            var tt2 = txz * ty;
+            for (var index = 0; index < tt1; index += batchSize)
+            {
+                for (var b = 0; b < batchSize && (index + b) < tt1; b++)
+                {
+                    var ix = (index + b) / txz;
+                    var iz = (index + b) % txz;
+
+                    for (int iy = 0; iy < ty; iy++)
+                    {
+                        var fx = startPos.x + ix * w;
+                        var fy = startPos.y + iy * h;
+                        var fz = startPos.z + iz * w;
+                        cache[ix * tt2 + iz * ty + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
+                    }
+                }
+                yield return null;
+            }
+        }
+
+        public IEnumerator SampleLerpAsync(Vector3 startChunkPos, int x, int y, int z, NativeArray<float> cache)
+        {
+            var w = m_cellWidth;
+            var h = m_cellHeight;
+
+            var txz = x / (int)w + 1;
+            var ty = y / (int)h + 1;
+            
+            // 对所有间隔点先采样, 需各维度多一个间隔
+            // var sw = Stopwatch.StartNew();
+
+            // var startPos = new Vector3(startChunkPos.x * 32, startChunkPos.y * 32, startChunkPos.z * 32);
+            
+            // var posList = new List<Vector3>();
+            // for (var ix = 0; ix < txz; ix++)
+            // {
+            //     for (var iz = 0; iz < txz; iz++)
+            //     {
+            //         for (var iy = 0; iy < ty; iy++)
+            //         {
+            //             var fx = startPos.x + ix * w;
+            //             var fy = startPos.y + iy * h;
+            //             var fz = startPos.z + iz * w;
+            //             posList.Add(new Vector3(fx, fy, fz));
+            //         }
+            //     }
+            // }
+            
+            // 全批量采样 JobSystem
+            // var cache = m_sampler.SampleBatch(posList.ToArray());
+            
+            
+            // var tempCache = new float[txz * ty * txz];
+            // yield return StartCoroutine(SampleCoroutine(startPos, w, h, txz, ty, tempCache));
+            
+            // Parallel.For(0, txz * txz, (index) =>
+            // {
+            //     var ix = index / txz;
+            //     var iz = index % txz;
+            //     for (var iy = 0; iy < ty; iy++)
+            //     {
+            //         var fx = startPos.x + ix * w;
+            //         var fy = startPos.y + iy * h;
+            //         var fz = startPos.z + iz * w;
+            //         tempCache[ix * txz * ty + iz * ty + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
+            //     }
+            // });
+
+            
+            
+            // var cache = new NativeArray<float>(tempCache, Allocator.TempJob);
+            
+            // 对中间点进行插值 JobSystem
+            var result = new NativeArray<float>(x * y * z, Allocator.TempJob);
+            var job = new TriLerpJob
+            {
+                cache = cache,
+                w = m_cellWidth,
+                h = m_cellHeight,
+                t = ty,
+                tt = ty * txz,
+                yz = y * z,
+                y = y,
+                z = z,
+                result = result
+            };
+
+            var handle = job.Schedule(x * y * z, 32);
+            
+            yield return new WaitUntil(() => handle.IsCompleted);
+
+            handle.Complete();
+            
+            m_result = result.ToArray();
+            
+            cache.Dispose();
+            result.Dispose();
+            
+            
+            // sw.Stop();
+            // Debug.Log($"Interpolate: {sw.ElapsedMilliseconds}ms");
+        }
 
         public override NativeArray<float> SampleBatch(Vector3 startChunkPos, int x, int y, int z)
         {
@@ -93,17 +208,17 @@ namespace RS.Utils
             var cache = m_sampler.SampleBatch(posList.ToArray());
             
             // 并行单次采样
-            // var cache = new NativeArray<float>(9 * 9 * 9, Allocator.TempJob);
-            // Parallel.For(0, 81, (index) =>
+            // var cache = new NativeArray<float>(txz * ty * txz, Allocator.TempJob);
+            // Parallel.For(0, txz * txz, (index) =>
             // {
-            //     var ix = index / 9;
-            //     var iz = index % 9;
-            //     for (var iy = 0; iy < 9; iy++)
+            //     var ix = index / txz;
+            //     var iz = index % txz;
+            //     for (var iy = 0; iy < ty; iy++)
             //     {
             //         var fx = startPos.x + ix * w;
             //         var fy = startPos.y + iy * h;
             //         var fz = startPos.z + iz * w;
-            //         cache[ix * 81 + iz * 9 + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
+            //         cache[ix * txz * ty + iz * ty + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
             //     }
             // });
             

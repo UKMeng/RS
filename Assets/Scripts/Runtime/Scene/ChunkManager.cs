@@ -11,6 +11,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
@@ -87,6 +88,137 @@ namespace RS.Scene
             return chunk;
         }
 
+        private IEnumerator GenerateChunksBatchBaseDataAsync(Vector3Int startChunkPos, int xSize, int zSize)
+        {
+            var samplerX = Mathf.FloorToInt(startChunkPos.x / 32.0f);
+            var samplerZ = Mathf.FloorToInt(startChunkPos.z / 32.0f);
+            
+            var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
+            
+            // 批量采样base data
+            // var sampleSw = Stopwatch.StartNew();
+
+            // var batchSampleResult = sampler.SampleBatch(startChunkPos, xSize * 32, 288, zSize * 32);
+            
+            // 外部分步执行协程
+            var w = 4;
+            var h = 4;
+            var txz = xSize * 32 / (int)w + 1;
+            var ty = 288 / (int)h + 1;
+            var cache = new NativeArray<float>(txz * ty * txz, Allocator.Persistent);
+            var startPos = new Vector3(startChunkPos.x * 32, startChunkPos.y * 32, startChunkPos.z * 32);
+            yield return StartCoroutine(sampler.SampleAsync(startPos, w, h, txz, ty, cache));
+            yield return StartCoroutine(sampler.SampleLerpAsync(startChunkPos, xSize * 32, 288, zSize * 32, cache));
+            
+            // 对所有间隔点先采样, 需各维度多一个间隔
+            // var sw = Stopwatch.StartNew();
+            
+            
+            
+            var result = sampler.GetSampleResult();
+            var batchSampleResult = new NativeArray<float>(result, Allocator.TempJob);
+            
+            // sampleSw.Stop();
+            // Debug.Log($"batch sample time: {sampleSw.ElapsedMilliseconds}ms");
+            
+            // var sw = Stopwatch.StartNew();
+
+            var blocksList = new List<NativeArray<BlockType>>();
+            var densityList = new List<NativeArray<float>>();
+            var jobHandles = new NativeArray<JobHandle>(xSize * zSize * 9, Allocator.TempJob);
+            
+            var index = 0;
+            for (var x = 0; x < xSize; x++)
+            {
+                for (var z = 0; z < zSize; z++)
+                {
+                    for (var y = 0; y < 9; y++)
+                    {
+                        var offsetX = x * 32;
+                        var offsetZ = z * 32;
+                        var offsetY = y * 32;
+                        
+                        
+                        var blocks = new NativeArray<BlockType>(32768, Allocator.TempJob);
+                        var density = new NativeArray<float>(32768, Allocator.TempJob);
+                        
+                        blocksList.Add(blocks);
+                        densityList.Add(density);
+
+                        var job = new JudgeBaseBlockJob()
+                        {
+                            blocks = blocks,
+                            density = density,
+                            batchSampleResult = batchSampleResult,
+                            offsetX = offsetX,
+                            offsetY = offsetY,
+                            offsetZ = offsetZ,
+                            sizeX = zSize * 32 * 288
+                        };
+                        
+                        jobHandles[index++] = job.Schedule(32768, 64);
+                    }
+                }
+            }
+
+            JobHandle.ScheduleBatchedJobs();
+            
+            var allDone = false;
+            while (!allDone)
+            {
+                allDone = true;
+                foreach (var handle in jobHandles)
+                {
+                    if (!handle.IsCompleted)
+                    {
+                        allDone = false;
+                        break;
+                    }
+                }
+
+                if (!allDone)
+                {
+                    yield return null;
+                }
+            }
+            
+            JobHandle.CompleteAll(jobHandles);
+
+            index = 0;
+            for (var x = 0; x < xSize; x++)
+            {
+                for (var z = 0; z < zSize; z++)
+                {
+                    for (var y = 0; y < 9; y++)
+                    {
+                        var chunkPos = startChunkPos + new Vector3Int(x, y, z);
+                        var chunk = GetOrCreateChunk(chunkPos);
+                        
+                        chunk.blocks = blocksList[index].ToArray();
+                        chunk.density = densityList[index++].ToArray();
+                        
+                        chunk.status = ChunkStatus.Aquifer;
+                    }
+                }
+            }
+
+            // sw.Stop();
+            // Debug.Log($"Deal with sampled data {sw.ElapsedMilliseconds} ms");
+
+            foreach (var block in blocksList)
+            {
+                block.Dispose();
+            }
+
+            foreach (var density in densityList)
+            {
+                density.Dispose();
+            }
+            
+            jobHandles.Dispose();
+            batchSampleResult.Dispose();
+        }
+        
         public void GenerateChunksBatchBaseData(Vector3Int startChunkPos, int xSize, int zSize)
         {
             var samplerX = Mathf.FloorToInt(startChunkPos.x / 32.0f);
@@ -797,16 +929,8 @@ namespace RS.Scene
                 }
                 
                 // 生成Base Data
-                // yield return StartCoroutine(GenerateBaseDataAsync(chunks, sampler));
-                GenerateChunksBatchBaseData(chunks[3].chunkPos, 1, 1);
-                
-                // for (var chunkY = 3; chunkY < 12; chunkY++)
-                // {
-                //     if (chunks[chunkY].status == ChunkStatus.BaseData)
-                //     {
-                //         GenerateBaseData(chunks[chunkY], sampler);
-                //     }
-                // }
+                // yield return StartCoroutine(GenerateBaseDataAsync(chunks));
+                yield return StartCoroutine(GenerateChunksBatchBaseDataAsync(chunks[3].chunkPos, 1, 1));
                 
                 // Aquifer阶段
                 for (var chunkY = 3; chunkY < 12; chunkY++)
@@ -859,7 +983,7 @@ namespace RS.Scene
             m_isGeneratingChunks = false;
         }
 
-        private IEnumerator GenerateBaseDataAsync(Chunk[] chunks, InterpolatedSampler sampler)
+        private IEnumerator GenerateBaseDataAsync(Chunk[] chunks)
         {
             var isRunning = true;
             
@@ -867,13 +991,7 @@ namespace RS.Scene
             {
                 try
                 {
-                    for (var chunkY = 3; chunkY < 12; chunkY++)
-                    {
-                        if (chunks[chunkY].status == ChunkStatus.BaseData)
-                        {
-                            GenerateBaseData(chunks[chunkY], sampler);
-                        }
-                    }
+                    GenerateChunksBatchBaseData(chunks[3].chunkPos, 1, 1);
 
                     isRunning = false;
                 }
@@ -887,43 +1005,6 @@ namespace RS.Scene
             {
                 yield return null;
             }
-        }
-        
-        private void GenerateBaseData(Chunk chunk, InterpolatedSampler sampler)
-        {
-            var offsetX = chunk.chunkPos.x * 32;
-            var offsetZ = chunk.chunkPos.z * 32;
-            var offsetY = chunk.chunkPos.y * 32;
-            
-            var sw = Stopwatch.StartNew();
-            
-            var blocks = new BlockType[32 * 32 * 32];
-            var finalDensity = new float[32 * 32 * 32];
-            var index = 0;
-            
-            var batchSampleResult = sampler.SampleBatch(chunk.chunkPos, 32, 32, 32);
-            
-            for (var sx = 0; sx < 32; sx++)
-            {
-                for (var sz = 0; sz < 32; sz++)
-                {
-                    for (var sy = 0; sy < 32; sy++)
-                    {
-                        var density = batchSampleResult[sx * 1024 + sy + sz * 32];
-                        blocks[index] = JudgeBaseBlockType(density);
-                        finalDensity[index++] = density;
-                    }
-                }
-            }
-            
-            batchSampleResult.Dispose();
-
-            chunk.blocks = blocks;
-            chunk.density = finalDensity;
-            chunk.status = ChunkStatus.Aquifer;
-            
-            sw.Stop();
-            // Debug.Log($"[ChunkManager] 生成Chunk {chunk.chunkPos} BaseData耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         private void GenerateAquifer(Chunk chunk)
