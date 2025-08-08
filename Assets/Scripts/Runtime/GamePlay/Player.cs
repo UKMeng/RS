@@ -3,6 +3,7 @@ using UnityEngine;
 
 using RS.Item;
 using RS.Scene;
+using RS.UI;
 using UnityEngine.InputSystem;
 
 namespace RS.GamePlay
@@ -22,6 +23,8 @@ namespace RS.GamePlay
         private ThirdPersonController m_controller;
 
         private ConsumeStamina m_consumeStaminaEvent;
+
+        private HUD m_HUD;
 
         public class ConsumeStamina : IUpdateByTick
         {
@@ -63,6 +66,7 @@ namespace RS.GamePlay
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();
+            m_HUD = GetComponent<HUD>();
         }
 
         public void Start()
@@ -85,6 +89,8 @@ namespace RS.GamePlay
             {
                 m_controller.Sprint = false;
             }
+
+            m_HUD.SetStamina(m_stamina);
         }
 
         
