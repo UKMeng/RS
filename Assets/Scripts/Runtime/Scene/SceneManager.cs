@@ -109,7 +109,7 @@ namespace RS.Scene
                 for (var z = 0; z < batchChunkSize; z++)
                 {
                     var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
-                    m_chunkManager.GenerateChunksBatchBaseData(chunkPos);
+                    m_chunkManager.GenerateChunksBatchBaseData(chunkPos, 8, 8);
 
                     // 进度条更新
                     progress += 64;
@@ -178,6 +178,8 @@ namespace RS.Scene
             
             m_map.AddMark(0, chestMarkPos);
             
+            m_chunkManager.UpdateChunkStatus(playerPos, true);
+            
             // 上午8点
             m_time = new GameTime(480); // 480 = 8:00
             m_tickManager.Register(m_time);
@@ -185,8 +187,6 @@ namespace RS.Scene
             // 放置Player
             m_player.Position = playerPos;
             m_lastPosition = new Vector3(0, 0, 0);
-            
-            m_chunkManager.UpdateChunkStatus(m_player.Position);
             
             Debug.Log($"[SceneManager]场景数据准备完毕");
         }
@@ -211,11 +211,11 @@ namespace RS.Scene
             }
             
             // 生成Chunk的数据不需要每次都执行
-            // if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
-            // {
-            //     m_chunkManager.GenerateNewChunk(m_player.Position);
-            //     m_lastPosition = m_player.Position;
-            // }
+            if ((m_lastPosition - m_player.Position).sqrMagnitude > 32.0f)
+            {
+                m_chunkManager.GenerateNewChunk(m_player.Position);
+                m_lastPosition = m_player.Position;
+            }
 
             m_chunkManager.UpdateChunkStatus(m_player.Position);
             UpdateDayLight();

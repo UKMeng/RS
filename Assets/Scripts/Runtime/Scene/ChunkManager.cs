@@ -75,7 +75,19 @@ namespace RS.Scene
             return chunk;
         }
 
-        public void GenerateChunksBatchBaseData(Vector3Int startChunkPos)
+        public Chunk GetOrCreateChunk(Vector3Int chunkPos)
+        {
+            if (!m_chunks.TryGetValue(chunkPos, out var chunk))
+            {
+                chunk = new Chunk(chunkPos);
+                chunk.status = ChunkStatus.BaseData;
+                m_chunks.Add(chunkPos, chunk);
+            }
+
+            return chunk;
+        }
+
+        public void GenerateChunksBatchBaseData(Vector3Int startChunkPos, int xSize, int zSize)
         {
             var samplerX = Mathf.FloorToInt(startChunkPos.x / 32.0f);
             var samplerZ = Mathf.FloorToInt(startChunkPos.z / 32.0f);
@@ -83,23 +95,23 @@ namespace RS.Scene
             var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
             
             // 批量采样base data
-            var sampleSw = Stopwatch.StartNew();
+            // var sampleSw = Stopwatch.StartNew();
             
-            var batchSampleResult = sampler.SampleBatch(startChunkPos, 256, 288, 256);
+            var batchSampleResult = sampler.SampleBatch(startChunkPos, xSize * 32, 288, zSize * 32);
             
-            sampleSw.Stop();
-            Debug.Log($"batch sample time: {sampleSw.ElapsedMilliseconds}ms");
+            // sampleSw.Stop();
+            // Debug.Log($"batch sample time: {sampleSw.ElapsedMilliseconds}ms");
             
-            var sw = Stopwatch.StartNew();
+            // var sw = Stopwatch.StartNew();
 
             var blocksList = new List<NativeArray<BlockType>>();
             var densityList = new List<NativeArray<float>>();
-            var jobHandles = new NativeArray<JobHandle>(576, Allocator.Temp);
+            var jobHandles = new NativeArray<JobHandle>(xSize * zSize * 9, Allocator.Temp);
             
             var index = 0;
-            for (var x = 0; x < 8; x++)
+            for (var x = 0; x < xSize; x++)
             {
-                for (var z = 0; z < 8; z++)
+                for (var z = 0; z < zSize; z++)
                 {
                     for (var y = 0; y < 9; y++)
                     {
@@ -122,6 +134,7 @@ namespace RS.Scene
                             offsetX = offsetX,
                             offsetY = offsetY,
                             offsetZ = offsetZ,
+                            sizeX = zSize * 32 * 288
                         };
                         
                         jobHandles[index++] = job.Schedule(32768, 64);
@@ -132,26 +145,25 @@ namespace RS.Scene
             JobHandle.CompleteAll(jobHandles);
 
             index = 0;
-            for (var x = 0; x < 8; x++)
+            for (var x = 0; x < xSize; x++)
             {
-                for (var z = 0; z < 8; z++)
+                for (var z = 0; z < zSize; z++)
                 {
                     for (var y = 0; y < 9; y++)
                     {
                         var chunkPos = startChunkPos + new Vector3Int(x, y, z);
-                        var chunk = new Chunk(chunkPos);
+                        var chunk = GetOrCreateChunk(chunkPos);
                         
                         chunk.blocks = blocksList[index].ToArray();
                         chunk.density = densityList[index++].ToArray();
                         
                         chunk.status = ChunkStatus.Aquifer;
-                        m_chunks[chunkPos] = chunk;
                     }
                 }
             }
 
-            sw.Stop();
-            Debug.Log($"Deal with sampled data {sw.ElapsedMilliseconds} ms");
+            // sw.Stop();
+            // Debug.Log($"Deal with sampled data {sw.ElapsedMilliseconds} ms");
 
             foreach (var block in blocksList)
             {
@@ -174,6 +186,7 @@ namespace RS.Scene
             [ReadOnly] public int offsetX;
             [ReadOnly] public int offsetY;
             [ReadOnly] public int offsetZ;
+            [ReadOnly] public int sizeX;
             [WriteOnly] public NativeArray<float> density;
             [WriteOnly] public NativeArray<BlockType> blocks;
 
@@ -183,7 +196,7 @@ namespace RS.Scene
                 var sz = index % 1024 / 32;
                 var sy = index % 32;
                 
-                var d = batchSampleResult[(offsetX + sx) * 73728 + offsetY + sy + (offsetZ + sz) * 288];
+                var d = batchSampleResult[(offsetX + sx) * sizeX + offsetY + sy + (offsetZ + sz) * 288];
                 blocks[index] = JudgeBaseBlockType(d);
                 density[index] = d;
             }
@@ -466,8 +479,8 @@ namespace RS.Scene
             {
                 for (var offsetZ = -m_loadDistance; offsetZ < m_loadDistance + 1; offsetZ++)
                 {
-                    var chunkX = playerChunkPos.x + offsetX;
-                    var chunkZ = playerChunkPos.z + offsetZ;
+                    var chunkX = playerChunkX + offsetX;
+                    var chunkZ = playerChunkZ + offsetZ;
                     
                     // y=0,1,2目前默认不生成，从位置3开始判断
                     var chunkPos = new Vector3Int(chunkX, 3, chunkZ);
@@ -502,7 +515,7 @@ namespace RS.Scene
             }
         }
 
-        public void UpdateChunkStatus(Vector3 playerPos)
+        public void UpdateChunkStatus(Vector3 playerPos, bool immediate = false)
         {
             var playerChunkPos = Chunk.WorldPosToChunkPos(playerPos);
             
@@ -565,18 +578,20 @@ namespace RS.Scene
                         
                         if (chunk.status == ChunkStatus.DataReady)
                         {
-                            // chunk数据准备完成，还没有生成Mesh和对应GameObject
-                            // InitChunkMesh(chunk);
-                            // 简易剔除，只生成玩家所在平面往下2格的Chunk
-                            // if (chunkY >= playerChunkPos.y - 1)
-                            // {
-                            //     InitChunkMesh(chunk);
-                            // }
-                            
+                            // chunk数据准备完成，还没有生成Mesh, 
                             // 创建Chunk的GameObject
                             InitChunkGameObject(chunk);
-                            // 使用JobSystem批量生成Mesh
-                            toGenerateMesh.Add(chunk);
+
+                            if (immediate)
+                            {
+                                // 使用JobSystem立即批量生成Mesh
+                                toGenerateMesh.Add(chunk);
+                            }
+                            else
+                            {
+                                // 通知tick manager安排更新mesh
+                                SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                            }
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
                         {
@@ -588,7 +603,7 @@ namespace RS.Scene
                 }
             }
 
-            if (toGenerateMesh.Count > 0)
+            if (immediate && toGenerateMesh.Count > 0)
             {
                 Chunk.BuildMeshUsingJobSystem(toGenerateMesh);
             }
@@ -596,45 +611,12 @@ namespace RS.Scene
 
         private void InitChunkGameObject(Chunk chunk)
         {
-            var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
-            var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
-            chunk.go = chunkGo;
-        }
-
-        private void InitChunkMesh(Chunk chunk)
-        {
-            var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
-            var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
-            var waterGo = chunkGo.transform.Find("Water").gameObject;
-            var extraBlocks = CollectNeighborBlocks(chunk.chunkPos);
-            var meshData = Chunk.BuildMesh(chunk.blocks, 32, 32, extraBlocks);
-            
-            // TODO： 如果meshData的顶点数为空，直接跳过生成mesh
-            var mesh = new Mesh();
-            mesh.vertices = meshData.vertices;
-            mesh.triangles = meshData.triangles;
-            mesh.uv = meshData.uvs;
-            mesh.RecalculateNormals();
-
-            var waterMesh = new Mesh();
-            waterMesh.vertices = meshData.waterVertices;
-            waterMesh.triangles = meshData.waterTriangles;
-            waterMesh.RecalculateNormals();
-
-            var chunkTf = chunkGo.GetComponent<MeshFilter>();
-            chunkTf.mesh = mesh;
-
-            var chunkMc = chunkGo.GetComponent<MeshCollider>();
-            chunkMc.sharedMesh = mesh;
-
-            var waterTf = waterGo.GetComponent<MeshFilter>();
-            waterTf.mesh = waterMesh;
-
-            var waterMc = waterGo.GetComponent<MeshCollider>();
-            waterMc.sharedMesh = waterMesh;
-
-            chunk.go = chunkGo;
-            chunk.status = ChunkStatus.Loaded;
+            if (chunk.go == null)
+            {
+                var chunkTsfPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
+                var chunkGo = Instantiate(chunkPrefab, chunkTsfPos, Quaternion.identity);
+                chunk.go = chunkGo;
+            }
         }
 
         public BlockType[] CollectNeighborBlocks(Vector3Int chunkPos)
@@ -795,9 +777,9 @@ namespace RS.Scene
             {
                 var chunkPosXZ = m_chunkGeneratingQueue.Dequeue();
 
-                var samplerX = Mathf.FloorToInt(chunkPosXZ.x / 32.0f);
-                var samplerZ = Mathf.FloorToInt(chunkPosXZ.y / 32.0f);
-                var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
+                // var samplerX = Mathf.FloorToInt(chunkPosXZ.x / 32.0f);
+                // var samplerZ = Mathf.FloorToInt(chunkPosXZ.y / 32.0f);
+                // var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("InterTest", new Vector3Int(samplerX, 0, samplerZ)) as InterpolatedSampler;
                 
                 var chunks = new Chunk[12];
                 // 目前先假定y轴上能有192m 12个chunk，创建Chunk
@@ -816,13 +798,15 @@ namespace RS.Scene
                 
                 // 生成Base Data
                 // yield return StartCoroutine(GenerateBaseDataAsync(chunks, sampler));
-                for (var chunkY = 3; chunkY < 12; chunkY++)
-                {
-                    if (chunks[chunkY].status == ChunkStatus.BaseData)
-                    {
-                        GenerateBaseData(chunks[chunkY], sampler);
-                    }
-                }
+                GenerateChunksBatchBaseData(chunks[3].chunkPos, 1, 1);
+                
+                // for (var chunkY = 3; chunkY < 12; chunkY++)
+                // {
+                //     if (chunks[chunkY].status == ChunkStatus.BaseData)
+                //     {
+                //         GenerateBaseData(chunks[chunkY], sampler);
+                //     }
+                // }
                 
                 // Aquifer阶段
                 for (var chunkY = 3; chunkY < 12; chunkY++)
@@ -917,7 +901,7 @@ namespace RS.Scene
             var finalDensity = new float[32 * 32 * 32];
             var index = 0;
             
-            var batchSampleResult = sampler.SampleBatch(new Vector3(offsetX, offsetY, offsetZ), 32, 32, 32);
+            var batchSampleResult = sampler.SampleBatch(chunk.chunkPos, 32, 32, 32);
             
             for (var sx = 0; sx < 32; sx++)
             {
@@ -951,6 +935,7 @@ namespace RS.Scene
 
             if (offsetY > m_seaLevel)
             {
+                chunk.status = ChunkStatus.Surface;
                 return;
             }
             
@@ -975,7 +960,7 @@ namespace RS.Scene
                 }
             }
             
-            // chunk.status = ChunkStatus.Surface;
+            chunk.status = ChunkStatus.Surface;
             
             // sw.Stop();
             // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
