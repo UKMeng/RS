@@ -96,6 +96,7 @@ namespace RS.Scene
             // 场景数据生成，返回进度条数值
             var batchChunkSize = m_mapSize / 32 / 8;
             // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
+            // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
             var startChunkPos = new Vector3Int(0, 0, 0);
 
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
@@ -148,7 +149,7 @@ namespace RS.Scene
                     Debug.Log($"加载进度: {m_loadingSlider.value}" );
                     yield return null;
                 }
-            } 
+            }
             
             // 地图生成
             var mapTexture = m_chunkManager.GenerateMap(startChunkPos, m_mapSize);
@@ -162,12 +163,8 @@ namespace RS.Scene
             m_loadingUI.SetActive(false);
             Destroy(m_loadingUI);
             
-            // 上午8点
-            m_time = new GameTime(480); // 480 = 8:00
-            m_tickManager.Register(m_time);
             
-            // 放置Player
-            // TODO: 后续位置要虽然随机但是要放在一个平地上
+            // 随机位置
             var playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
             Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
 
@@ -181,6 +178,11 @@ namespace RS.Scene
             
             m_map.AddMark(0, chestMarkPos);
             
+            // 上午8点
+            m_time = new GameTime(480); // 480 = 8:00
+            m_tickManager.Register(m_time);
+            
+            // 放置Player
             m_player.Position = playerPos;
             m_lastPosition = new Vector3(0, 0, 0);
             

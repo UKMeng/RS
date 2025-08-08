@@ -418,7 +418,7 @@ namespace RS.Scene
                 var chunkX = startChunkPos.x + RsRandom.Instance.NextInt(0, chunkSize);
                 var chunkZ = startChunkPos.z + RsRandom.Instance.NextInt(0, chunkSize);
 
-                if (chunkX - playerChunkPos.x + chunkZ - playerChunkPos.z < minChunkDistance)
+                if (Mathf.Abs(chunkX - playerChunkPos.x) + Mathf.Abs(chunkZ - playerChunkPos.z) < minChunkDistance)
                 {
                     continue;
                 }

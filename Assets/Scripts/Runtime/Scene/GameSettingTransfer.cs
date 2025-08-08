@@ -8,6 +8,6 @@
         // 全水点，看看怎么处理
         // 15648695461;
         // 游戏难度，决定地图大小
-        public static int mapSize = 256;
+        public static int mapSize = 512;
     }
 }
