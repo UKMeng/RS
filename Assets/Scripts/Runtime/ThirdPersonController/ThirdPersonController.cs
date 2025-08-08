@@ -316,7 +316,7 @@ namespace RS
                 var floatAmplitude = 0.1f;
                 var floatSpeed = 2f;
                 var floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
-                var desiredY = 62.49f + floatOffset;
+                var desiredY = 62.4f + floatOffset;
                 var currentY = transform.position.y;
                 var targetY = Mathf.Lerp(currentY, desiredY, Time.deltaTime * 2f); 
                 var deltaY = targetY - currentY;
