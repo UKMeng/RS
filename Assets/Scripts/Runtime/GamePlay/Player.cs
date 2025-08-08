@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 using RS.Item;
 using RS.Scene;
@@ -10,6 +11,8 @@ namespace RS.GamePlay
     {
         private int m_health; // 血条 0~100
         private int m_stamina; // 耐力值 0~100
+        private int m_staminaRegainSpeed = 10;
+        
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
         private RsItem[] m_items; // 道具栏 暂定为10个栏位
@@ -17,6 +20,37 @@ namespace RS.GamePlay
         // private BlockType m_onBlockType;
         private bool m_isInWater = false;
         private ThirdPersonController m_controller;
+
+        private ConsumeStamina m_consumeStaminaEvent;
+
+        public class ConsumeStamina : IUpdateByTick
+        {
+            private Player m_player;
+            
+            public ConsumeStamina(Player player)
+            {
+                m_player = player;
+            }
+            
+            public void OnTick()
+            {
+                var stamina = m_player.Stamina;
+                if (m_player.Sprint && m_player.Floating)
+                {
+                    stamina -= 10;
+                }
+                else if (m_player.Floating || m_player.Sprint)
+                {
+                    stamina -= 5;
+                }
+                else
+                {
+                    stamina += m_player.StaminaRegainSpeed;
+                }
+                
+                m_player.Stamina = Mathf.Clamp(stamina, 0, 100);
+            }
+        }
         
         public void Awake()
         {
@@ -31,6 +65,12 @@ namespace RS.GamePlay
             m_controller = GetComponent<ThirdPersonController>();
         }
 
+        public void Start()
+        {
+            m_consumeStaminaEvent = new ConsumeStamina(this);
+            SceneManager.Instance.RegisterTickEvent(m_consumeStaminaEvent);
+        }
+
         public void Update()
         {
             var pos = m_transform.position;
@@ -39,6 +79,11 @@ namespace RS.GamePlay
             if (onBlockType == BlockType.Water)
             {
                 m_isInWater = true;
+            }
+
+            if (m_stamina < 5)
+            {
+                m_controller.Sprint = false;
             }
         }
 
@@ -68,6 +113,12 @@ namespace RS.GamePlay
         public int Stamina
         {
             get { return m_stamina; }
+            set { m_stamina = value; }
+        }
+
+        public int StaminaRegainSpeed
+        {
+            get { return m_staminaRegainSpeed; }
         }
 
         public bool InWater
@@ -82,7 +133,7 @@ namespace RS.GamePlay
 
         public bool Sprint
         {
-            get { return m_controller.Srpint; }
+            get { return m_controller.Sprint; }
         }
 
         public BlockType HandItem

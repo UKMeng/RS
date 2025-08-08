@@ -127,9 +127,10 @@ namespace RS
             }
         }
 
-        public bool Srpint
+        public bool Sprint
         {
             get => _input.sprint;
+            set => _input.sprint = value;
         }
 
 
