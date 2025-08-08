@@ -16,14 +16,12 @@ namespace RS.GamePlay
         private GameObject m_outline;
         private Player m_player;
         private SceneManager m_sceneManager;
-        private PlayerInput m_playerInput;
         
 
         private void Awake()
         {
             var sceneRoot = GameObject.Find("SceneRoot");
             m_sceneManager = sceneRoot.GetComponent<SceneManager>();
-            m_playerInput = GetComponent<PlayerInput>();
             m_player = GetComponent<Player>();
             m_outline = Instantiate(outlinePrefab, Vector3.down, Quaternion.identity);
             m_outline.SetActive(false);
@@ -59,7 +57,7 @@ namespace RS.GamePlay
             }
         }
         
-        public void OnAttack(InputValue value)
+        public void OnAttack(InputAction.CallbackContext context)
         {
             if (Cursor.lockState == CursorLockMode.None)
             {
@@ -157,7 +155,7 @@ namespace RS.GamePlay
             }
         }
 
-        public void OnPut(InputValue value)
+        public void OnPut(InputAction.CallbackContext context)
         {
             // 从屏幕中心发出射线
             var screenCenter = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);

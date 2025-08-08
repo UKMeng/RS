@@ -140,13 +140,14 @@ namespace RS.GMTool
                 GUILayout.Label("玩家信息:", m_labelStyle);
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("血量:" + player.Health, m_labelStyle);
-                GUILayout.Label("饥饿:" + player.Hungry, m_labelStyle);
+                GUILayout.Label("耐力:" + player.Stamina, m_labelStyle);
                 GUILayout.Label("手持道具" + player.HandItem, m_labelStyle);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 // GUILayout.Label("脚底上方块" + player.OnBlockType, m_labelStyle);
                 GUILayout.Label("在水中:" + player.InWater, m_labelStyle);
                 GUILayout.Label("漂浮:" + player.Floating, m_labelStyle);
+                GUILayout.Label("冲刺:" + player.Sprint, m_labelStyle);
                 GUILayout.EndHorizontal();
                 
                 GUILayout.Label("Biome:" + m_debugData.biomeType, m_labelStyle);

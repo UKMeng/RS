@@ -9,24 +9,26 @@ namespace RS.GamePlay
     public class Player : MonoBehaviour
     {
         private int m_health; // 血条 0~100
-        private int m_hungry; // 饥饿值 0~100
+        private int m_stamina; // 耐力值 0~100
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
         private RsItem[] m_items; // 道具栏 暂定为10个栏位
         private PlayerInput m_playerInput;
         // private BlockType m_onBlockType;
         private bool m_isInWater = false;
+        private ThirdPersonController m_controller;
         
         public void Awake()
         {
             m_health = 100;
-            m_hungry = 100;
+            m_stamina = 100;
             m_items = new RsItem[10];
             m_items[0] = new Block(BlockType.Orc);
             m_items[1] = new Block(BlockType.Leaf);
             m_handItem = m_items[0];
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
+            m_controller = GetComponent<ThirdPersonController>();
         }
 
         public void Update()
@@ -40,14 +42,17 @@ namespace RS.GamePlay
             }
         }
 
-        public void OnItem1(InputValue value)
+        
+        public void OnItem(InputAction.CallbackContext context)
         {
-            m_handItem = m_items[0];
-        }
-
-        public void OnItem2(InputValue value)
-        {
-            m_handItem = m_items[1];
+            if (context.performed)
+            {
+                var index = int.Parse(context.control.name);
+                if (index < m_items.Length + 1)
+                {
+                    m_handItem = m_items[index - 1];
+                }
+            }
         }
 
         // public BlockType OnBlockType
@@ -60,9 +65,9 @@ namespace RS.GamePlay
             get { return m_health; }
         }
 
-        public int Hungry
+        public int Stamina
         {
-            get { return m_hungry; }
+            get { return m_stamina; }
         }
 
         public bool InWater
@@ -73,6 +78,11 @@ namespace RS.GamePlay
         public bool Floating
         {
             get { return m_isInWater && m_transform.position.y < 62.49; }
+        }
+
+        public bool Sprint
+        {
+            get { return m_controller.Srpint; }
         }
 
         public BlockType HandItem

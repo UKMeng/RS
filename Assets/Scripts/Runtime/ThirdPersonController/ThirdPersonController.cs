@@ -127,6 +127,11 @@ namespace RS
             }
         }
 
+        public bool Srpint
+        {
+            get => _input.sprint;
+        }
+
 
         private void Awake()
         {

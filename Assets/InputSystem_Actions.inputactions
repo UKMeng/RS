@@ -78,18 +78,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Item1",
+                    "name": "Item",
                     "type": "Button",
                     "id": "8586469b-13d4-4599-932f-7ec7348e4ae8",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Item2",
-                    "type": "Button",
-                    "id": "632d14e8-cd96-4967-bbcb-4f55817de8ab",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -456,18 +447,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Item1",
+                    "action": "Item",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "236d28bf-273b-4bd1-a7b5-37c8107eb747",
+                    "id": "7c911f27-ffc3-4cfd-a99d-61821fbe7c62",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Item2",
+                    "action": "Item",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
