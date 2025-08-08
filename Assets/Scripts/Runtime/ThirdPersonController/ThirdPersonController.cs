@@ -195,6 +195,11 @@ namespace RS
 
         private void CameraRotation()
         {
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                return;
+            }
+            
             // if there is an input and camera position is not fixed
             if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
             {

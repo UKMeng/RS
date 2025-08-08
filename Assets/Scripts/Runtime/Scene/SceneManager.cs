@@ -302,6 +302,15 @@ namespace RS.Scene
             }
         }
 
+        public void OnMenu(InputValue value)
+        {
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+        }
+
         public Vector3 GetPlayerPos()
         {
             return m_player.Position;
