@@ -39,8 +39,8 @@
             
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "Assets/Scripts/Runtime/Shader/Include/Global.hlsl"
-            #include "Assets/Scripts/Runtime/Shader/Include/Math.hlsl"
+            #include "Assets/Scripts/Runtime/Rendering/Shader/Include/Global.hlsl"
+            #include "Assets/Scripts/Runtime/Rendering/Shader/Include/Math.hlsl"
             
             struct Attributes
             {
