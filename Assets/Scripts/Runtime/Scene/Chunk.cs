@@ -569,7 +569,7 @@ namespace RS.Scene
             var waterVerticesList = new NativeList<Vector3>[chunkCount];
             var waterTrianglesList = new NativeList<int>[chunkCount];
 
-            var jobSw = Stopwatch.StartNew();
+            // var jobSw = Stopwatch.StartNew();
             
             for (var i = 0; i < chunkCount; i++)
             {
@@ -600,8 +600,8 @@ namespace RS.Scene
             // 等待全部完成
             JobHandle.CompleteAll(jobHandles);
             
-            jobSw.Stop();
-            Debug.Log($"JobFinish Updated in {jobSw.ElapsedMilliseconds} ms");
+            // jobSw.Stop();
+            // Debug.Log($"JobFinish Updated in {jobSw.ElapsedMilliseconds} ms");
             
             // 处理生成数据
             // var dataSw = Stopwatch.StartNew();

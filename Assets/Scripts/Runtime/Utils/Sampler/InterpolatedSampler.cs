@@ -71,7 +71,7 @@ namespace RS.Utils
         
         public IEnumerator SampleAsync(Vector3 startPos, float w, float h, int txz, int ty, NativeArray<float> cache)
         {
-            var batchSize = 8;
+            var batchSize = 9;
             var tt1 = txz * txz;
             var tt2 = txz * ty;
             for (var index = 0; index < tt1; index += batchSize)
@@ -100,50 +100,6 @@ namespace RS.Utils
 
             var txz = x / (int)w + 1;
             var ty = y / (int)h + 1;
-            
-            // 对所有间隔点先采样, 需各维度多一个间隔
-            // var sw = Stopwatch.StartNew();
-
-            // var startPos = new Vector3(startChunkPos.x * 32, startChunkPos.y * 32, startChunkPos.z * 32);
-            
-            // var posList = new List<Vector3>();
-            // for (var ix = 0; ix < txz; ix++)
-            // {
-            //     for (var iz = 0; iz < txz; iz++)
-            //     {
-            //         for (var iy = 0; iy < ty; iy++)
-            //         {
-            //             var fx = startPos.x + ix * w;
-            //             var fy = startPos.y + iy * h;
-            //             var fz = startPos.z + iz * w;
-            //             posList.Add(new Vector3(fx, fy, fz));
-            //         }
-            //     }
-            // }
-            
-            // 全批量采样 JobSystem
-            // var cache = m_sampler.SampleBatch(posList.ToArray());
-            
-            
-            // var tempCache = new float[txz * ty * txz];
-            // yield return StartCoroutine(SampleCoroutine(startPos, w, h, txz, ty, tempCache));
-            
-            // Parallel.For(0, txz * txz, (index) =>
-            // {
-            //     var ix = index / txz;
-            //     var iz = index % txz;
-            //     for (var iy = 0; iy < ty; iy++)
-            //     {
-            //         var fx = startPos.x + ix * w;
-            //         var fy = startPos.y + iy * h;
-            //         var fz = startPos.z + iz * w;
-            //         tempCache[ix * txz * ty + iz * ty + iy] = m_sampler.Sample(new Vector3(fx, fy, fz));
-            //     }
-            // });
-
-            
-            
-            // var cache = new NativeArray<float>(tempCache, Allocator.TempJob);
             
             // 对中间点进行插值 JobSystem
             var result = new NativeArray<float>(x * y * z, Allocator.TempJob);

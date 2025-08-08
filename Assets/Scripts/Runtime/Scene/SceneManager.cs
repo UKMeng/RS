@@ -94,6 +94,7 @@ namespace RS.Scene
             var sw = Stopwatch.StartNew();
             
             // 场景数据生成，返回进度条数值
+            // var batchChunkSize = m_mapSize / 32 / 8;
             var batchChunkSize = m_mapSize / 32 / 8;
             // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
             // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了

@@ -42,46 +42,50 @@ namespace RS.Scene
                 // 延迟在本tick更新的chunk mesh
                 if (m_toUpdateChunks.Count > 0)
                 {
-                    if (m_toUpdateChunks.Count < 11)
-                    {
-                        Chunk.BuildMeshUsingJobSystem(m_toUpdateChunks);
-                        m_toUpdateChunks.Clear();
-                        continue;
-                    }
+                    Chunk.BuildMeshUsingJobSystem(m_toUpdateChunks);
+                    m_toUpdateChunks.Clear();
                     
-                    // 分帧生成，每次只处理距离最近的10个Chunk mesh
-                    // top k
-                    var pos = SceneManager.Instance.GetPlayerPos();
-                    var k = 10;
-                    var maxHeap = new SortedList<float, Chunk>(new DescComparer());
-
-                    foreach (var chunk in m_toUpdateChunks)
-                    {
-                        var chunkPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
-                        var dist = Vector3.Distance(pos, chunkPos);
-                        if (maxHeap.ContainsKey(dist))
-                        {
-                            dist += 0.001f;
-                        }
-
-                        if (maxHeap.Count < k)
-                        {
-                            maxHeap.Add(dist, chunk);
-                        }
-                        else if (dist < maxHeap.Keys[0])
-                        {
-                            maxHeap.RemoveAt(0);
-                            maxHeap.Add(dist, chunk);
-                        }
-                    }
-
-                    var topK = new List<Chunk>(maxHeap.Values);
-                    Chunk.BuildMeshUsingJobSystem(topK);
                     
-                    foreach (var chunk in topK)
-                    {
-                        m_toUpdateChunks.Remove(chunk);
-                    }
+                    // if (m_toUpdateChunks.Count < 51)
+                    // {
+                    //     Chunk.BuildMeshUsingJobSystem(m_toUpdateChunks);
+                    //     m_toUpdateChunks.Clear();
+                    //     continue;
+                    // }
+                    //
+                    // // 分帧生成，每次只处理距离最近的10个Chunk mesh
+                    // // top k
+                    // var pos = SceneManager.Instance.GetPlayerPos();
+                    // var k = 50;
+                    // var maxHeap = new SortedList<float, Chunk>(new DescComparer());
+                    //
+                    // foreach (var chunk in m_toUpdateChunks)
+                    // {
+                    //     var chunkPos = Chunk.ChunkPosToWorldPos(chunk.chunkPos);
+                    //     var dist = Vector3.Distance(pos, chunkPos);
+                    //     if (maxHeap.ContainsKey(dist))
+                    //     {
+                    //         dist += 0.001f;
+                    //     }
+                    //
+                    //     if (maxHeap.Count < k)
+                    //     {
+                    //         maxHeap.Add(dist, chunk);
+                    //     }
+                    //     else if (dist < maxHeap.Keys[0])
+                    //     {
+                    //         maxHeap.RemoveAt(0);
+                    //         maxHeap.Add(dist, chunk);
+                    //     }
+                    // }
+                    //
+                    // var topK = new List<Chunk>(maxHeap.Values);
+                    // Chunk.BuildMeshUsingJobSystem(topK);
+                    //
+                    // foreach (var chunk in topK)
+                    // {
+                    //     m_toUpdateChunks.Remove(chunk);
+                    // }
                 }
             }
         }
