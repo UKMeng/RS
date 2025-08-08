@@ -44,6 +44,11 @@ namespace RS.Scene
 
         public static void Init(Int64 seed)
         {
+            if (s_instance != null)
+            {
+                s_instance.Dispose();
+            }
+            
             s_instance = new NoiseManager(seed);
             // 需要在单例对象生成后
             s_instance.InitNoiseManager();

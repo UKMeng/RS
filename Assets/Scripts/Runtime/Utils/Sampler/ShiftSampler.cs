@@ -206,6 +206,10 @@ namespace RS.Utils
                                               pos.y * m_yScale + offsetY[i],
                                               pos.z * m_xzScale + offsetZ[i]);
             }
+
+            offsetX.Dispose();
+            offsetY.Dispose();
+            offsetZ.Dispose();
             
             return base.SampleBatch(shiftPosList);
         }
