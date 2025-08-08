@@ -1,4 +1,5 @@
-﻿ using UnityEngine;
+﻿ using RS.GamePlay;
+ using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -108,6 +109,7 @@ namespace RS
         private CharacterController _controller;
         private AssetsInputs _input;
         private GameObject _mainCamera;
+        private Player m_player;
 
         private const float _threshold = 0.01f;
 
@@ -137,6 +139,8 @@ namespace RS
 
         private void Start()
         {
+            m_player = GetComponent<Player>();
+            
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             
             _hasAnimator = TryGetComponent(out _animator);
@@ -157,8 +161,12 @@ namespace RS
 
         private void Update()
         {
+            if (m_player.Floating)
+            {
+                _input.jump = false;
+            }
+            
             _hasAnimator = TryGetComponent(out _animator);
-
             JumpAndGravity();
             GroundedCheck();
             Move();
@@ -225,6 +233,12 @@ namespace RS
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            
+            // 漂浮是移动变慢
+            if (m_player.Floating)
+            {
+                targetSpeed *= 0.3f;
+            }
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -291,6 +305,29 @@ namespace RS
 
         private void JumpAndGravity()
         {
+            if (m_player.Floating && !Grounded)
+            {
+                var floatAmplitude = 0.1f;
+                var floatSpeed = 2f;
+                var floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
+                var desiredY = 62.49f + floatOffset;
+                var currentY = transform.position.y;
+                var targetY = Mathf.Lerp(currentY, desiredY, Time.deltaTime * 2f); 
+                var deltaY = targetY - currentY;
+
+                var maxVerticalSpeed = 1.5f;
+                _verticalVelocity = Mathf.Clamp(deltaY / Time.deltaTime, -maxVerticalSpeed, maxVerticalSpeed);
+                
+                if (_hasAnimator)
+                {
+                    _animator.SetBool(_animIDJump, true);
+                    _animator.SetBool(_animIDFreeFall, false);
+                }
+
+                return;
+            }
+            
+            
             if (Grounded)
             {
                 // reset the fall timeout timer
