@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using RS.Item;
+using RS.Scene;
 using UnityEngine.InputSystem;
 
 namespace RS.GamePlay
@@ -13,6 +14,8 @@ namespace RS.GamePlay
         private RsItem m_handItem; // 目前手持道具
         private RsItem[] m_items; // 道具栏 暂定为10个栏位
         private PlayerInput m_playerInput;
+        // private BlockType m_onBlockType;
+        private bool m_isInWater = false;
         
         public void Awake()
         {
@@ -26,6 +29,17 @@ namespace RS.GamePlay
             m_playerInput = GetComponent<PlayerInput>();
         }
 
+        public void Update()
+        {
+            var pos = m_transform.position;
+            // var blockPos = Chunk.WorldPosToBlockWorldPos(pos);
+            var onBlockType = SceneManager.Instance.GetBlockType(Chunk.WorldPosToBlockWorldPos(pos) + Vector3Int.up);
+            if (onBlockType == BlockType.Water)
+            {
+                m_isInWater = true;
+            }
+        }
+
         public void OnItem1(InputValue value)
         {
             m_handItem = m_items[0];
@@ -36,6 +50,11 @@ namespace RS.GamePlay
             m_handItem = m_items[1];
         }
 
+        // public BlockType OnBlockType
+        // {
+        //     get { return m_onBlockType; }
+        // }
+
         public int Health
         {
             get { return m_health; }
@@ -44,6 +63,16 @@ namespace RS.GamePlay
         public int Hungry
         {
             get { return m_hungry; }
+        }
+
+        public bool InWater
+        {
+            get { return m_isInWater; }
+        }
+
+        public bool Floating
+        {
+            get { return m_isInWater && m_transform.position.y < 62.49; }
         }
 
         public BlockType HandItem

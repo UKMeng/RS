@@ -40,6 +40,13 @@ namespace RS.GamePlay
                 var pos = hitInfo.point;
                 var normal = hitInfo.normal;
                 var blockPos = RsMath.GetBlockMinCorner(pos, normal);
+                var block = m_sceneManager.GetBlockType(Chunk.WorldPosToBlockWorldPos(blockPos));
+                
+                // 水无法选中
+                if (block == BlockType.Water || block == BlockType.Air)
+                {
+                    return;
+                }
 
                 // 命中的block套上黑框
                 // TODO: 收到实际aabb大小影响
@@ -54,6 +61,12 @@ namespace RS.GamePlay
         
         public void OnAttack(InputValue value)
         {
+            if (Cursor.lockState == CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = true;
+            }
+            
             // 从屏幕中心发出射线
             var screenCenter = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
             var ray = Camera.main.ScreenPointToRay(screenCenter);
@@ -72,6 +85,13 @@ namespace RS.GamePlay
                 var normal = hitInfo.normal;
                 var blockPos = RsMath.GetBlockMinCorner(pos, normal);
                 var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
+                var blockType = m_sceneManager.GetBlockType(Chunk.WorldPosToBlockWorldPos(blockPos));
+
+                if (blockType == BlockType.Water || blockType == BlockType.Air)
+                {
+                    return;
+                }
+                
                 var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
                 Debug.Log($"Hit Position: {pos}");
 

@@ -546,8 +546,8 @@ namespace RS.Scene
             var waterTf = waterGo.GetComponent<MeshFilter>();
             waterTf.mesh = waterMesh;
             
-            var waterMc = waterGo.GetComponent<MeshCollider>();
-            waterMc.sharedMesh = waterMesh;
+            // var waterMc = waterGo.GetComponent<MeshCollider>();
+            // waterMc.sharedMesh = waterMesh;
 
             sw.Stop();
             Debug.Log($"Chunk Mesh Updated in {sw.ElapsedMilliseconds} ms");
@@ -657,8 +657,8 @@ namespace RS.Scene
                     var waterTf = waterGo.GetComponent<MeshFilter>();
                     waterTf.mesh = waterMesh;
             
-                    var waterMc = waterGo.GetComponent<MeshCollider>();
-                    waterMc.sharedMesh = waterMesh;
+                    // var waterMc = waterGo.GetComponent<MeshCollider>();
+                    // waterMc.sharedMesh = waterMesh;
                 }
                 chunk.status = ChunkStatus.Loaded;
             }

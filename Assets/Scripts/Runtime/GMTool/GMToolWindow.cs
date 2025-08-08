@@ -1,7 +1,8 @@
 ﻿using RS.Scene;
 using RS.Scene.Biome;
 using RS.GamePlay;
-
+using RS.Item;
+using RS.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -32,6 +33,8 @@ namespace RS.GMTool
         private DebugData m_debugData;
 
         private bool m_cmdSwitch = false;
+
+        private string m_rayCastText;
         
 
         private void Awake()
@@ -82,12 +85,33 @@ namespace RS.GMTool
                 }
             }
         }
+
+        private void RayCastTest()
+        {
+            var screenCenter = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
+            var ray = Camera.main.ScreenPointToRay(screenCenter);
+            var rayDistance = 10.0f;
+
+            if (Physics.Raycast(ray, out var hitInfo, rayDistance))
+            {
+                var pos = hitInfo.point;
+                var normal = hitInfo.normal;
+                var blockPos = RsMath.GetBlockMinCorner(pos, normal);
+                var blockType = m_sceneManager.GetBlockType(Chunk.WorldPosToBlockWorldPos(blockPos));
+                m_rayCastText = $"{blockType}";
+            }
+            else
+            {
+                m_rayCastText = "null";
+            }
+        }
         
         public void Update()
         {
             if (m_showWindow)
             {
                 UpdateDebugData();
+                RayCastTest();
             }
         }
 
@@ -119,8 +143,15 @@ namespace RS.GMTool
                 GUILayout.Label("饥饿:" + player.Hungry, m_labelStyle);
                 GUILayout.Label("手持道具" + player.HandItem, m_labelStyle);
                 GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                // GUILayout.Label("脚底上方块" + player.OnBlockType, m_labelStyle);
+                GUILayout.Label("在水中:" + player.InWater, m_labelStyle);
+                GUILayout.Label("漂浮:" + player.Floating, m_labelStyle);
+                GUILayout.EndHorizontal();
                 
                 GUILayout.Label("Biome:" + m_debugData.biomeType, m_labelStyle);
+                
+                GUILayout.Label("RayCast Block:" + m_rayCastText, m_labelStyle);
             }
             
             GUILayout.Space(10);
