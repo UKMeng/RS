@@ -300,5 +300,10 @@ namespace RS.Scene
                 m_map.Toggle();
             }
         }
+
+        public Vector3 GetPlayerPos()
+        {
+            return m_player.Position;
+        }
     }
 }

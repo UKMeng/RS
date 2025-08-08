@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
@@ -567,6 +569,8 @@ namespace RS.Scene
             var waterVerticesList = new NativeList<Vector3>[chunkCount];
             var waterTrianglesList = new NativeList<int>[chunkCount];
 
+            var jobSw = Stopwatch.StartNew();
+            
             for (var i = 0; i < chunkCount; i++)
             {
                 verticesList[i] = new NativeList<Vector3>(Allocator.TempJob);
@@ -596,7 +600,12 @@ namespace RS.Scene
             // 等待全部完成
             JobHandle.CompleteAll(jobHandles);
             
+            jobSw.Stop();
+            Debug.Log($"JobFinish Updated in {jobSw.ElapsedMilliseconds} ms");
+            
             // 处理生成数据
+            // var dataSw = Stopwatch.StartNew();
+            
             for (var i = 0; i < chunkCount; i++)
             {
                 var chunk = chunks[i];
@@ -606,7 +615,7 @@ namespace RS.Scene
                 var uvs = uvsList[i];
                 var waterVertices = waterVerticesList[i];
                 var waterTriangles = waterTrianglesList[i];
-
+            
                 // 不生成mesh
                 if (vertices.Length == 0 && waterVertices.Length == 0)
                 {
@@ -619,49 +628,14 @@ namespace RS.Scene
                     continue;
                 }
                 
-                var verticesArray = new Vector3[vertices.Length];
-                var vertexIndex = 0;
-                foreach (var vertex in vertices)
-                {
-                    verticesArray[vertexIndex++] = vertex;
-                }
-            
-                var trianglesArray = new int[triangles.Length];
-                var triangleIndex = 0;
-                foreach (var triangle in triangles)
-                {
-                    trianglesArray[triangleIndex++] = triangle;
-                }
-            
-                var uvArray = new Vector2[uvs.Length];
-                var uvIndex = 0;
-                foreach (var uv in uvs)
-                {
-                    uvArray[uvIndex++] = uv;
-                }
-                
-                var waterVerticesArray = new Vector3[waterVertices.Length];
-                var waterVertexIndex = 0;
-                foreach (var waterVertex in waterVertices)
-                {
-                    waterVerticesArray[waterVertexIndex++] = waterVertex;
-                }
-            
-                var waterTrianglesArray = new int[waterTriangles.Length];
-                var waterTriangleIndex = 0;
-                foreach (var waterTriangle in waterTriangles)
-                {
-                    waterTrianglesArray[waterTriangleIndex++] = waterTriangle;
-                }
-                
                 var go = chunks[i].go;
                 go.SetActive(true);
                 var waterGo = go.transform.Find("Water").gameObject;
-
+                
                 var mesh = new Mesh();
-                mesh.vertices = verticesArray;
-                mesh.triangles = trianglesArray;
-                mesh.uv = uvArray;
+                mesh.SetVertices(vertices.AsArray());
+                mesh.SetTriangles(triangles.AsArray().ToArray(), 0);
+                mesh.SetUVs(0, uvs.AsArray());
                 mesh.RecalculateNormals();
                 
                 var chunkTf = go.GetComponent<MeshFilter>();
@@ -669,7 +643,7 @@ namespace RS.Scene
                     
                 var chunkMc = go.GetComponent<MeshCollider>();
                 chunkMc.sharedMesh = mesh;
-
+            
                 if (waterVertices.Length == 0)
                 {
                     waterGo.SetActive(false);
@@ -677,8 +651,8 @@ namespace RS.Scene
                 else
                 {
                     var waterMesh = new Mesh();
-                    waterMesh.vertices = waterVerticesArray;
-                    waterMesh.triangles = waterTrianglesArray;
+                    waterMesh.SetVertices(waterVertices.AsArray());
+                    waterMesh.SetTriangles(waterTriangles.AsArray().ToArray(), 0);
                     waterMesh.RecalculateNormals();
                     var waterTf = waterGo.GetComponent<MeshFilter>();
                     waterTf.mesh = waterMesh;
@@ -686,10 +660,11 @@ namespace RS.Scene
                     var waterMc = waterGo.GetComponent<MeshCollider>();
                     waterMc.sharedMesh = waterMesh;
                 }
-                
-                chunks[i].status = ChunkStatus.Loaded;
+                chunk.status = ChunkStatus.Loaded;
             }
 
+            // dataSw.Stop();
+            // Debug.Log($"DataFinish Updated in {dataSw.ElapsedMilliseconds} ms");
 
             // Dispose所有数据
             for (var i = 0; i < chunkCount; i++)
