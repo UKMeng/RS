@@ -304,7 +304,7 @@ MonoBehaviour:
   chestPrefab: {fileID: 6200720779111275133, guid: 1083f87f08232f541942f4a22a00127e, type: 3}
   returnRockPrefab: {fileID: 2804321427668277467, guid: 1d536a8e3cda42047aae07883a0349f0, type: 3}
   dayLight: {fileID: 410087040}
-  daySkybox: {fileID: 2100000, guid: 56113b3b655ab7349bab4d7d405c258a, type: 2}
+  daySkybox: {fileID: 2100000, guid: 5c80d49013691df48ac94280337e88ce, type: 2}
   nightSkybox: {fileID: 2100000, guid: 135a7036ca1a07b4e9e162d80e6b6e77, type: 2}
   morningSkybox: {fileID: 2100000, guid: 8fc56946a1b593c4d8e3e0e94483338e, type: 2}
   sunsetSkybox: {fileID: 2100000, guid: 20f6d22d93779de4ea6f62f8ab305593, type: 2}

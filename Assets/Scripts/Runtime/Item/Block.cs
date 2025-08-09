@@ -118,6 +118,7 @@ namespace RS.Item
             SceneManager.Instance.PlaceBlock(blockWorldPos, m_type);
 
             m_count--;
+            player.UseItem();
 
             if (m_count == 0)
             {

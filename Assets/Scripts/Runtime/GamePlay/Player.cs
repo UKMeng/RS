@@ -149,6 +149,11 @@ namespace RS.GamePlay
             OnHandItemIndexChanged?.Invoke();
         }
 
+        public void UseItem()
+        {
+            OnItemsChanged?.Invoke();
+        }
+
         public void DisposeItem(RsItem item)
         {
             m_items[m_handItemIndex] = null;
@@ -175,6 +180,8 @@ namespace RS.GamePlay
                 }
             }
             m_items[lastIndex - 1] = null;
+            
+            OnItemsChanged?.Invoke();
         }
 
         public void TryAddBlock(BlockType blockType)
@@ -195,7 +202,7 @@ namespace RS.GamePlay
                         {
                             block.Add();
                         }
-
+                        OnItemsChanged?.Invoke();
                         return;
                     }
                 }

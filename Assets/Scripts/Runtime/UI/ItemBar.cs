@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 using RS.GamePlay;
 using RS.Item;
+using TMPro;
 
 namespace RS.UI
 {
@@ -13,6 +14,7 @@ namespace RS.UI
         [SerializeField] private List<Sprite> m_blockSprites;
         [SerializeField] private List<Image> m_slots;
         [SerializeField] private List<Image> m_items;
+        [SerializeField] private List<TextMeshProUGUI> m_itemCounts;
         [SerializeField] private Player m_player;
 
         public void OnEnable()
@@ -35,11 +37,13 @@ namespace RS.UI
                 var item = items[i];
                 if (item == null)
                 {
+                    m_itemCounts[i].text = "";
                     SetImageAlpha(m_items[i], 0);
                 }
                 else
                 {
                     Sprite sprite = null;
+                    var count = 0;
                     if (item is Block block)
                     {
                         foreach (var s in m_blockSprites)
@@ -47,6 +51,7 @@ namespace RS.UI
                             if (s.name == block.Type.ToString())
                             {
                                 sprite = s;
+                                count = block.Count;
                                 break;
                             }
                         }
@@ -59,9 +64,38 @@ namespace RS.UI
                     if (sprite != null)
                     {
                         m_items[i].sprite = sprite;
-                        SetImageAlpha(m_items[i], 175);
+                        if (count > 0)
+                        {
+                            m_itemCounts[i].text = count.ToString();
+                        }
+
+                        if (i == m_player.HandItemIndex)
+                        {
+                            SetImageAlpha(m_items[i], 255);
+                        }
+                        else
+                        {
+                            SetImageAlpha(m_items[i], 175);
+                        }
                     }
-                    
+                }
+            }
+        }
+
+        public void UpdateItemCount()
+        {
+            var items = m_player.Items;
+            for (var i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                if (item != null)
+                {
+                    var count = 0;
+                    if (item is Block block)
+                    {
+                        count = block.Count;
+                        m_itemCounts[i].text = count.ToString();
+                    }
                 }
             }
         }
@@ -71,7 +105,30 @@ namespace RS.UI
             var handIndex = m_player.HandItemIndex;
             for (var i = 0; i < m_slots.Count; i++)
             {
-                SetImageAlpha(m_slots[i], i == handIndex ? 255 : 175);
+                if (i == handIndex)
+                {
+                    if (m_player.Items[i] == null)
+                    {
+                        SetImageAlpha(m_items[i], 0);
+                    }
+                    else
+                    {
+                        SetImageAlpha(m_items[i], 255);
+                    }
+                    SetImageAlpha(m_slots[i], 255);
+                }
+                else
+                {
+                    if (m_player.Items[i] == null)
+                    {
+                        SetImageAlpha(m_items[i], 0);
+                    }
+                    else
+                    {
+                        SetImageAlpha(m_items[i], 175);
+                    }
+                    SetImageAlpha(m_slots[i], 175);
+                }
             }
         }
 
