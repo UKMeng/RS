@@ -134,7 +134,7 @@ namespace RS.GamePlay
 
         public bool Floating
         {
-            get { return m_isInWater && m_transform.position.y < 62.5; }
+            get { return m_isInWater && m_transform.position.y < 62.49; }
         }
 
         public bool Sprint
