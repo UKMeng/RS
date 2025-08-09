@@ -8,7 +8,14 @@ namespace RS.Item
     {
         private List<Liquid> m_liquids;
         private Liquid m_source;
+        private int m_tickTimes = 7;
 
+        public int TickTimes
+        {
+            get => m_tickTimes;
+            set => m_tickTimes = value;
+        }
+        
         public Flow(Liquid source)
         {
             m_liquids = new List<Liquid>();

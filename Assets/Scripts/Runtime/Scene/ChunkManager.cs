@@ -1138,7 +1138,7 @@ namespace RS.Scene
             }
         }
         
-        private void NotifyNeighborUpdateMesh(Vector3Int chunkPos)
+        public void NotifyNeighborUpdateMesh(Vector3Int chunkPos)
         {
             foreach (var dir in m_directions)
             {

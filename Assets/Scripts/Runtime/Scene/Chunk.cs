@@ -526,29 +526,44 @@ namespace RS.Scene
             var meshData = BuildMesh(blocks, 32, 32, extraBlocks);
             
             var waterGo = go.transform.Find("Water").gameObject;
-            var mesh = new Mesh();
-            mesh.vertices = meshData.vertices;
-            mesh.triangles = meshData.triangles;
-            mesh.uv = meshData.uvs;
-            mesh.RecalculateNormals();
 
-            var waterMesh = new Mesh();
-            waterMesh.vertices = meshData.waterVertices;
-            waterMesh.triangles = meshData.waterTriangles;
-            waterMesh.RecalculateNormals();
+            if (meshData.vertices.Length > 0)
+            {
+                go.SetActive(true);
+                var mesh = new Mesh();
+                mesh.vertices = meshData.vertices;
+                mesh.triangles = meshData.triangles;
+                mesh.uv = meshData.uvs;
+                mesh.RecalculateNormals();
+                
+                var chunkTf = go.GetComponent<MeshFilter>();
+                chunkTf.mesh = mesh;
                     
-            var chunkTf = go.GetComponent<MeshFilter>();
-            chunkTf.mesh = mesh;
-                    
-            var chunkMc = go.GetComponent<MeshCollider>();
-            chunkMc.sharedMesh = mesh;
+                var chunkMc = go.GetComponent<MeshCollider>();
+                chunkMc.sharedMesh = mesh;
+            }
             
-            var waterTf = waterGo.GetComponent<MeshFilter>();
-            waterTf.mesh = waterMesh;
-            
-            // var waterMc = waterGo.GetComponent<MeshCollider>();
-            // waterMc.sharedMesh = waterMesh;
 
+            if (meshData.waterVertices.Length > 0)
+            {
+                if (waterGo.activeSelf == false)
+                {
+                    ChunkManager.Instance.NotifyNeighborUpdateMesh(chunkPos);
+                }
+                
+                waterGo.SetActive(true);
+                var waterMesh = new Mesh();
+                waterMesh.vertices = meshData.waterVertices;
+                waterMesh.triangles = meshData.waterTriangles;
+                waterMesh.RecalculateNormals();
+                var waterTf = waterGo.GetComponent<MeshFilter>();
+                waterTf.mesh = waterMesh;
+                
+                // var waterMc = waterGo.GetComponent<MeshCollider>();
+                // waterMc.sharedMesh = waterMesh;
+
+            }
+            
             sw.Stop();
             Debug.Log($"Chunk Mesh Updated in {sw.ElapsedMilliseconds} ms");
         }

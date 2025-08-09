@@ -30,6 +30,8 @@ namespace RS.GamePlay
         {
             private Player m_player;
             
+            public int TickTimes { get; set; } = -1;
+            
             public ConsumeStamina(Player player)
             {
                 m_player = player;
@@ -83,6 +85,10 @@ namespace RS.GamePlay
             if (onBlockType == BlockType.Water)
             {
                 m_isInWater = true;
+            }
+            else
+            {
+                m_isInWater = false;
             }
 
             if (m_stamina < 5)

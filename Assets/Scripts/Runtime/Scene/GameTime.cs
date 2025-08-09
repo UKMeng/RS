@@ -12,6 +12,8 @@ namespace RS.Scene
         private uint m_hourTick;
         private uint m_minuteTick;
 
+        public int TickTimes { get; set; } = -1;
+
         public GameTime(uint time)
         {
             m_time = time;

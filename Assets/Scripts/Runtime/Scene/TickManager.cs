@@ -8,6 +8,7 @@ namespace RS.Scene
 {
     public interface IUpdateByTick
     {
+        int TickTimes { get; set; }
         void OnTick();
     }
     
@@ -16,11 +17,13 @@ namespace RS.Scene
         // 0.5s更新一次
         public float tickInterval = 0.5f;
         private List<IUpdateByTick> m_subscribers;
+        private List<IUpdateByTick> m_toRemove;
         private List<Chunk> m_toUpdateChunks;
 
         public void Awake()
         {
             m_subscribers = new List<IUpdateByTick>();
+            m_toRemove = new List<IUpdateByTick>();
             m_toUpdateChunks = new List<Chunk>();
         }
 
@@ -36,7 +39,27 @@ namespace RS.Scene
                 yield return new WaitForSeconds(tickInterval);
                 foreach (var sub in m_subscribers)
                 {
+                    if (sub.TickTimes == 0)
+                    {
+                        m_toRemove.Add(sub);
+                        continue;
+                    }
+
+                    if (sub.TickTimes != -1)
+                    {
+                        sub.TickTimes--;
+                    }
+                    
                     sub.OnTick();
+                }
+
+                if (m_toRemove.Count > 0)
+                {
+                    foreach (var sub in m_toRemove)
+                    {
+                        m_subscribers.Remove(sub);
+                    }
+                    m_toRemove.Clear();
                 }
 
                 // 延迟在本tick更新的chunk mesh

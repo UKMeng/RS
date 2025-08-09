@@ -89,12 +89,15 @@ namespace RS.GamePlay
                 var normal = hitInfo.normal;
                 var blockPos = RsMath.GetBlockMinCorner(pos, normal);
                 var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                var blockType = m_sceneManager.GetBlockType(Chunk.WorldPosToBlockWorldPos(blockPos));
+                
+                var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
+                var blockType = m_sceneManager.GetBlockType(blockWorldPos);
 
                 if (blockType == BlockType.Water || blockType == BlockType.Air)
                 {
                     return;
                 }
+
                 
                 var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
                 Debug.Log($"Hit Position: {pos}");
@@ -106,6 +109,50 @@ namespace RS.GamePlay
                 var chunk = m_sceneManager.GetChunk(chunkPos);
                 chunk.ModifyBlock(blockLocalPos, BlockType.Air);
                 chunk.UpdateMesh();
+                
+                // 如何y小于127，检查邻居是否有水
+                if (blockLocalPos.y < 127)
+                {
+                    var upType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.up);
+                    if (upType == BlockType.Water)
+                    {
+                        var water = new Water(blockWorldPos + Vector3Int.up);
+                        var sub = new Flow(water);
+                        m_sceneManager.RegisterTickEvent(sub);
+                    }
+                    
+                    var leftType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.left);
+                    if (leftType == BlockType.Water)
+                    {
+                        var water = new Water(blockWorldPos + Vector3Int.left);
+                        var sub = new Flow(water);
+                        m_sceneManager.RegisterTickEvent(sub);
+                    }
+                    
+                    var rightType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.right);
+                    if (rightType == BlockType.Water)
+                    {
+                        var water = new Water(blockWorldPos + Vector3Int.right);
+                        var sub = new Flow(water);
+                        m_sceneManager.RegisterTickEvent(sub);
+                    }
+                    
+                    var forwardType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.forward);
+                    if (forwardType == BlockType.Water)
+                    {
+                        var water = new Water(blockWorldPos + Vector3Int.forward);
+                        var sub = new Flow(water);
+                        m_sceneManager.RegisterTickEvent(sub);
+                    }
+                    
+                    var backType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.back);
+                    if (backType == BlockType.Water)
+                    {
+                        var water = new Water(blockWorldPos + Vector3Int.back);
+                        var sub = new Flow(water);
+                        m_sceneManager.RegisterTickEvent(sub);
+                    }
+                }
                 
                 // 检查是否是边界是否需要更新邻居Chunk的mesh
                 if (blockLocalPos.y == 0)
