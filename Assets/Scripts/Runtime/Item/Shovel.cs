@@ -28,6 +28,8 @@ namespace RS.Item
             {
                 return;
             }
+
+            player.PlayMining();
             
             var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
             Debug.Log($"Hit Position: {pos}");

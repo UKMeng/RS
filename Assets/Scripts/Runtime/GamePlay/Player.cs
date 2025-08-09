@@ -10,6 +10,7 @@ namespace RS.GamePlay
 {
     public class Player : MonoBehaviour
     {
+        private Animator m_animator;
         private int m_health; // 血条 0~100
         private int m_stamina; // 耐力值 0~100
         private int m_staminaRegainSpeed = 10;
@@ -26,6 +27,9 @@ namespace RS.GamePlay
         private ConsumeStamina m_consumeStaminaEvent;
 
         private HUD m_HUD;
+        
+        // animation ID
+        private int m_animIDMining;
 
         public event Action OnItemsChanged;
         public event Action OnHandItemIndexChanged;
@@ -73,6 +77,11 @@ namespace RS.GamePlay
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();
             m_HUD = GetComponent<HUD>();
+            m_animator = GetComponent<Animator>();
+            if (m_animator)
+            {
+                m_animIDMining = Animator.StringToHash("Mining");
+            }
             
             OnItemsChanged?.Invoke();
             OnHandItemIndexChanged?.Invoke();
@@ -211,6 +220,11 @@ namespace RS.GamePlay
             m_items[index] = new Block(blockType, 3);
 
             OnItemsChanged?.Invoke();
+        }
+
+        public void PlayMining()
+        {
+            m_animator.SetTrigger(m_animIDMining);
         }
 
         // public BlockType OnBlockType
