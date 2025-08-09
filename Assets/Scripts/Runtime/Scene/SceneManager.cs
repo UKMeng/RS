@@ -25,8 +25,8 @@ namespace RS.Scene
         
         public GameObject chunkPrefab;
         public GameObject chestPrefab;
-
-        public GameObject dayLight;
+        
+        public Light dayLight;
         public Material daySkybox;
         public Material nightSkybox;
         public Material morningSkybox;
@@ -186,7 +186,7 @@ namespace RS.Scene
             m_chunkManager.UpdateChunkStatus(playerPos, true);
             
             // 上午8点
-            m_time = new GameTime(480); // 480 = 8:00
+            m_time = new GameTime(360); // 480 = 8:00 360 = 6:00
             m_tickManager.Register(m_time);
             
             // 放置Player
@@ -234,19 +234,18 @@ namespace RS.Scene
         private void UpdateDayLight()
         {
             var dayProgress = m_time.GetDayProgress();
-            float sunAngle;
+            var hour = m_time.GetHour();
             
+            // 计算太阳角度
+            float sunAngle;
             if (dayProgress < 0.25f)
             {
                 sunAngle = (dayProgress + 0.5f) * 360.0f - 90.0f;
             }
             else if (dayProgress == 0.25f)
             {
-                // 06:00 太阳升起
+                // 06:00 早晨
                 sunAngle = 0.0f;
-                var light = dayLight.GetComponent<Light>();
-                light.colorTemperature = 20000;
-                light.intensity = 2.0f;
             }
             else if (dayProgress < 0.75f)
             {
@@ -256,18 +255,56 @@ namespace RS.Scene
             {
                 // 18:00 换成月光
                 sunAngle = 0.0f;
-                var light = dayLight.GetComponent<Light>();
-                light.colorTemperature = 20000;
-                light.intensity = 0.2f;
-                RenderSettings.skybox = nightSkybox;
-                DynamicGI.UpdateEnvironment();
             }
             else
             {
                 sunAngle = (dayProgress - 0.5f) * 360.0f - 90.0f;
             }
+
+            // 以x正轴（y = -90）为东
+            dayLight.transform.rotation = Quaternion.Euler(sunAngle, -90.0f, 0.0f);
             
-            dayLight.transform.rotation = Quaternion.Euler(sunAngle, -30.0f, 0.0f);
+            // 更换skybox
+            if (hour == 6)
+            {
+                if (RenderSettings.skybox != morningSkybox)
+                {
+                    dayLight.colorTemperature = 10000;
+                    dayLight.intensity = 1.0f;
+                    RenderSettings.skybox = morningSkybox;
+                    DynamicGI.UpdateEnvironment();
+                }
+            }
+            else if (hour == 7)
+            {
+                if (RenderSettings.skybox != daySkybox)
+                {
+                    dayLight.colorTemperature = 5000;
+                    dayLight.intensity = 2.0f;
+                    RenderSettings.skybox = daySkybox;
+                    DynamicGI.UpdateEnvironment();
+                }
+            }
+            else if (hour == 14)
+            {
+                if (RenderSettings.skybox != sunsetSkybox)
+                {
+                    dayLight.colorTemperature = 10000;
+                    dayLight.intensity = 1.0f;
+                    RenderSettings.skybox = sunsetSkybox;
+                    DynamicGI.UpdateEnvironment();
+                }
+            }
+            else if (hour == 18)
+            {
+                if (RenderSettings.skybox != nightSkybox)
+                {
+                    dayLight.colorTemperature = 20000;
+                    dayLight.intensity = 0.2f;
+                    RenderSettings.skybox = nightSkybox;
+                    DynamicGI.UpdateEnvironment();
+                }
+            }
         }
 
         public void RegisterTickEvent(IUpdateByTick sub)
