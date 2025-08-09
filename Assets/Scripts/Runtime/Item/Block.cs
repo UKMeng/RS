@@ -28,6 +28,8 @@ namespace RS.Item
         private int m_capacity = 3;
         private int m_count = 0;
 
+        public override int Id => -1;
+        
         public override int Capacity
         {
             get => m_capacity;

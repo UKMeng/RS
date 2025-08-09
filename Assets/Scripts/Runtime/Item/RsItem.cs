@@ -5,6 +5,7 @@ namespace RS.Item
 {
     public class RsItem
     {
+        public virtual int Id => -1;
         public virtual int Capacity => 1;
         public virtual int Count => 0;
         public virtual string Name => "Unknown";

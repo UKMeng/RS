@@ -7,6 +7,7 @@ namespace RS.Item
 {
     public class Shovel : RsItem
     {
+        public override int Id => 0;
         public override int Capacity => 1;
         public override int Count => 1;
         public override string Name => "铲子";
@@ -39,7 +40,7 @@ namespace RS.Item
             chunk.ModifyBlock(blockLocalPos, BlockType.Air);
             chunk.UpdateMesh();
 
-            if (blockType == BlockType.Dirt || blockType == BlockType.Grass)
+            if (blockType == BlockType.Dirt || blockType == BlockType.Grass || blockType ==  BlockType.Snow)
             {
                 player.TryAddBlock(BlockType.Dirt);
             }

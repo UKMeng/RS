@@ -143,8 +143,8 @@ namespace RS.GMTool
                 GUILayout.Label("耐力:" + player.Stamina, m_labelStyle);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("手持道具:" + player.HandItem.Name, m_labelStyle);
-                GUILayout.Label("道具数量:" + player.HandItem.Count + "/" + player.HandItem.Capacity, m_labelStyle);
+                GUILayout.Label("手持道具:" + player.HandItem?.Name, m_labelStyle);
+                GUILayout.Label("道具数量:" + player.HandItem?.Count + "/" + player.HandItem?.Capacity, m_labelStyle);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 // GUILayout.Label("脚底上方块" + player.OnBlockType, m_labelStyle);

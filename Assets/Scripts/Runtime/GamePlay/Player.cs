@@ -27,6 +27,9 @@ namespace RS.GamePlay
 
         private HUD m_HUD;
 
+        public event Action OnItemsChanged;
+        public event Action OnHandItemIndexChanged;
+        
         public class ConsumeStamina : IUpdateByTick
         {
             private Player m_player;
@@ -62,14 +65,17 @@ namespace RS.GamePlay
         {
             m_health = 100;
             m_stamina = 100;
-            m_items = new RsItem[10];
+            m_items = new RsItem[8];
+            m_handItemIndex = 0;
             m_items[0] = new Shovel();
             m_handItem = m_items[0];
-            m_handItemIndex = 0;
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();
             m_HUD = GetComponent<HUD>();
+            
+            OnItemsChanged?.Invoke();
+            OnHandItemIndexChanged?.Invoke();
         }
 
         public void Start()
@@ -108,10 +114,39 @@ namespace RS.GamePlay
                 var index = int.Parse(context.control.name);
                 if (index < m_items.Length + 1)
                 {
-                    m_handItem = m_items[index - 1];
-                    m_handItemIndex = index - 1;
+                   SetHandItem(index - 1);
                 }
             }
+        }
+
+        public void OnItemScroll(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                var scroll = context.ReadValue<Vector2>();
+                var value = scroll.y;
+
+                if (value == 0)
+                {
+                    return;
+                }
+                
+                if (value > 0)
+                {
+                    SetHandItem((m_handItemIndex + 1) % 8);
+                }
+                else
+                {
+                    SetHandItem((m_handItemIndex - 1 + 8) % 8);
+                }
+            }
+        }
+
+        public void SetHandItem(int index)
+        {
+            m_handItem = m_items[index];
+            m_handItemIndex = index;
+            OnHandItemIndexChanged?.Invoke();
         }
 
         public void DisposeItem(RsItem item)
@@ -167,6 +202,8 @@ namespace RS.GamePlay
             }
 
             m_items[index] = new Block(blockType, 3);
+
+            OnItemsChanged?.Invoke();
         }
 
         // public BlockType OnBlockType
@@ -183,6 +220,11 @@ namespace RS.GamePlay
         {
             get { return m_stamina; }
             set { m_stamina = value; }
+        }
+
+        public RsItem[] Items
+        {
+            get { return m_items; }
         }
 
         public int StaminaRegainSpeed
@@ -210,6 +252,14 @@ namespace RS.GamePlay
             get
             {
                 return m_handItem;
+            }
+        }
+
+        public int HandItemIndex
+        {
+            get
+            {
+                return m_handItemIndex;
             }
         }
 

@@ -46,8 +46,10 @@ namespace RS
 			actions["Sprint"].canceled  += OnSprint;
 			
 			actions["Item"].performed += m_player.OnItem;
+			actions["ItemScroll"].performed += m_player.OnItemScroll;
 			// actions["Put"].performed += m_raycast.OnPut;
 			actions["Attack"].performed += m_raycast.OnAttack;
+			
 			
 			
 		}
@@ -69,6 +71,7 @@ namespace RS
             actions["Sprint"].canceled  -= OnSprint;
             
             actions["Item"].performed -= m_player.OnItem;
+            actions["ItemScroll"].performed -= m_player.OnItemScroll;
             actions["Attack"].performed -= m_raycast.OnAttack;
             // actions["Put"].performed -= m_raycast.OnPut;
 		}
