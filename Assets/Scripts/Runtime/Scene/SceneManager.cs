@@ -26,6 +26,7 @@ namespace RS.Scene
         
         public GameObject chunkPrefab;
         public GameObject chestPrefab;
+        public GameObject returnRockPrefab;
         
         public Light dayLight;
         public Material daySkybox;
@@ -179,10 +180,18 @@ namespace RS.Scene
             // 先放置宝箱在面前
             Instantiate(chestPrefab, chestPos, Quaternion.identity);
 
+            var returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
+            Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
+            Instantiate(returnRockPrefab, returnPos, Quaternion.identity);
+            
             var chestMarkPos = new Vector2((chestPos.x - startChunkPos.x * 32) / m_mapSize,
                 (chestPos.z - startChunkPos.z * 32) / m_mapSize);
             
+            var returnMarkPos = new Vector2((returnPos.x - startChunkPos.x * 32) / m_mapSize,
+                (returnPos.z - startChunkPos.z * 32) / m_mapSize);
+            
             m_map.AddMark(0, chestMarkPos);
+            m_map.AddMark(2, returnMarkPos);
             
             m_chunkManager.UpdateChunkStatus(playerPos, true);
             
