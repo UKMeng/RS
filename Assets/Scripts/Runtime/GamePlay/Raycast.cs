@@ -77,6 +77,12 @@ namespace RS.GamePlay
                     chest.Open();
                     Debug.Log("Hit a Chest");
                 }
+                else if (hitInfo.collider.gameObject.name == "ReturnRock")
+                {
+                    var rock = hitInfo.collider.transform.parent.gameObject.GetComponent<ReturnRock>();
+                    rock.Trigger();
+                    Debug.Log("Hit a Return Rock");
+                }
                 
                 
                 var pos = hitInfo.point;

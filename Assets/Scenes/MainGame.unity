@@ -308,6 +308,7 @@ MonoBehaviour:
   nightSkybox: {fileID: 2100000, guid: 135a7036ca1a07b4e9e162d80e6b6e77, type: 2}
   morningSkybox: {fileID: 2100000, guid: 8fc56946a1b593c4d8e3e0e94483338e, type: 2}
   sunsetSkybox: {fileID: 2100000, guid: 20f6d22d93779de4ea6f62f8ab305593, type: 2}
+  PlayerInput: {fileID: 1321737847}
   seed: 20250715
 --- !u!4 &50099546
 Transform:

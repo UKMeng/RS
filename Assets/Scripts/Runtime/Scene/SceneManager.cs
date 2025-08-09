@@ -33,6 +33,7 @@ namespace RS.Scene
         public Material nightSkybox;
         public Material morningSkybox;
         public Material sunsetSkybox;
+        public PlayerInput PlayerInput;
         
         public long seed = 1284752702419125144;
 
@@ -93,6 +94,11 @@ namespace RS.Scene
             m_isLoading = true;
             // 初始化场景，协程传递参数给进度条
             StartCoroutine(InitSceneData());
+        }
+
+        public void ReturnHome()
+        {
+            Debug.Log("返回主城");
         }
 
         private IEnumerator InitSceneData()
