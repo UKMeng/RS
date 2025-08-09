@@ -27,6 +27,10 @@ namespace RS.Scene
         public GameObject chestPrefab;
 
         public GameObject dayLight;
+        public Material daySkybox;
+        public Material nightSkybox;
+        public Material morningSkybox;
+        public Material sunsetSkybox;
         
         public long seed = 1284752702419125144;
 
@@ -255,6 +259,8 @@ namespace RS.Scene
                 var light = dayLight.GetComponent<Light>();
                 light.colorTemperature = 20000;
                 light.intensity = 0.2f;
+                RenderSettings.skybox = nightSkybox;
+                DynamicGI.UpdateEnvironment();
             }
             else
             {
