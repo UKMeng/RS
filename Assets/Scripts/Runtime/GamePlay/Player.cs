@@ -91,6 +91,7 @@ namespace RS.GamePlay
         {
             m_consumeStaminaEvent = new ConsumeStamina(this);
             SceneManager.Instance.RegisterTickEvent(m_consumeStaminaEvent);
+            OnHandItemIndexChanged?.Invoke();
         }
 
         public void Update()
@@ -189,8 +190,10 @@ namespace RS.GamePlay
                 }
             }
             m_items[lastIndex - 1] = null;
+            m_handItemIndex -= 1;
             
             OnItemsChanged?.Invoke();
+            OnHandItemIndexChanged?.Invoke();
         }
 
         public void TryAddBlock(BlockType blockType)

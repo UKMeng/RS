@@ -2457,6 +2457,8 @@ MonoBehaviour:
   - {fileID: 5108026064585393148, guid: bf9c2648f144b5a4d92274bc89f69faa, type: 3}
   - {fileID: 2829453727648849170, guid: 746f136b6d8f0ee42b588ace9b12adcf, type: 3}
   - {fileID: 2114453113218626825, guid: b10aedad91e77b240ae76fbe1b364ec4, type: 3}
+  m_blockPrefab: {fileID: 1525992211635647144, guid: 08a497819df83604f857840a41b6e822, type: 3}
+  m_player: {fileID: 2122471629}
 --- !u!1001 &5168157438494178335
 PrefabInstance:
   m_ObjectHideFlags: 0

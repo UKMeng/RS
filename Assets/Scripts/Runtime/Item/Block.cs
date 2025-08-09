@@ -119,6 +119,7 @@ namespace RS.Item
 
             m_count--;
             player.UseItem();
+            player.PlayMining();
 
             if (m_count == 0)
             {

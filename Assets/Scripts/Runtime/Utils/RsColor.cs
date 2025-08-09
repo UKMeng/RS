@@ -22,7 +22,7 @@ namespace RS.Utils
         
         // Block
         public static Color Stone = Color.grey;
-        public static Color Dirt = Color.brown;
+        public static Color Dirt = Color.saddleBrown;
         public static Color Grass = new Color(0.0f, 0.7f, 0.0f);
         public static Color Snow = new Color(1.0f, 1.0f, 1.0f);
         public static Color Leaf = new Color(0.0f, 0.5f, 0.0f);
