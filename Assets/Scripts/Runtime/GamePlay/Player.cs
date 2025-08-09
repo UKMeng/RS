@@ -16,6 +16,7 @@ namespace RS.GamePlay
         
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
+        private int m_handItemIndex = 0;
         private RsItem[] m_items; // 道具栏 暂定为10个栏位
         private PlayerInput m_playerInput;
         // private BlockType m_onBlockType;
@@ -64,6 +65,7 @@ namespace RS.GamePlay
             m_items = new RsItem[10];
             m_items[0] = new Shovel();
             m_handItem = m_items[0];
+            m_handItemIndex = 0;
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();
@@ -107,8 +109,64 @@ namespace RS.GamePlay
                 if (index < m_items.Length + 1)
                 {
                     m_handItem = m_items[index - 1];
+                    m_handItemIndex = index - 1;
                 }
             }
+        }
+
+        public void DisposeItem(RsItem item)
+        {
+            m_items[m_handItemIndex] = null;
+            
+            if (m_handItemIndex == 0)
+            {
+                m_handItem = null;
+            }
+            else
+            {
+                m_handItem = m_items[m_handItemIndex - 1];
+            }
+
+            var lastIndex = m_handItemIndex + 1;
+            for (; lastIndex < m_items.Length; lastIndex++)
+            {
+                if (m_items[lastIndex] != null)
+                {
+                    m_items[lastIndex - 1] = m_items[lastIndex];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            m_items[lastIndex - 1] = null;
+        }
+
+        public void TryAddBlock(BlockType blockType)
+        {
+            var index = 0;
+            for (; index < m_items.Length; index++)
+            {
+                var item = m_items[index];
+                if (item == null)
+                {
+                    break;
+                }
+                if (item is Block block)
+                {
+                    if (block.Type == blockType)
+                    {
+                        if (block.Count < block.Capacity)
+                        {
+                            block.Add();
+                        }
+
+                        return;
+                    }
+                }
+            }
+
+            m_items[index] = new Block(blockType, 3);
         }
 
         // public BlockType OnBlockType

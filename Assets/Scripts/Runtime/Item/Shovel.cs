@@ -23,12 +23,11 @@ namespace RS.Item
             var blockType = SceneManager.Instance.GetBlockType(blockWorldPos);
 
             // 铲子只能用来铲泥土
-            if (blockType != BlockType.Dirt)
+            if (!IsBreakable(blockType))
             {
                 return;
             }
-
-
+            
             var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
             Debug.Log($"Hit Position: {pos}");
 
@@ -39,6 +38,16 @@ namespace RS.Item
             var chunk = SceneManager.Instance.GetChunk(chunkPos);
             chunk.ModifyBlock(blockLocalPos, BlockType.Air);
             chunk.UpdateMesh();
+
+            if (blockType == BlockType.Dirt || blockType == BlockType.Grass)
+            {
+                player.TryAddBlock(BlockType.Dirt);
+            }
+            else if (blockType == BlockType.Sand)
+            {
+                player.TryAddBlock(BlockType.Sand);
+            }
+            
 
             // 如何y小于127，检查邻居是否有水
             if (blockLocalPos.y < 127)
@@ -133,6 +142,25 @@ namespace RS.Item
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
+                }
+            }
+        }
+
+        private bool IsBreakable(BlockType blockType)
+        {
+            switch (blockType)
+            {
+                case BlockType.Dirt:
+                case BlockType.Grass:
+                case BlockType.Leaf:
+                case BlockType.Sand:
+                case BlockType.Snow:
+                {
+                    return true;
+                }
+                default:
+                {
+                    return false;
                 }
             }
         }

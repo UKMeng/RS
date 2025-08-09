@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RS.GamePlay;
+using RS.Scene;
 using RS.Utils;
 using Unity.Collections;
 using UnityEngine;
@@ -21,8 +23,26 @@ namespace RS.Item
         Water,
     }
     
-    public class Block
+    public class Block : RsItem
     {
+        private int m_capacity = 3;
+        private int m_count = 0;
+
+        public override int Capacity
+        {
+            get => m_capacity;
+        }
+
+        public override int Count
+        {
+            get => m_count;
+        }
+
+        public override string Name
+        {
+            get => m_type.ToString();
+        }
+
         public static readonly Color[] BlockColors =
         {
             RsColor.Unknown,
@@ -44,14 +64,81 @@ namespace RS.Item
         public Block(BlockType type)
         {
             m_type = type;
+            m_count = 1;
         }
 
-        protected Block(ushort heapCount)
+        public Block(BlockType type, int capacity)
         {
+            m_type = type;
+            m_capacity = capacity;
+            m_count = 1;
+        }
+
+        public override void Interact(RaycastHit hitInfo, Player player)
+        {
+            var pos = hitInfo.point;
+            var normal = hitInfo.normal;
+            var blockPos = RsMath.GetBlockMinCorner(pos, normal);
             
+            // 根据normal判断放置block的位置
+            if (normal == Vector3.up)
+            {
+                blockPos.y += 0.5f;
+            }
+            else if (normal == Vector3.down)
+            {
+                blockPos.y -= 0.5f;
+            }
+            else if (normal == Vector3.left)
+            {
+                blockPos.x -= 1;
+            }
+            else if (normal == Vector3.right)
+            {
+                blockPos.x += 1;
+            }
+            else if (normal == Vector3.forward)
+            {
+                blockPos.z += 1;
+            }
+            else if (normal == Vector3.back)
+            {
+                blockPos.z -= 1;
+            }
+        
+            var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
+            // var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
+            // var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
+            Debug.Log($"Hit Position: {pos}");
+            Debug.Log($"Block World Pos: {blockWorldPos}");
+        
+            
+            SceneManager.Instance.PlaceBlock(blockWorldPos, m_type);
+
+            m_count--;
+
+            if (m_count == 0)
+            {
+                player.DisposeItem(this);
+            }
+            // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
+            // SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
+            // SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
+
+            // 放置这个block
+            // 首先获取chunk
+            // var chunk = m_sceneManager.GetChunk(chunkPos);
+            // chunk.ModifyBlock(blockLocalPos, BlockType.Stone);
+        }
+
+        public void Add()
+        {
+            m_count++;
         }
         
-        
+        /// <summary>
+        /// 一些用于渲染的静态方法
+        /// </summary>
         public static Vector2[][] uvTable;
         public static NativeArray<Vector2> uvTableArray;
         /// <summary>
