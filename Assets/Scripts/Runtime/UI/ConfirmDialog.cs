@@ -44,6 +44,7 @@ namespace RS.UI
                 Cursor.visible = true;
                 m_playerInput.actions["Attack"].Disable();
                 m_playerInput.actions["Look"].Disable();
+                m_playerInput.actions["Move"].Disable();
             }
             
             gameObject.SetActive(true);
@@ -57,6 +58,7 @@ namespace RS.UI
                 Cursor.visible = false;
                 m_playerInput.actions["Attack"].Enable();
                 m_playerInput.actions["Look"].Enable();
+                m_playerInput.actions["Move"].Enable();
             }
             gameObject.SetActive(false);
         }
