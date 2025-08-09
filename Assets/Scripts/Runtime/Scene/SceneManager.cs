@@ -301,7 +301,7 @@ namespace RS.Scene
                     DynamicGI.UpdateEnvironment();
                 }
             }
-            else if (hour == 14)
+            else if (hour == 16)
             {
                 if (RenderSettings.skybox != sunsetSkybox)
                 {
