@@ -21,7 +21,7 @@ namespace RS.Item
         Water,
     }
     
-    public class Block: Heapable
+    public class Block
     {
         public static readonly Color[] BlockColors =
         {
@@ -47,7 +47,6 @@ namespace RS.Item
         }
 
         protected Block(ushort heapCount)
-            : base(heapCount)
         {
             
         }

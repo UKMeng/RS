@@ -141,7 +141,7 @@ namespace RS.GMTool
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("血量:" + player.Health, m_labelStyle);
                 GUILayout.Label("耐力:" + player.Stamina, m_labelStyle);
-                GUILayout.Label("手持道具" + player.HandItem, m_labelStyle);
+                GUILayout.Label("手持道具" + player.HandItem.Name, m_labelStyle);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 // GUILayout.Label("脚底上方块" + player.OnBlockType, m_labelStyle);

@@ -46,7 +46,7 @@ namespace RS
 			actions["Sprint"].canceled  += OnSprint;
 			
 			actions["Item"].performed += m_player.OnItem;
-			actions["Put"].performed += m_raycast.OnPut;
+			// actions["Put"].performed += m_raycast.OnPut;
 			actions["Attack"].performed += m_raycast.OnAttack;
 			
 			
@@ -70,7 +70,7 @@ namespace RS
             
             actions["Item"].performed -= m_player.OnItem;
             actions["Attack"].performed -= m_raycast.OnAttack;
-            actions["Put"].performed -= m_raycast.OnPut;
+            // actions["Put"].performed -= m_raycast.OnPut;
 		}
 
 #if ENABLE_INPUT_SYSTEM

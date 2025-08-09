@@ -62,8 +62,7 @@ namespace RS.GamePlay
             m_health = 100;
             m_stamina = 100;
             m_items = new RsItem[10];
-            m_items[0] = new Block(BlockType.Orc);
-            m_items[1] = new Block(BlockType.Leaf);
+            m_items[0] = new Shovel();
             m_handItem = m_items[0];
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
@@ -148,18 +147,11 @@ namespace RS.GamePlay
             get { return m_controller.Sprint; }
         }
 
-        public BlockType HandItem
+        public RsItem HandItem
         {
             get
             {
-                if (m_handItem is Block block)
-                {
-                    return block.Type;
-                }
-                else
-                {
-                    return BlockType.Air;
-                }
+                return m_handItem;
             }
         }
 

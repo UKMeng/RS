@@ -71,6 +71,7 @@ namespace RS.GamePlay
 
             if (Physics.Raycast(ray, out var hitInfo, rayDistance))
             {
+                // 优先和场景物互动
                 if (hitInfo.collider.gameObject.name == "Chest")
                 {
                     var chest = hitInfo.collider.transform.parent.gameObject.GetComponent<Chest>();
@@ -83,192 +84,75 @@ namespace RS.GamePlay
                     rock.Trigger();
                     Debug.Log("Hit a Return Rock");
                 }
-                
-                
-                var pos = hitInfo.point;
-                var normal = hitInfo.normal;
-                var blockPos = RsMath.GetBlockMinCorner(pos, normal);
-                var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                
-                var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
-                var blockType = m_sceneManager.GetBlockType(blockWorldPos);
 
-                if (blockType == BlockType.Water || blockType == BlockType.Air)
+                if (m_player.HandItem != null)
                 {
-                    return;
-                }
-
-                
-                var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
-                Debug.Log($"Hit Position: {pos}");
-
-                Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
-                
-                // 破坏这个block
-                // 首先获取chunk
-                var chunk = m_sceneManager.GetChunk(chunkPos);
-                chunk.ModifyBlock(blockLocalPos, BlockType.Air);
-                chunk.UpdateMesh();
-                
-                // 如何y小于127，检查邻居是否有水
-                if (blockLocalPos.y < 127)
-                {
-                    var upType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.up);
-                    if (upType == BlockType.Water)
-                    {
-                        var water = new Water(blockWorldPos + Vector3Int.up);
-                        var sub = new Flow(water);
-                        m_sceneManager.RegisterTickEvent(sub);
-                    }
-                    
-                    var leftType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.left);
-                    if (leftType == BlockType.Water)
-                    {
-                        var water = new Water(blockWorldPos + Vector3Int.left);
-                        var sub = new Flow(water);
-                        m_sceneManager.RegisterTickEvent(sub);
-                    }
-                    
-                    var rightType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.right);
-                    if (rightType == BlockType.Water)
-                    {
-                        var water = new Water(blockWorldPos + Vector3Int.right);
-                        var sub = new Flow(water);
-                        m_sceneManager.RegisterTickEvent(sub);
-                    }
-                    
-                    var forwardType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.forward);
-                    if (forwardType == BlockType.Water)
-                    {
-                        var water = new Water(blockWorldPos + Vector3Int.forward);
-                        var sub = new Flow(water);
-                        m_sceneManager.RegisterTickEvent(sub);
-                    }
-                    
-                    var backType = m_sceneManager.GetBlockType(blockWorldPos + Vector3Int.back);
-                    if (backType == BlockType.Water)
-                    {
-                        var water = new Water(blockWorldPos + Vector3Int.back);
-                        var sub = new Flow(water);
-                        m_sceneManager.RegisterTickEvent(sub);
-                    }
-                }
-                
-                // 检查是否是边界是否需要更新邻居Chunk的mesh
-                if (blockLocalPos.y == 0)
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.down);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
-                }
-                else if (blockLocalPos.y == 31)
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.up);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
-                }
-
-                if (blockLocalPos.z == 0)
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.back);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
-                }
-                else if (blockLocalPos.z == 31)
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.forward);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
-                }
-
-                if (blockLocalPos.x == 0)
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.left);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
-                }
-                else
-                {
-                    var neighbor = m_sceneManager.GetChunk(chunkPos + Vector3Int.right);
-                    if (neighbor != null)
-                    {
-                        neighbor.UpdateMesh();
-                    }
+                    m_player.HandItem.Interact(hitInfo, m_player);
                 }
             }
         }
 
-        public void OnPut(InputAction.CallbackContext context)
-        {
-            // 从屏幕中心发出射线
-            var screenCenter = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
-            var ray = Camera.main.ScreenPointToRay(screenCenter);
-
-            if (Physics.Raycast(ray, out var hitInfo, rayDistance))
-            {
-                var pos = hitInfo.point;
-                var normal = hitInfo.normal;
-                var blockPos = RsMath.GetBlockMinCorner(pos, normal);
-                
-                // 根据normal判断放置block的位置
-                if (normal == Vector3.up)
-                {
-                    blockPos.y += 0.5f;
-                }
-                else if (normal == Vector3.down)
-                {
-                    blockPos.y -= 0.5f;
-                }
-                else if (normal == Vector3.left)
-                {
-                    blockPos.x -= 1;
-                }
-                else if (normal == Vector3.right)
-                {
-                    blockPos.x += 1;
-                }
-                else if (normal == Vector3.forward)
-                {
-                    blockPos.z += 1;
-                }
-                else if (normal == Vector3.back)
-                {
-                    blockPos.z -= 1;
-                }
-
-                var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
-                // var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
-                // var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
-                Debug.Log($"Hit Position: {pos}");
-                Debug.Log($"Block World Pos: {blockWorldPos}");
-
-                var handBlock = m_player.HandItem;
-                if (handBlock != BlockType.Air)
-                {
-                    SceneManager.Instance.PlaceBlock(blockWorldPos, handBlock);
-                }
-                
-
-                
-                // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
-                // SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
-                // SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
-                
-                // 放置这个block
-                // 首先获取chunk
-                // var chunk = m_sceneManager.GetChunk(chunkPos);
-                // chunk.ModifyBlock(blockLocalPos, BlockType.Stone);
-            }
-        }
+        // public void OnPut(InputAction.CallbackContext context)
+        // {
+        //     // 从屏幕中心发出射线
+        //     var screenCenter = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
+        //     var ray = Camera.main.ScreenPointToRay(screenCenter);
+        //
+        //     if (Physics.Raycast(ray, out var hitInfo, rayDistance))
+        //     {
+        //         var pos = hitInfo.point;
+        //         var normal = hitInfo.normal;
+        //         var blockPos = RsMath.GetBlockMinCorner(pos, normal);
+        //         
+        //         // 根据normal判断放置block的位置
+        //         if (normal == Vector3.up)
+        //         {
+        //             blockPos.y += 0.5f;
+        //         }
+        //         else if (normal == Vector3.down)
+        //         {
+        //             blockPos.y -= 0.5f;
+        //         }
+        //         else if (normal == Vector3.left)
+        //         {
+        //             blockPos.x -= 1;
+        //         }
+        //         else if (normal == Vector3.right)
+        //         {
+        //             blockPos.x += 1;
+        //         }
+        //         else if (normal == Vector3.forward)
+        //         {
+        //             blockPos.z += 1;
+        //         }
+        //         else if (normal == Vector3.back)
+        //         {
+        //             blockPos.z -= 1;
+        //         }
+        //
+        //         var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
+        //         // var chunkPos = new Vector3Int(Mathf.FloorToInt(blockPos.x / 32.0f), Mathf.FloorToInt(blockPos.y / 16.0f), Mathf.FloorToInt(blockPos.z / 32.0f));
+        //         // var blockLocalPos = Chunk.WorldPosToBlockLocalPos(blockPos);
+        //         Debug.Log($"Hit Position: {pos}");
+        //         Debug.Log($"Block World Pos: {blockWorldPos}");
+        //
+        //         var handBlock = m_player.HandItem;
+        //         if (handBlock != BlockType.Air)
+        //         {
+        //             SceneManager.Instance.PlaceBlock(blockWorldPos, handBlock);
+        //         }
+        //         
+        //
+        //         
+        //         // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
+        //         // SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
+        //         // SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
+        //         
+        //         // 放置这个block
+        //         // 首先获取chunk
+        //         // var chunk = m_sceneManager.GetChunk(chunkPos);
+        //         // chunk.ModifyBlock(blockLocalPos, BlockType.Stone);
+        //     }
+        // }
     }
 }
