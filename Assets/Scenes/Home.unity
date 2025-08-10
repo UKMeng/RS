@@ -311,7 +311,7 @@ MonoBehaviour:
   sunsetSkybox: {fileID: 2100000, guid: 20f6d22d93779de4ea6f62f8ab305593, type: 2}
   PlayerInput: {fileID: 1321737847}
   seed: 20250715
-  InHome: 0
+  InHome: 1
 --- !u!4 &50099546
 Transform:
   m_ObjectHideFlags: 0
