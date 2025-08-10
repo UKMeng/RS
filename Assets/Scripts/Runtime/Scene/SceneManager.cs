@@ -27,6 +27,7 @@ namespace RS.Scene
         public GameObject chunkPrefab;
         public GameObject chestPrefab;
         public GameObject returnRockPrefab;
+        public GameObject treasurePrefab;
         
         public Light dayLight;
         public Material daySkybox;
@@ -184,7 +185,9 @@ namespace RS.Scene
             var chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
             Debug.Log($"[SceneManager] 宝箱位置: {chestPos}");
             // 先放置宝箱在面前
-            Instantiate(chestPrefab, chestPos, Quaternion.Euler(0, GetRandomRotation(), 0));
+            var chest = Instantiate(chestPrefab, playerPos, Quaternion.Euler(0, GetRandomRotation(), 0));
+            var treasure = new Treasure(treasurePrefab, "test name", "test desc");
+            chest.GetComponent<Chest>().SetTreasure(treasure);
 
             var returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
             Debug.Log($"[SceneManager] 返回点位置: {returnPos}");

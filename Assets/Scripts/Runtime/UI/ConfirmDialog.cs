@@ -15,11 +15,6 @@ namespace RS.UI
         [SerializeField] private Button m_yesButton;
         [SerializeField] private Button m_noButton;
         private PlayerInput m_playerInput;
-
-        private void Awake()
-        {
-            m_playerInput = SceneManager.Instance.PlayerInput;
-        }
         
         public void Show(string message, Action onYes, Action onNo)
         {
@@ -38,6 +33,11 @@ namespace RS.UI
                 Close();
             });
 
+            if (m_playerInput == null)
+            {
+                m_playerInput = SceneManager.Instance.PlayerInput;
+            }
+            
             if (m_playerInput != null)
             {
                 Cursor.lockState = CursorLockMode.None;
