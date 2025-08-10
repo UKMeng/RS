@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 using RS.Item;
@@ -8,12 +9,28 @@ using UnityEngine.InputSystem;
 
 namespace RS.GamePlay
 {
+    public enum PlayerStatus
+    {
+        FirstTime,
+        GetShovel,
+        GetAxe,
+        GetPickaxe,
+        Done
+    };
+    
     public class Player : MonoBehaviour
     {
         private Animator m_animator;
         private int m_health; // 血条 0~100
         private int m_stamina; // 耐力值 0~100
         private int m_staminaRegainSpeed = 10;
+        
+        // 提示与存档相关
+        private bool m_firstWater;
+        private bool m_firstNight;
+        private PlayerStatus m_status;
+        private List<int> m_treasure;
+        private Vector3 m_birthPosition;
         
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
@@ -33,6 +50,20 @@ namespace RS.GamePlay
 
         public event Action OnItemsChanged;
         public event Action OnHandItemIndexChanged;
+
+        public void Load(PlayerData data)
+        {
+            m_status = data.status;
+            m_firstNight = data.firstNight;
+            m_firstWater = data.firstWater;
+            m_treasure = data.treasure;
+            m_birthPosition = data.birthPosition;
+        }
+
+        public PlayerData Save()
+        {
+            return new PlayerData(m_status, m_birthPosition, m_firstNight, m_firstWater, m_treasure);
+        }
         
         public class ConsumeStamina : IUpdateByTick
         {

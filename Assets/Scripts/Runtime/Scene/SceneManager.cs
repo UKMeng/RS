@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using RS.GamePlay;
 using RS.Item;
@@ -120,7 +121,8 @@ namespace RS.Scene
             if (InHome)
             {
                 var modifyData = m_blockModifyRecorder.GetModifyDataList();
-                var saveData = new SaveData(modifyData);
+                var playerData = m_player.Save();
+                var saveData = new SaveData(modifyData, playerData);
                 SaveSystem.SaveGame(saveData);
             }
         }

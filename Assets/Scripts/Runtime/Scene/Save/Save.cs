@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
 
@@ -10,12 +11,13 @@ namespace RS.Scene
     public class SaveData
     {
         public List<BlockModifyData> blockModifyData = new List<BlockModifyData>();
-
-        public SaveData(List<BlockModifyData> blockModifyData)
+        public PlayerData playerData;
+        
+        public SaveData(List<BlockModifyData> blockModifyData, PlayerData playerData)
         {
             this.blockModifyData = blockModifyData;
+            this.playerData = playerData;
         }
-        
     }
 
     [Serializable]
@@ -45,6 +47,26 @@ namespace RS.Scene
             
             blockIndex.Add(index);
             blockTypes.Add(blockType);
+        }
+    }
+
+    [Serializable]
+    public class PlayerData
+    {
+        public PlayerStatus status;
+        public Vector3 birthPosition;
+        public bool firstNight;
+        public bool firstWater;
+        public List<int> treasure;
+
+        public PlayerData(PlayerStatus status, Vector3 birthPosition, bool firstNight, bool firstWater,
+            List<int> treasure)
+        {
+            this.status = status;
+            this.birthPosition = birthPosition;
+            this.firstNight = firstNight;
+            this.firstWater = firstWater;
+            this.treasure = treasure;
         }
     }
     
