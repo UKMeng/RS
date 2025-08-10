@@ -52,6 +52,7 @@ namespace RS.Scene
         
         // 场景初始化与进度条相关
         private int m_mapSize;
+        private int m_preloadSize;
         private bool m_isLoading = true;
         [SerializeField] private GameObject m_loadingUI;
         private Slider m_loadingSlider;
@@ -89,7 +90,8 @@ namespace RS.Scene
             if (InHome)
             {
                 seed = 114514;
-                m_mapSize = 512;
+                m_mapSize = 256;
+                m_preloadSize = 512;
                 m_blockModifyRecorder = new BlockModifyRecorder();
                 var saveData = SaveSystem.LoadGame();
                 m_lastSaveData = saveData;
@@ -102,6 +104,7 @@ namespace RS.Scene
                 m_lastSaveData = saveData;
                 seed = GameSettingTransfer.seed;
                 m_mapSize = GameSettingTransfer.mapSize;
+                m_preloadSize = 512;
                 m_player.Load(saveData.playerData);
             }
             
@@ -139,17 +142,17 @@ namespace RS.Scene
             {
                 case 0:
                 {
-                    GameSettingTransfer.mapSize = 256;
+                    GameSettingTransfer.mapSize = 128;
                     break;
                 }
                 case 1:
                 {
-                    GameSettingTransfer.mapSize = 512;
+                    GameSettingTransfer.mapSize = 256;
                     break;
                 }
                 case 2:
                 {
-                    GameSettingTransfer.mapSize = 1024;
+                    GameSettingTransfer.mapSize = 512;
                     break;
                 }
             }
@@ -208,7 +211,7 @@ namespace RS.Scene
             var sw = Stopwatch.StartNew();
             
             // 场景数据生成，返回进度条数值
-            var batchChunkSize = m_mapSize / 32 / 8;
+            var batchChunkSize = m_preloadSize / 32 / 8;
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
 
 
@@ -223,6 +226,7 @@ namespace RS.Scene
             {
                 // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
                 // 需要随机
+                // 这个是PreloadStartPos
                 startChunkPos = new Vector3Int(0, 0, 0);
             }
 
@@ -282,7 +286,6 @@ namespace RS.Scene
                 m_chunkManager.ApplyDataModify(m_blockModifyRecorder.GetModifyDataList());
                 
                 // 定制下地图
-                m_mapSize = 256;
                 startChunkPos = new Vector3Int(-431, 0, -5);
             }
             
