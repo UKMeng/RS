@@ -9,6 +9,7 @@ using Debug = UnityEngine.Debug;
 
 using RS.GMTool;
 using RS.UI;
+using UnityEditor;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -59,6 +60,7 @@ namespace RS.Scene
         
         // 地图相关
         private Map m_map;
+        
         private GameStart m_gameStart;
         
         // 主城状态
@@ -66,6 +68,8 @@ namespace RS.Scene
         private BlockModifyRecorder m_blockModifyRecorder;
         private SaveData m_lastSaveData;
         private bool m_needSave = true;
+        
+        [SerializeField] private MenuUI m_menu;
 
         public void Awake()
         {
@@ -74,6 +78,8 @@ namespace RS.Scene
             var mapUI = GameObject.Find("MapUI");
             m_map = mapUI.GetComponent<Map>();
             mapUI.SetActive(false);
+
+            m_menu.gameObject.SetActive(false);
             
             var gameStartUI = GameObject.Find("GameStartUI");
             if (gameStartUI)
@@ -167,7 +173,7 @@ namespace RS.Scene
             Debug.Log($"返回主城 {success}");
             if (success)
             {
-                SaveGame();
+                SaveGame(false);
                 m_needSave = false;
                 OpenHomeScene();
             }
@@ -189,7 +195,7 @@ namespace RS.Scene
             SceneManager.LoadScene("Scenes/MainGame", LoadSceneMode.Single);
         }
 
-        public void SaveGame()
+        public void SaveGame(bool isGiveUp = true)
         {
             if (InHome)
             {
@@ -200,6 +206,11 @@ namespace RS.Scene
             }
             else
             {
+                if (isGiveUp)
+                {
+                    SaveSystem.SaveGame(m_lastSaveData);
+                    return;
+                }
                 var playerData = m_player.Save();
                 var saveData = new SaveData(m_lastSaveData.blockModifyData, playerData);
                 SaveSystem.SaveGame(saveData);
@@ -539,10 +550,9 @@ namespace RS.Scene
 
         public void OnMenu(InputValue value)
         {
-            if (Cursor.lockState == CursorLockMode.Locked)
+            if (!m_isLoading)
             {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+                m_menu.Toggle();
             }
         }
 
