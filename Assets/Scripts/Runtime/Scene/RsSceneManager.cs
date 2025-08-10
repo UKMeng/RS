@@ -491,12 +491,12 @@ namespace RS.Scene
                     dayLight.intensity = 1.0f;
                     RenderSettings.skybox = sunsetSkybox;
                     DynamicGI.UpdateEnvironment();
-                }
-
-                if (m_player.FirstNight)
-                {
-                    m_player.InvokeTips("天黑之后会开始掉血，速回！");
-                    m_player.FirstNight = false;
+                    
+                    if (m_player.FirstNight)
+                    {
+                        m_player.InvokeTips("天黑之后会开始掉血，速回！");
+                        m_player.FirstNight = false;
+                    }
                 }
             }
             else if (hour == 18)
@@ -507,6 +507,8 @@ namespace RS.Scene
                     dayLight.intensity = 0.2f;
                     RenderSettings.skybox = nightSkybox;
                     DynamicGI.UpdateEnvironment();
+                    
+                    m_player.RegisterConsumeHealthEvent();
                 }
             }
         }

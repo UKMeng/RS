@@ -1671,6 +1671,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5168157438494178336}
     - target: {fileID: 3167981201654048096, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: m_health
+      value: 
+      objectReference: {fileID: 5168157438494178340}
+    - target: {fileID: 3167981201654048096, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
       propertyPath: m_normal
       value: 
       objectReference: {fileID: 5168157438494178337}
@@ -1678,6 +1682,10 @@ PrefabInstance:
       propertyPath: m_stamina
       value: 
       objectReference: {fileID: 739490541}
+    - target: {fileID: 3167981201654048096, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: m_healthFill
+      value: 
+      objectReference: {fileID: 5168157438494178339}
     - target: {fileID: 3167981201654048096, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
       propertyPath: m_staminaFill
       value: 
@@ -2657,6 +2665,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5168157438494178339 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1946934220705998325, guid: ced14186709f67e4580fcaae5f49f3b3, type: 3}
+  m_PrefabInstance: {fileID: 5168157438494178335}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5168157438494178340 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 606357446999852177, guid: ced14186709f67e4580fcaae5f49f3b3, type: 3}
+  m_PrefabInstance: {fileID: 5168157438494178335}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

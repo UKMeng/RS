@@ -9,6 +9,8 @@ namespace RS.UI
     {
         [SerializeField] private Slider m_stamina;
         [SerializeField] private Image m_staminaFill;
+        [SerializeField] private Slider m_health;
+        [SerializeField] private Image m_healthFill;
         [SerializeField] private GameObject m_normal;
         [SerializeField] private GameObject m_death;
         [SerializeField] private Button m_deathReturnBtn;
@@ -42,7 +44,7 @@ namespace RS.UI
         
         public void SetStamina(int value)
         {
-            if (value == 100)
+            if (value >= 100)
             {
                 m_stamina.gameObject.SetActive(false);
                 return;
@@ -64,6 +66,19 @@ namespace RS.UI
             }
 
             m_stamina.value = value / 100.0f;
+        }
+
+        public void SetHealth(int value)
+        {
+            if (value >= 100)
+            {
+                m_health.gameObject.SetActive(false);
+                return;
+            }
+
+            m_health.gameObject.SetActive(true);
+
+            m_health.value = value / 100.0f;
         }
     }
 }

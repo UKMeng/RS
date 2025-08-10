@@ -45,6 +45,7 @@ namespace RS.GamePlay
         private ThirdPersonController m_controller;
 
         private ConsumeStamina m_consumeStaminaEvent;
+        private ConsumeHealth m_consumeHealthEvent;
 
         private HUD m_HUD;
         
@@ -127,6 +128,31 @@ namespace RS.GamePlay
                 }
             }
         }
+
+        public class ConsumeHealth : IUpdateByTick
+        {
+            private Player m_player;
+            
+            public int TickTimes { get; set; } = -1;
+            
+            public ConsumeHealth(Player player)
+            {
+                m_player = player;
+            }
+            
+            public void OnTick()
+            {
+                var health = m_player.Health;
+                health -= 1;
+                
+                m_player.Health = Mathf.Clamp(health, 0, 100);
+
+                if (m_player.Health == 0)
+                {
+                    m_player.InvokeDeath();
+                }
+            }
+        }
         
         public void Awake()
         {
@@ -149,10 +175,16 @@ namespace RS.GamePlay
         public void Start()
         {
             m_consumeStaminaEvent = new ConsumeStamina(this);
+            m_consumeHealthEvent = new ConsumeHealth(this);
             RsSceneManager.Instance.RegisterTickEvent(m_consumeStaminaEvent);
             OnHandItemIndexChanged?.Invoke();
         }
 
+        public void RegisterConsumeHealthEvent()
+        {
+            RsSceneManager.Instance.RegisterTickEvent(m_consumeHealthEvent);
+        }
+        
         public void Update()
         {
             var pos = m_transform.position;
@@ -173,6 +205,7 @@ namespace RS.GamePlay
             }
 
             m_HUD.SetStamina(m_stamina);
+            m_HUD.SetHealth(m_health);
         }
 
         
@@ -373,6 +406,7 @@ namespace RS.GamePlay
         public int Health
         {
             get { return m_health; }
+            set { m_health = value; }
         }
 
         public int Stamina
