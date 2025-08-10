@@ -11,7 +11,7 @@ namespace RS.GamePlay
         public void Trigger()
         {
             m_dialog.Show("是否返回主城？",
-                () => { SceneManager.Instance.ReturnHome(); },
+                () => { SceneManager.Instance.ReturnHome(true); },
                 () => { Debug.Log("取消"); }
             );
         }

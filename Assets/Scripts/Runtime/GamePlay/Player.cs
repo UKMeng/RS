@@ -80,6 +80,11 @@ namespace RS.GamePlay
         {
             m_tipManager.Show(tips);
         }
+
+        public void InvokeDeath()
+        {
+            m_HUD.ShowDeath();
+        }
         
         public class ConsumeStamina : IUpdateByTick
         {
@@ -109,6 +114,11 @@ namespace RS.GamePlay
                 }
                 
                 m_player.Stamina = Mathf.Clamp(stamina, 0, 100);
+
+                if (m_player.Stamina == 0 && m_player.Floating)
+                {
+                    m_player.InvokeDeath();
+                }
             }
         }
         

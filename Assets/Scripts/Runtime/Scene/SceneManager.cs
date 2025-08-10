@@ -114,9 +114,9 @@ namespace RS.Scene
             StartCoroutine(InitSceneData());
         }
 
-        public void ReturnHome()
+        public void ReturnHome(bool success = false)
         {
-            Debug.Log("返回主城");
+            Debug.Log($"返回主城 {success}");
         }
 
         public void SaveGame()

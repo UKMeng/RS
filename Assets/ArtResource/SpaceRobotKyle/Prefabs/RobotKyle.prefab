@@ -1230,6 +1230,7 @@ GameObject:
   - component: {fileID: 5345386928228238500}
   - component: {fileID: 6772080370674287517}
   - component: {fileID: 3167981201654048096}
+  - component: {fileID: 9129162238845977001}
   m_Layer: 3
   m_Name: RobotKyle
   m_TagString: Player
@@ -1507,6 +1508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ae1a5c02e634cb48d179b6601a820a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_tipManager: {fileID: 0}
 --- !u!114 &3167981201654048096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1521,6 +1523,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_stamina: {fileID: 0}
   m_staminaFill: {fileID: 0}
+  m_normal: {fileID: 0}
+  m_death: {fileID: 0}
+--- !u!114 &9129162238845977001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3862277631971027947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13fb6ac63b64f7aac60c9a02bf751c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_rightHand: {fileID: 2423095658409874090}
+  m_itemPrefabs:
+  - {fileID: 5108026064585393148, guid: bf9c2648f144b5a4d92274bc89f69faa, type: 3}
+  - {fileID: 2829453727648849170, guid: 746f136b6d8f0ee42b588ace9b12adcf, type: 3}
+  - {fileID: 2114453113218626825, guid: b10aedad91e77b240ae76fbe1b364ec4, type: 3}
+  m_blockPrefab: {fileID: 1525992211635647144, guid: 08a497819df83604f857840a41b6e822, type: 3}
+  m_player: {fileID: 6772080370674287517}
 --- !u!1 &4072265639379859564
 GameObject:
   m_ObjectHideFlags: 0
@@ -2856,6 +2879,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73ffbc06802a247cfb1b26f4ee67eba8, type: 3}
+--- !u!4 &2423095658409874090 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8580684477638385493, guid: 73ffbc06802a247cfb1b26f4ee67eba8, type: 3}
+  m_PrefabInstance: {fileID: 2975709781968826881}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3369080900709340650 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73ffbc06802a247cfb1b26f4ee67eba8, type: 3}
