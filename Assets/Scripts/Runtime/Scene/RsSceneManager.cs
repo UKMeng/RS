@@ -75,8 +75,12 @@ namespace RS.Scene
             mapUI.SetActive(false);
             
             var gameStartUI = GameObject.Find("GameStartUI");
-            m_gameStart = gameStartUI.GetComponent<GameStart>();
-            gameStartUI.SetActive(false);
+            if (gameStartUI)
+            {
+                m_gameStart = gameStartUI.GetComponent<GameStart>();
+                gameStartUI.SetActive(false);
+            }
+            
             
             var player = GameObject.Find("Player");
             m_player = player.GetComponent<Player>();
@@ -125,6 +129,11 @@ namespace RS.Scene
 
         public void GameStart(long seed, int mode)
         {
+            if (m_player.Status == PlayerStatus.GetShovel)
+            {
+                m_player.StatusChange(PlayerStatus.OnceMainGame);
+            }
+            
             GameSettingTransfer.seed = seed;
             switch (mode)
             {
@@ -212,7 +221,6 @@ namespace RS.Scene
             }
             else
             {
-                // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
                 // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
                 // 需要随机
                 startChunkPos = new Vector3Int(0, 0, 0);

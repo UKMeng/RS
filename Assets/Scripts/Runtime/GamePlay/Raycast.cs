@@ -83,6 +83,22 @@ namespace RS.GamePlay
                         chest.Open(true);
                         return;
                     }
+
+                    if (m_player.Status == PlayerStatus.OnceMainGame)
+                    {
+                        m_player.InvokeTips("恭喜你获得斧头，但需要在日落前回到传送点才能带回去。");
+                        m_player.StatusChange(PlayerStatus.GetAxe);
+                        chest.Open(true);
+                        return;
+                    }
+
+                    if (m_player.Status == PlayerStatus.GetAxe)
+                    {
+                        m_player.InvokeTips("恭喜你获得镐子，现在可以破坏普通石头了，记得回去。");
+                        m_player.StatusChange(PlayerStatus.GetPickaxe);
+                        chest.Open(true);
+                        return;
+                    }
                     
                     chest.Open();
                     // Debug.Log("Hit a Chest");

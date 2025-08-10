@@ -262,10 +262,18 @@ namespace RS.GamePlay
             switch(status)
             {
                 case PlayerStatus.GetShovel:
+                {
+                    m_items[0] = new Shovel();
+                    m_handItemIndex = 0;
+                    OnItemsChanged?.Invoke();
+                    OnHandItemIndexChanged?.Invoke();
+                    break;
+                }
                 case PlayerStatus.OnceMainGame:
                 {
                     m_items[0] = new Shovel();
                     m_handItemIndex = 0;
+                    m_birthPosition = new Vector3(-13622.0f, 69.0f, 45.0f);
                     OnItemsChanged?.Invoke();
                     OnHandItemIndexChanged?.Invoke();
                     break;
