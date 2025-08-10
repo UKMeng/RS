@@ -101,8 +101,8 @@ namespace RS.Scene
             NoiseManager.Init(seed);
             
             m_tickManager = gameObject.AddComponent<TickManager>();
-            
-            m_chunkManager = gameObject.AddComponent<ChunkManager>();
+
+            m_chunkManager = GetComponent<ChunkManager>();
             m_chunkManager.chunkPrefab = chunkPrefab;
         }
         
@@ -221,12 +221,6 @@ namespace RS.Scene
             sw.Stop();
             Debug.Log($"[SceneManager]场景数据生成完毕，耗时: {sw.ElapsedMilliseconds} ms");
             
-            // 数据加载完成，更新游戏内时间，spawn玩家
-            m_isLoading = false;
-            m_loadingUI.SetActive(false);
-            Destroy(m_loadingUI);
-            
-            
             // 随机位置
             Vector3 playerPos;
             Vector3 chestPos;
@@ -291,6 +285,11 @@ namespace RS.Scene
             {
                 m_player.InvokeTips("按Q打开地图，参考地形找到X位置的宝箱");
             }
+            
+            // 数据加载完成，更新游戏内时间，spawn玩家
+            m_isLoading = false;
+            m_loadingUI.SetActive(false);
+            Destroy(m_loadingUI);
             Debug.Log($"[SceneManager]场景数据准备完毕");
         }
 
