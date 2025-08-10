@@ -1170,7 +1170,7 @@ namespace RS.Scene
                     
                     // 测试概率，与噪声、biome设置相关
                     // 相关的还没做
-                    if (sampleResult[sx * 32 + sz] < 0.5f)
+                    if (sampleResult[sx * 32 + sz] < 0.8f)
                     {
                         sz++;
                         continue;
@@ -1203,6 +1203,7 @@ namespace RS.Scene
                     sz += 2;
                 }
 
+                sz = 2;
                 sx++;
             }
             
