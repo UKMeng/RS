@@ -265,6 +265,7 @@ namespace RS.GamePlay
                 {
                     m_items[0] = new Shovel();
                     m_handItemIndex = 0;
+                    m_handItem = m_items[0];
                     OnItemsChanged?.Invoke();
                     OnHandItemIndexChanged?.Invoke();
                     break;
@@ -273,6 +274,7 @@ namespace RS.GamePlay
                 {
                     m_items[0] = new Shovel();
                     m_handItemIndex = 0;
+                    m_handItem = m_items[0];
                     m_birthPosition = new Vector3(-13622.0f, 69.0f, 45.0f);
                     OnItemsChanged?.Invoke();
                     OnHandItemIndexChanged?.Invoke();
@@ -281,8 +283,20 @@ namespace RS.GamePlay
                 case PlayerStatus.GetAxe:
                 {
                     m_items[0] = new Shovel();
+                    if (m_items[1] != null)
+                    {
+                        for (var i = 7; i > 1; i--)
+                        {
+                            if (m_items[i - 1] != null)
+                            {
+                                m_items[i] = m_items[i - 1];
+                            }
+                        }
+                    }
                     m_items[1] = new Axe();
                     m_handItemIndex = 1;
+                    m_handItem = m_items[1];
+                    
                     OnItemsChanged?.Invoke();
                     OnHandItemIndexChanged?.Invoke();
                     break;
@@ -291,7 +305,18 @@ namespace RS.GamePlay
                 {
                     m_items[0] = new Shovel();
                     m_items[1] = new Axe();
+                    if (m_items[2] != null)
+                    {
+                        for (var i = 7; i > 2; i--)
+                        {
+                            if (m_items[i - 1] != null)
+                            {
+                                m_items[i] = m_items[i - 1];
+                            }
+                        }
+                    }
                     m_items[2] = new Pickaxe();
+                    m_handItem = m_items[2];
                     m_handItemIndex = 2;
                     OnItemsChanged?.Invoke();
                     OnHandItemIndexChanged?.Invoke();

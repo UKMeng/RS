@@ -59,6 +59,7 @@ namespace RS.UI
                     else
                     {
                         sprite = m_itemSprites[item.Id];
+                        count = 0;
                     }
 
                     if (sprite != null)
@@ -67,6 +68,11 @@ namespace RS.UI
                         if (count > 0)
                         {
                             m_itemCounts[i].text = count.ToString();
+                        }
+
+                        if (count == 0)
+                        {
+                            m_itemCounts[i].text = "";
                         }
 
                         if (i == m_player.HandItemIndex)
