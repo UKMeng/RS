@@ -533,7 +533,7 @@ namespace RS.Scene
         {
             var chunkSize = mapSize / 32;
 
-            var totalChance = 10;
+            var totalChance = 20;
             
             while (totalChance > 0)
             {
@@ -581,7 +581,7 @@ namespace RS.Scene
             var chunkSize = mapSize / 32;
             var minChunkDistance = chunkSize / 2;
             
-            var totalChance = 10;
+            var totalChance = 20;
             
             while (totalChance > 0)
             {

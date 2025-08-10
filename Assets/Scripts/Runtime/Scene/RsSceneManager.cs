@@ -217,6 +217,39 @@ namespace RS.Scene
             }
         }
 
+        private Vector3Int GetProperStartChunkPos(int preloadSize)
+        {
+            while (true)
+            {
+                var x = Random.Range(-10, 10);
+                var z = Random.Range(-10, 10);
+                var chunkStartPos = new Vector3Int(x * 32, 0, z * 32);
+                var offset = preloadSize / 5;
+
+                // 采样9个点的大陆性，如果大于5个点是大陆则返回
+                var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("Continents", new Vector3Int(x, 0, z));
+                var count = 0;
+
+                for (var ix = 0; ix < 3; ix++)
+                {
+                    for (var iz = 0; iz < 3; iz++)
+                    {
+                        var sampleValue =
+                            sampler.Sample(new Vector3(x * 1024 + offset * ix, 0, z * 1024 + offset * iz));
+                        if (sampleValue > -0.19f)
+                        {
+                            count++;
+                        }
+                    }
+                }
+
+                if (count > 7)
+                {
+                    return chunkStartPos;
+                }
+            }
+        }
+
         private IEnumerator InitSceneData()
         {
             var sw = Stopwatch.StartNew();
@@ -226,19 +259,19 @@ namespace RS.Scene
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
 
 
-            Vector3Int startChunkPos;
+            Vector3Int preloadStartChunkPos;
             // 主城加载固定
             if (InHome)
             {
                 // 选点需要注意，不能跨大块的采样器进行采样（32X32) 余32要小于等于24
-                startChunkPos = new Vector3Int(-432, 0, -8);
+                preloadStartChunkPos = new Vector3Int(-432, 0, -8);
             }
             else
             {
                 // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
                 // 需要随机
                 // 这个是PreloadStartPos
-                startChunkPos = new Vector3Int(0, 0, 0);
+                preloadStartChunkPos = GetProperStartChunkPos(m_preloadSize);
             }
 
 
@@ -248,7 +281,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = preloadStartChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchBaseData(chunkPos, 8, 8);
 
                     // 进度条更新
@@ -264,7 +297,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = preloadStartChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchAquifer(chunkPos);
 
                     // 进度条更新
@@ -280,7 +313,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < batchChunkSize; z++)
                 {
-                    var chunkPos = startChunkPos + new Vector3Int(x * 8, 3, z * 8);
+                    var chunkPos = preloadStartChunkPos + new Vector3Int(x * 8, 3, z * 8);
                     m_chunkManager.GenerateChunksBatchSurface(chunkPos);
 
                     // 进度条更新
@@ -291,6 +324,8 @@ namespace RS.Scene
                 }
             }
 
+
+            Vector3Int startChunkPos;
             if (InHome)
             {
                 // 加载用户修改记录
@@ -298,6 +333,10 @@ namespace RS.Scene
                 
                 // 定制下地图
                 startChunkPos = new Vector3Int(-431, 0, -5);
+            }
+            else
+            {
+                startChunkPos = preloadStartChunkPos;
             }
             
             // 地图生成
