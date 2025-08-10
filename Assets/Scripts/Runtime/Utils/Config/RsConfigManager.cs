@@ -55,7 +55,8 @@ namespace RS.Utils
             "SpaghettiRoughness",
             "SpaghettiRoughnessModulator",
             "Surface",
-            "Temperature"
+            "Temperature",
+            "Tree",
         };
 
         private static string[] m_presetSamplers = new string[]
@@ -88,7 +89,7 @@ namespace RS.Utils
             "SurfaceNoise",
             "Temperature",
             "Temp",
-            "tt",
+            "Tree",
             "YLimit",
         };
 

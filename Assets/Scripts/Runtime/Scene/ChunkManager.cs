@@ -371,6 +371,8 @@ namespace RS.Scene
                 var offsetX = (startChunkPos.x + x) * 32;
                 for (var z = 0; z < 8; z++)
                 {
+                    var chunks = new Chunk[12];
+                    
                     var offsetZ = (startChunkPos.z + z) * 32;
                     var contexts = new SurfaceContext[32 * 32];
                     for (var sx = 0; sx < 32; sx++)
@@ -394,14 +396,19 @@ namespace RS.Scene
                         }
 
                         // offset += 32768;
-                        chunk.status = ChunkStatus.DataReady;
+                        chunk.status = ChunkStatus.Tree;
 
                         if (y == 0)
                         {
                             chunk.topBlocks = topBlocks;
                             chunk.topBlockHeights = topBlockHeights;
                         }
+
+                        chunks[y + 3] = chunk;
                     }
+                    
+                    // 生成树木
+                    GenerateTree(chunks, contexts);
                 }
             }
             
@@ -971,6 +978,9 @@ namespace RS.Scene
                         chunk.topBlockHeights = topBlockHeights;
                     }
                 }
+                
+                // 生成树木
+                GenerateTree(chunks, contexts);
 
                 // if (chunkPosXZ.x == 0 && chunkPosXZ.y == 0)
                 // {
@@ -1114,7 +1124,7 @@ namespace RS.Scene
                 }
             }
             
-            chunk.status = ChunkStatus.DataReady;
+            chunk.status = ChunkStatus.Tree;
             
             // 数据完成时，通知邻居更新mesh，如果有的话
             NotifyNeighborUpdateMesh(chunk.chunkPos);
@@ -1124,19 +1134,100 @@ namespace RS.Scene
         }
 
 
-        public void PutATree(Vector3 pos)
+        private void GenerateTree(Chunk[] chunks, SurfaceContext[] contexts)
         {
-            var blockWorldPos = Chunk.WorldPosToBlockWorldPos(pos);
-            var tree = new Tree(1, 3);
-            var changeList = tree.GetChangeList();
+            var sx = 2;
+            var sz = 2;
 
-            foreach (var change in changeList)
+            var chunkPos = chunks[3].chunkPos;
+            var topBlocks = chunks[3].topBlocks;
+            var topBlockHeights = chunks[3].topBlockHeights;
+            var offsetX = chunkPos.x * 32;
+            var offsetZ = chunkPos.z * 32;
+
+            var sampler = NoiseManager.Instance.GetOrCreateSampler("Tree");
+            var sampleResult = sampler.SampleBatch(new Vector3(offsetX, 0, offsetZ), 32, 1, 32);
+
+            var blackList = new bool[32 * 32];
+            
+            while (sx < 30)
             {
-                var relativePos = change.Item1;
-                var newPos = blockWorldPos + relativePos;
-                PlaceBlock(newPos, change.Item2, true);
+                while (sz < 30)
+                {
+                    // 此处已生成树，直接跳过
+                    if (blackList[sx * 32 + sz])
+                    {
+                        sz++;
+                        continue;
+                    }
+                    
+                    // 目前树只能长在草块上
+                    if (topBlocks[sx * 32 + sz] != BlockType.Grass)
+                    {
+                        sz++;
+                        continue;
+                    }
+                    
+                    // 测试概率，与噪声、biome设置相关
+                    // 相关的还没做
+                    if (sampleResult[sx * 32 + sz] < 0.5f)
+                    {
+                        sz++;
+                        continue;
+                    }
+                    
+                    // 测试通过，生成一棵树
+                    // 更新黑名单
+                    for (var ix = -2; ix <= 2; ix++)
+                    {
+                        for (var iz = -2; iz <= 2; iz++)
+                        {
+                            blackList[(sx + ix) * 32 + sz + iz] = true;
+                            topBlocks[(sx + ix) * 32 + sz + iz] = BlockType.Leaf;
+                        }
+                    }
+                    
+                    var height = topBlockHeights[sx * 32 + sz];
+                    var treePos = new Vector3Int(sx, height + 1, sz);
+                    var changeList = Tree.GetChangeList(1, 3);
+
+                    foreach (var change in changeList)
+                    {
+                        var relativePos = change.Item1;
+                        var newPos = treePos + relativePos;
+                        var chunk = chunks[newPos.y / 32];
+                        newPos.y %= 32;
+                        chunk.blocks[Chunk.GetBlockIndex(newPos)] = change.Item2;
+                    }
+
+                    sz += 2;
+                }
+
+                sx++;
             }
+            
+
+            for (var chunkY = 3; chunkY < 12; chunkY++)
+            {
+                chunks[chunkY].status = ChunkStatus.DataReady;
+            }
+
+            sampleResult.Dispose();
         }
+        
+        // public void PutATree(Vector3 pos)
+        // {
+        //     var blockWorldPos = Chunk.WorldPosToBlockWorldPos(pos);
+        //     var tree = new Tree(1, 3);
+        //     var changeList = tree.GetChangeList();
+        //
+        //     foreach (var change in changeList)
+        //     {
+        //         var relativePos = change.Item1;
+        //         var newPos = blockWorldPos + relativePos;
+        //         PlaceBlock(newPos, change.Item2, true);
+        //     }
+        // }
         
         public void NotifyNeighborUpdateMesh(Vector3Int chunkPos)
         {

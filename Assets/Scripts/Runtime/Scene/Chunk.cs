@@ -19,6 +19,7 @@ namespace RS.Scene
         BaseData, // 基础数据准备中
         Aquifer, // 水域数据准备中
         Surface, // 地表数据准备中
+        Tree, // 树木生成中
         DataReady, // 数据准备完成，Mesh未生成
         MeshReady, // Mesh未加载active == false
         Loaded, // 当前场景已加载显示中

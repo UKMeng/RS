@@ -27,15 +27,15 @@ namespace RS.Scene
             m_height = height;
         }
 
-        public List<(Vector3Int, BlockType)> GetChangeList()
+        public static List<(Vector3Int, BlockType)> GetChangeList(int size, int height)
         {
             var list = new List<(Vector3Int, BlockType)>();
             var pos = new Vector3Int(0, 0, 0); // 相对位置
 
-            for (var i = 0; i < m_height + 2; i++)
+            for (var i = 0; i < height + 2; i++)
             {
                 // 树顶加一个叶子
-                if (i == m_height + 1)
+                if (i == height + 1)
                 {
                     list.Add((pos, BlockType.Leaf));
                     break;
@@ -51,7 +51,7 @@ namespace RS.Scene
                 }
 
                 // 树干高度2 * m_height
-                if (i < m_height)
+                if (i < height)
                 {
                     list.Add((pos, BlockType.Orc));
                     list.Add((pos + Vector3Int.up, BlockType.Orc));
