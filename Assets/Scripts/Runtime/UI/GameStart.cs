@@ -40,7 +40,14 @@ namespace RS.UI
                 }
                 else
                 {
-                    m_easyToggle.isOn = true;
+                    if (m_difficulty == 0)
+                    {
+                        m_easyToggle.isOn = true;
+                    }
+                    else
+                    {
+                        m_easyToggle.isOn = false;
+                    }
                 }
             });
             m_normalToggle.onValueChanged.AddListener(isOn => 
@@ -51,7 +58,14 @@ namespace RS.UI
                 }
                 else
                 {
-                    m_normalToggle.isOn = true;
+                    if (m_difficulty == 1)
+                    {
+                        m_normalToggle.isOn = true;
+                    }
+                    else
+                    {
+                        m_normalToggle.isOn = false;
+                    }
                 }
             });
             m_hardToggle.onValueChanged.AddListener(isOn => 
@@ -62,7 +76,14 @@ namespace RS.UI
                 }
                 else
                 {
-                    m_hardToggle.isOn = true;
+                    if (m_difficulty == 2)
+                    {
+                        m_hardToggle.isOn = true;
+                    }
+                    else
+                    {
+                        m_hardToggle.isOn = false;
+                    }
                 }
             });
 
