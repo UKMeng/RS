@@ -138,7 +138,7 @@ namespace RS.GMTool
                 GUILayout.Label("游戏时间:" + m_debugData.gameTime, m_labelStyle);
                 
                 GUILayout.Label("玩家坐标:" + player.Position, m_labelStyle);
-                GUILayout.Label("玩家信息:", m_labelStyle);
+                GUILayout.Label("玩家信息:" + player.Status, m_labelStyle);
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("血量:" + player.Health, m_labelStyle);
                 GUILayout.Label("耐力:" + player.Stamina, m_labelStyle);

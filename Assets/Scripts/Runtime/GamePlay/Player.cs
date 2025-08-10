@@ -13,6 +13,7 @@ namespace RS.GamePlay
     {
         FirstTime,
         GetShovel,
+        OnceMainGame,
         GetAxe,
         GetPickaxe,
         Done
@@ -37,7 +38,7 @@ namespace RS.GamePlay
         private Transform m_transform;
         private RsItem m_handItem; // 目前手持道具
         private int m_handItemIndex = 0;
-        private RsItem[] m_items; // 道具栏 暂定为10个栏位
+        private RsItem[] m_items; // 道具栏 暂定为8个栏位
         private PlayerInput m_playerInput;
         // private BlockType m_onBlockType;
         private bool m_isInWater = false;
@@ -53,16 +54,21 @@ namespace RS.GamePlay
         public event Action OnItemsChanged;
         public event Action OnHandItemIndexChanged;
 
-        public PlayerStatus Status => m_status;
+        public PlayerStatus Status
+        {
+            get => m_status;
+            set => m_status = value;
+        }
         public Vector3 BirthPosition => m_birthPosition;
         
         public void Load(PlayerData data)
         {
-            m_status = data.status;
             m_firstNight = data.firstNight;
             m_firstWater = data.firstWater;
             m_treasure = data.treasure;
             m_birthPosition = data.birthPosition;
+
+            StatusChange(data.status);
         }
         
         public PlayerData Save()
@@ -109,13 +115,7 @@ namespace RS.GamePlay
         public void Awake()
         {
             m_health = 100;
-            m_stamina = 100;
-            m_items = new RsItem[8];
-            m_handItemIndex = 0;
-            m_items[0] = new Shovel();
-            m_items[1] = new Axe();
-            m_items[2] = new Pickaxe();
-            m_handItem = m_items[0];
+            m_stamina = 100; ;
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();
@@ -239,6 +239,49 @@ namespace RS.GamePlay
             OnHandItemIndexChanged?.Invoke();
         }
 
+        public void StatusChange(PlayerStatus status)
+        {
+            if (m_items == null)
+            {
+                m_items = new RsItem[8];
+                m_handItemIndex = 0;
+                m_handItem = m_items[0];
+            }
+            
+            m_status = status;
+            switch(status)
+            {
+                case PlayerStatus.GetShovel:
+                case PlayerStatus.OnceMainGame:
+                {
+                    m_items[0] = new Shovel();
+                    m_handItemIndex = 0;
+                    OnItemsChanged?.Invoke();
+                    OnHandItemIndexChanged?.Invoke();
+                    break;
+                }
+                case PlayerStatus.GetAxe:
+                {
+                    m_items[0] = new Shovel();
+                    m_items[1] = new Axe();
+                    m_handItemIndex = 1;
+                    OnItemsChanged?.Invoke();
+                    OnHandItemIndexChanged?.Invoke();
+                    break;
+                }
+                case PlayerStatus.GetPickaxe:
+                {
+                    m_items[0] = new Shovel();
+                    m_items[1] = new Axe();
+                    m_items[2] = new Pickaxe();
+                    m_handItemIndex = 2;
+                    OnItemsChanged?.Invoke();
+                    OnHandItemIndexChanged?.Invoke();
+                    break;
+                }
+            }
+        }
+        
         public void TryAddBlock(BlockType blockType)
         {
             var index = 0;

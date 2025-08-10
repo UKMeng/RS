@@ -75,14 +75,29 @@ namespace RS.GamePlay
                 if (hitInfo.collider.gameObject.name == "Chest")
                 {
                     var chest = hitInfo.collider.transform.parent.gameObject.GetComponent<Chest>();
+
+                    if (m_player.Status == PlayerStatus.FirstTime)
+                    {
+                        m_player.InvokeTips("恭喜你找到第一个宝箱！获得了一把铲子,它能铲出泥块和沙块。");
+                        m_player.StatusChange(PlayerStatus.GetShovel);
+                        chest.Open(true);
+                        return;
+                    }
+                    
                     chest.Open();
-                    Debug.Log("Hit a Chest");
+                    // Debug.Log("Hit a Chest");
                 }
                 else if (hitInfo.collider.gameObject.name == "ReturnRock")
                 {
+                    if (m_player.Status == PlayerStatus.FirstTime)
+                    {
+                        m_player.InvokeTips("你需要先找到宝箱。按Q打开地图观察位置。");
+                        return;
+                    }
+                    
                     var rock = hitInfo.collider.transform.parent.gameObject.GetComponent<ReturnRock>();
                     rock.Trigger();
-                    Debug.Log("Hit a Return Rock");
+                    // Debug.Log("Hit a Return Rock");
                 }
 
                 if (m_player.HandItem != null)
