@@ -70,6 +70,10 @@ namespace RS.Scene
             m_map = mapUI.GetComponent<Map>();
             mapUI.SetActive(false);
             
+            var player = GameObject.Find("Player");
+            m_player = player.GetComponent<Player>();
+            GetComponent<GMToolWindow>().player = m_player;
+            
             if (InHome)
             {
                 seed = 114514;
@@ -77,17 +81,16 @@ namespace RS.Scene
                 m_blockModifyRecorder = new BlockModifyRecorder();
                 var saveData = SaveSystem.LoadGame();
                 m_blockModifyRecorder.Init(saveData);
+                m_player.Load(saveData.playerData);
             }
             else
             {
+                var saveData = SaveSystem.LoadGame();
                 seed = GameSettingTransfer.seed;
                 m_mapSize = GameSettingTransfer.mapSize;
+                m_player.Load(saveData.playerData);
             }
             
-            var player = GameObject.Find("Player");
-            m_player = player.GetComponent<Player>();
-            GetComponent<GMToolWindow>().player = m_player;
-
             m_loadingUI = GameObject.Find("LoadingUI");
             m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
             
@@ -231,7 +234,7 @@ namespace RS.Scene
 
             if (InHome)
             {
-                playerPos = new Vector3(-13736.0f, 66.0f, -51.0f);
+                playerPos = m_player.BirthPosition; // new Vector3(-13736.0f, 66.0f, -51.0f);
                 chestPos = new Vector3(-13725.98f, 63.5f, 17.497f);
                 returnPos = new Vector3(-13622.0f, 69.0f, 47.0f);
             }
@@ -246,9 +249,14 @@ namespace RS.Scene
             Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
             
             // 初始化物件
-            var chest = Instantiate(chestPrefab, chestPos, InHome? Quaternion.identity : Quaternion.Euler(0, GetRandomRotation(), 0));
-            var treasure = new Treasure(treasurePrefab, "test name", "test desc");
-            chest.GetComponent<Chest>().SetTreasure(treasure);
+            if ((InHome && m_player.Status == PlayerStatus.FirstTime) || !InHome)
+            {
+                // 第一次进入主城，放置宝箱 另外主游戏也要放置
+                var chest = Instantiate(chestPrefab, chestPos, InHome? Quaternion.identity : Quaternion.Euler(0, GetRandomRotation(), 0));
+                var treasure = new Treasure(treasurePrefab, "test name", "test desc");
+                chest.GetComponent<Chest>().SetTreasure(treasure);
+            }
+            
             Instantiate(returnRockPrefab, returnPos, InHome? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, GetRandomRotation(), 0));
             
             // 放置地图标记
@@ -278,7 +286,11 @@ namespace RS.Scene
             m_player.Position = playerPos;
             m_player.Rotation = Quaternion.Euler(0, GetRandomRotation(), 0);
             m_lastPosition = new Vector3(0, 0, 0);
-            
+
+            if (m_player.Status == PlayerStatus.FirstTime)
+            {
+                m_player.InvokeTips("按Q打开地图，参考地形找到X位置的宝箱");
+            }
             Debug.Log($"[SceneManager]场景数据准备完毕");
         }
 

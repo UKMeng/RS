@@ -20,6 +20,8 @@ namespace RS.GamePlay
     
     public class Player : MonoBehaviour
     {
+        [SerializeField] private TipManager m_tipManager;
+        
         private Animator m_animator;
         private int m_health; // 血条 0~100
         private int m_stamina; // 耐力值 0~100
@@ -51,6 +53,9 @@ namespace RS.GamePlay
         public event Action OnItemsChanged;
         public event Action OnHandItemIndexChanged;
 
+        public PlayerStatus Status => m_status;
+        public Vector3 BirthPosition => m_birthPosition;
+        
         public void Load(PlayerData data)
         {
             m_status = data.status;
@@ -59,10 +64,15 @@ namespace RS.GamePlay
             m_treasure = data.treasure;
             m_birthPosition = data.birthPosition;
         }
-
+        
         public PlayerData Save()
         {
             return new PlayerData(m_status, m_birthPosition, m_firstNight, m_firstWater, m_treasure);
+        }
+
+        public void InvokeTips(string tips)
+        {
+            m_tipManager.Show(tips);
         }
         
         public class ConsumeStamina : IUpdateByTick

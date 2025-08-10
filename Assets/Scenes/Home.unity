@@ -898,7 +898,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u64A4\u79BB\u70B9"
+  m_text: "\u4F20\u9001\u70B9"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 53e2ce99878092248a730ec70e4442bf, type: 2}
   m_sharedMaterial: {fileID: -4404510727699517002, guid: 53e2ce99878092248a730ec70e4442bf, type: 2}
@@ -1944,6 +1944,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6772080370674287517, guid: 7ae956b4f54394e80818898d8f4d30c6, type: 3}
+      propertyPath: m_tipManager
+      value: 
+      objectReference: {fileID: 5168157438494178336}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2719,6 +2723,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ced14186709f67e4580fcaae5f49f3b3, type: 3}
+--- !u!114 &5168157438494178336 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3007011719435381053, guid: ced14186709f67e4580fcaae5f49f3b3, type: 3}
+  m_PrefabInstance: {fileID: 5168157438494178335}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4417f89b4a43443a85775fb7e0f5628f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
