@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace RS.Utils
@@ -22,7 +23,7 @@ namespace RS.Utils
     
     public class RsConfig
     {
-        private static string m_configPath = "Assets/Scripts/Runtime/Config/{0}.json";
+        private static string m_configPath = Application.streamingAssetsPath + "/Config/{0}.json";
 
         public static RsConfig GetConfig(string name)
         {

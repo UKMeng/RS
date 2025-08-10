@@ -73,6 +73,7 @@ namespace RS.Scene
     public static class SaveSystem
     {
         private static string m_savePath = Application.persistentDataPath + "/save.json";
+        private static string m_initSavePath = $"{Application.streamingAssetsPath}/Config/InitSave.json";
 
         public static void SaveGame(SaveData data)
         {
@@ -85,7 +86,7 @@ namespace RS.Scene
         {
             if (!File.Exists(m_savePath))
             {
-                return null;
+                File.Copy(m_initSavePath, m_savePath);
             }
 
             var json = File.ReadAllText(m_savePath);
