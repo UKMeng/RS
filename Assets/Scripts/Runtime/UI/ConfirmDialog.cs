@@ -42,6 +42,7 @@ namespace RS.UI
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+
                 m_playerInput.actions["Attack"].Disable();
                 m_playerInput.actions["Look"].Disable();
                 m_playerInput.actions["Move"].Disable();

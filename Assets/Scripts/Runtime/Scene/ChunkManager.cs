@@ -416,7 +416,25 @@ namespace RS.Scene
             Debug.Log($"Deal with Surface {sw.ElapsedMilliseconds} ms");
         }
 
-        public Texture2D GenerateMap(Vector3Int startPos, int size)
+        public void ApplyDataModify(List<BlockModifyData> modifyDataList)
+        {
+            foreach (var modifyData in modifyDataList)
+            {
+                var chunkPos = modifyData.chunkPos;
+                var chunk = GetChunk(chunkPos);
+                if (chunk != null && chunk.status == ChunkStatus.DataReady)
+                {
+                    for (var i = 0; i < modifyData.blockIndex.Count; i++)
+                    {
+                        var index = modifyData.blockIndex[i];
+                        var type = modifyData.blockTypes[i];
+                        chunk.blocks[index] = type;
+                    }
+                }
+            }
+        }
+        
+        public Texture2D GenerateMap(Vector3Int startChunkPos, int size)
         {
             var sw = Stopwatch.StartNew();
 
@@ -424,7 +442,7 @@ namespace RS.Scene
             var colorArray = new NativeArray<Color>(size * size, Allocator.TempJob);
             var blockColorArray = new NativeArray<Color>(Block.BlockColors, Allocator.TempJob);
             var chunkSize = size / 32;
-            var chunkStartPos = Chunk.WorldPosToChunkPos(startPos);
+            // var chunkStartPos = Chunk.WorldPosToChunkPos(startPos);
             
             var topBlocksArray = new NativeArray<BlockType>(size * size, Allocator.TempJob);
             var topHeightsArray = new NativeArray<int>(size * size, Allocator.TempJob);
@@ -434,7 +452,7 @@ namespace RS.Scene
             {
                 for (var z = 0; z < chunkSize; z++)
                 {
-                    var chunkPos = chunkStartPos + new Vector3Int(x, 3, z);
+                    var chunkPos = startChunkPos + new Vector3Int(x, 3, z);
                     var chunk = GetChunk(chunkPos);
                     var topBlocks = chunk.topBlocks;
                     var topHeights = chunk.topBlockHeights;

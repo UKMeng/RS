@@ -56,6 +56,10 @@ namespace RS.Scene
         
         // 地图相关
         private Map m_map;
+        
+        // 主城状态
+        public bool InHome = true;
+        private BlockModifyRecorder m_blockModifyRecorder;
 
         public void Awake()
         {
@@ -75,8 +79,14 @@ namespace RS.Scene
             m_loadingUI = GameObject.Find("LoadingUI");
             m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
 
+            if (InHome)
+            {
+                m_blockModifyRecorder = new BlockModifyRecorder();
+                var saveData = SaveSystem.LoadGame();
+                m_blockModifyRecorder.Init(saveData);
+            }
             
-
+            
             // 初始化Block UV
             Block.Init();
             
@@ -102,6 +112,16 @@ namespace RS.Scene
             Debug.Log("返回主城");
         }
 
+        public void SaveGame()
+        {
+            if (InHome)
+            {
+                var modifyData = m_blockModifyRecorder.GetModifyDataList();
+                var saveData = new SaveData(modifyData);
+                SaveSystem.SaveGame(saveData);
+            }
+        }
+
         private IEnumerator InitSceneData()
         {
             var sw = Stopwatch.StartNew();
@@ -111,8 +131,10 @@ namespace RS.Scene
             var batchChunkSize = m_mapSize / 32 / 8;
             // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
             // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
-            var startChunkPos = new Vector3Int(0, 0, 0);
+            
+            // var startChunkPos = new Vector3Int(0, 0, 0);
 
+            var startChunkPos = new Vector3Int(-427, 0, -1);
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
             
 
@@ -164,6 +186,12 @@ namespace RS.Scene
                     yield return null;
                 }
             }
+
+            if (InHome)
+            {
+                // 加载用户修改记录
+                m_chunkManager.ApplyDataModify(m_blockModifyRecorder.GetModifyDataList());
+            }
             
             // 地图生成
             var mapTexture = m_chunkManager.GenerateMap(startChunkPos, m_mapSize);
@@ -179,7 +207,8 @@ namespace RS.Scene
             
             
             // 随机位置
-            var playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
+            // var playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
+            var playerPos = new Vector3(-13728.0f, 90.0f, -64.0f);
             Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
 
             var chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
@@ -227,6 +256,10 @@ namespace RS.Scene
         private void OnDestroy()
         {
             Debug.Log("开始销毁资源");
+            
+            // 保存
+            SaveGame();
+            
             Block.UnInit();
             GetComponent<TickManager>().Unregister(m_time);
             NoiseManager.Instance.Dispose();
@@ -382,6 +415,16 @@ namespace RS.Scene
         public Vector3 GetPlayerPos()
         {
             return m_player.Position;
+        }
+
+        public void BlockModifyRecord(Vector3Int chunkPos, int blockIndex, BlockType blockType)
+        {
+            if (!InHome)
+            {
+                return;
+            }
+            
+            m_blockModifyRecorder.AddModifyData(chunkPos, blockIndex, blockType);
         }
     }
 }
