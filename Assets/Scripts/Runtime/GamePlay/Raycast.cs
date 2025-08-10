@@ -78,7 +78,7 @@ namespace RS.GamePlay
 
                     if (m_player.Status == PlayerStatus.FirstTime)
                     {
-                        m_player.InvokeTips("恭喜你找到第一个宝箱！获得了一把铲子,它能铲出泥块和沙块。");
+                        m_player.InvokeTips("恭喜你找到第一个宝箱！获得了一把铲子,它能铲出泥块和沙块。接下去去找R标记的传送点。");
                         m_player.StatusChange(PlayerStatus.GetShovel);
                         chest.Open(true);
                         return;
@@ -92,6 +92,13 @@ namespace RS.GamePlay
                     if (m_player.Status == PlayerStatus.FirstTime)
                     {
                         m_player.InvokeTips("你需要先找到宝箱。按Q打开地图观察位置。");
+                        return;
+                    }
+
+                    if (RsSceneManager.Instance.InHome)
+                    {
+                        // Home弹出开始游戏的UI
+                        RsSceneManager.Instance.ToggleGameStartUI();
                         return;
                     }
                     

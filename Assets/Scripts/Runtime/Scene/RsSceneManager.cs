@@ -58,11 +58,13 @@ namespace RS.Scene
         
         // 地图相关
         private Map m_map;
+        private GameStart m_gameStart;
         
         // 主城状态
         public bool InHome = true;
         private BlockModifyRecorder m_blockModifyRecorder;
         private SaveData m_lastSaveData;
+        private bool m_needSave = true;
 
         public void Awake()
         {
@@ -71,6 +73,10 @@ namespace RS.Scene
             var mapUI = GameObject.Find("MapUI");
             m_map = mapUI.GetComponent<Map>();
             mapUI.SetActive(false);
+            
+            var gameStartUI = GameObject.Find("GameStartUI");
+            m_gameStart = gameStartUI.GetComponent<GameStart>();
+            gameStartUI.SetActive(false);
             
             var player = GameObject.Find("Player");
             m_player = player.GetComponent<Player>();
@@ -117,23 +123,58 @@ namespace RS.Scene
             StartCoroutine(InitSceneData());
         }
 
+        public void GameStart(long seed, int mode)
+        {
+            GameSettingTransfer.seed = seed;
+            switch (mode)
+            {
+                case 0:
+                {
+                    GameSettingTransfer.mapSize = 256;
+                    break;
+                }
+                case 1:
+                {
+                    GameSettingTransfer.mapSize = 512;
+                    break;
+                }
+                case 2:
+                {
+                    GameSettingTransfer.mapSize = 1024;
+                    break;
+                }
+            }
+
+            SaveGame();
+            m_needSave = false;
+            OpenMainGameScene();
+        }
+
         public void ReturnHome(bool success = false)
         {
             Debug.Log($"返回主城 {success}");
             if (success)
             {
-                
+                SaveGame();
+                m_needSave = false;
+                OpenHomeScene();
             }
             else
             {
                 SaveSystem.SaveGame(m_lastSaveData);
+                m_needSave = false;
                 OpenHomeScene();
             }
         }
 
-        public void OpenHomeScene()
+        private void OpenHomeScene()
         {
             SceneManager.LoadScene("Scenes/Home", LoadSceneMode.Single);
+        }
+
+        private void OpenMainGameScene()
+        {
+            SceneManager.LoadScene("Scenes/MainGame", LoadSceneMode.Single);
         }
 
         public void SaveGame()
@@ -143,6 +184,12 @@ namespace RS.Scene
                 var modifyData = m_blockModifyRecorder.GetModifyDataList();
                 var playerData = m_player.Save();
                 var saveData = new SaveData(modifyData, playerData);
+                SaveSystem.SaveGame(saveData);
+            }
+            else
+            {
+                var playerData = m_player.Save();
+                var saveData = new SaveData(m_lastSaveData.blockModifyData, playerData);
                 SaveSystem.SaveGame(saveData);
             }
         }
@@ -321,6 +368,11 @@ namespace RS.Scene
         private void OnDestroy()
         {
             Debug.Log("开始销毁资源");
+
+            if (m_needSave)
+            {
+                SaveGame();
+            }
             
             Block.UnInit();
             GetComponent<TickManager>().Unregister(m_time);
@@ -467,6 +519,11 @@ namespace RS.Scene
             {
                 m_map.Toggle();
             }
+        }
+
+        public void ToggleGameStartUI()
+        {
+            m_gameStart.Toggle();
         }
 
         public void OnMenu(InputValue value)
