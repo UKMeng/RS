@@ -69,8 +69,19 @@ namespace RS.Scene
             m_map = mapUI.GetComponent<Map>();
             mapUI.SetActive(false);
             
-            seed = GameSettingTransfer.seed;
-            m_mapSize = GameSettingTransfer.mapSize;
+            if (InHome)
+            {
+                seed = 114514;
+                m_mapSize = 512;
+                m_blockModifyRecorder = new BlockModifyRecorder();
+                var saveData = SaveSystem.LoadGame();
+                m_blockModifyRecorder.Init(saveData);
+            }
+            else
+            {
+                seed = GameSettingTransfer.seed;
+                m_mapSize = GameSettingTransfer.mapSize;
+            }
             
             var player = GameObject.Find("Player");
             m_player = player.GetComponent<Player>();
@@ -78,14 +89,6 @@ namespace RS.Scene
 
             m_loadingUI = GameObject.Find("LoadingUI");
             m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
-
-            if (InHome)
-            {
-                m_blockModifyRecorder = new BlockModifyRecorder();
-                var saveData = SaveSystem.LoadGame();
-                m_blockModifyRecorder.Init(saveData);
-            }
-            
             
             // 初始化Block UV
             Block.Init();
@@ -127,16 +130,25 @@ namespace RS.Scene
             var sw = Stopwatch.StartNew();
             
             // 场景数据生成，返回进度条数值
-            // var batchChunkSize = m_mapSize / 32 / 8;
             var batchChunkSize = m_mapSize / 32 / 8;
-            // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
-            // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
-            
-            // var startChunkPos = new Vector3Int(0, 0, 0);
-
-            var startChunkPos = new Vector3Int(-427, 0, -1);
             var totalProgress = 64 * batchChunkSize * batchChunkSize * 3;
-            
+
+
+            Vector3Int startChunkPos;
+            // 主城加载固定
+            if (InHome)
+            {
+                // 选点需要注意，不能跨大块的采样器进行采样（32X32) 余32要小于等于24
+                startChunkPos = new Vector3Int(-432, 0, -8);
+            }
+            else
+            {
+                // TODO: 后续地图起始点随机且要确定地图的海洋面积不能太大
+                // 大概的做法是，在范围内选取9-16个点（根据地图范围）取样大陆性，然后至少3/4的点不能是海洋，这样能规避大部分起始点问题了
+                // 需要随机
+                startChunkPos = new Vector3Int(0, 0, 0);
+            }
+
 
             // base data阶段，其实可以分帧处理不同阶段？
             var progress = 0;
@@ -191,6 +203,10 @@ namespace RS.Scene
             {
                 // 加载用户修改记录
                 m_chunkManager.ApplyDataModify(m_blockModifyRecorder.GetModifyDataList());
+                
+                // 定制下地图
+                m_mapSize = 256;
+                startChunkPos = new Vector3Int(-431, 0, -5);
             }
             
             // 地图生成
@@ -207,24 +223,35 @@ namespace RS.Scene
             
             
             // 随机位置
-            // var playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
-            var playerPos = new Vector3(-13728.0f, 90.0f, -64.0f);
-            Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
+            Vector3 playerPos;
+            Vector3 chestPos;
+            Vector3 returnPos;
 
-            var chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
+            if (InHome)
+            {
+                playerPos = new Vector3(-13736.0f, 66.0f, -51.0f);
+                chestPos = new Vector3(-13725.98f, 63.5f, 17.497f);
+                returnPos = new Vector3(-13622.0f, 69.0f, 47.0f);
+            }
+            else
+            {
+                playerPos = m_chunkManager.ChoosePlayerPos(startChunkPos, m_mapSize);
+                chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
+                returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
+            }
+            Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
             Debug.Log($"[SceneManager] 宝箱位置: {chestPos}");
-            // 先放置宝箱在面前
-            var chest = Instantiate(chestPrefab, playerPos, Quaternion.Euler(0, GetRandomRotation(), 0));
+            Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
+            
+            // 初始化物件
+            var chest = Instantiate(chestPrefab, chestPos, InHome? Quaternion.identity : Quaternion.Euler(0, GetRandomRotation(), 0));
             var treasure = new Treasure(treasurePrefab, "test name", "test desc");
             chest.GetComponent<Chest>().SetTreasure(treasure);
-
-            var returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
-            Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
-            Instantiate(returnRockPrefab, returnPos, Quaternion.Euler(0, GetRandomRotation(), 0));
+            Instantiate(returnRockPrefab, returnPos, InHome? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, GetRandomRotation(), 0));
             
+            // 放置地图标记
             var chestMarkPos = new Vector2((chestPos.x - startChunkPos.x * 32) / m_mapSize,
                 (chestPos.z - startChunkPos.z * 32) / m_mapSize);
-            
             var returnMarkPos = new Vector2((returnPos.x - startChunkPos.x * 32) / m_mapSize,
                 (returnPos.z - startChunkPos.z * 32) / m_mapSize);
             
@@ -234,8 +261,16 @@ namespace RS.Scene
             m_chunkManager.UpdateChunkStatus(playerPos, true);
             
             // 上午8点
-            m_time = new GameTime(360); // 480 = 8:00 360 = 6:00
-            m_tickManager.Register(m_time);
+            if (InHome)
+            {
+                // 主城时间不变动
+                m_time = new GameTime(540);
+            }
+            else
+            {
+                m_time = new GameTime(360); // 480 = 8:00 360 = 6:00
+                m_tickManager.Register(m_time);
+            }
             
             // 放置Player
             m_player.Position = playerPos;
@@ -281,7 +316,11 @@ namespace RS.Scene
             }
 
             m_chunkManager.UpdateChunkStatus(m_player.Position);
-            UpdateDayLight();
+
+            if (!InHome)
+            {
+                UpdateDayLight();
+            }
         }
 
         public Chunk GetChunk(Vector3Int chunkPos)
@@ -425,6 +464,12 @@ namespace RS.Scene
             }
             
             m_blockModifyRecorder.AddModifyData(chunkPos, blockIndex, blockType);
+        }
+
+        public void QuitGame()
+        {
+            SaveGame();
+            Application.Quit();
         }
     }
 }
