@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 50099545}
   - component: {fileID: 50099547}
   - component: {fileID: 50099548}
+  - component: {fileID: 50099549}
   m_Layer: 0
   m_Name: SceneRoot
   m_TagString: Untagged
@@ -371,6 +372,22 @@ MonoBehaviour:
   m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &50099549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50099544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e5bb01ec5b4f9596d12e5fca14c40f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chunkPrefab: {fileID: 0}
+  m_loadDistance: 5
+  m_deactivateDistance: 8
+  m_destroyDistance: 10
 --- !u!1 &70479256
 GameObject:
   m_ObjectHideFlags: 0

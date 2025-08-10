@@ -46,9 +46,9 @@ namespace RS.Scene
         private Queue<Vector2Int> m_chunkGeneratingQueue;
         private bool m_isGeneratingChunks;
         
-        private int m_loadDistance = 10;
-        private int m_deactivateDistance = 15;
-        private int m_destroyDistance = 20;
+        [SerializeField] private int m_loadDistance = 10;
+        [SerializeField] private int m_deactivateDistance = 15;
+        [SerializeField] private int m_destroyDistance = 20;
         private int m_maxChunksPerFrame = 1;
 
         private int m_seaLevel = 127;
