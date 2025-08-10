@@ -14,6 +14,7 @@ namespace RS.Scene
     public struct SurfaceContext
     {
         public BiomeType biome;
+        public float humidity;
         public float surfaceNoise;
         public float surfaceDepth;
         public int waterHeight;     // 本方块距离上方最近的液体表面上方一格的距离，如果上方有空气，则不在水下，值为int最小值
@@ -186,13 +187,14 @@ namespace RS.Scene
             var samplerZ = Mathf.FloorToInt(chunkPos.y / 32.0f);
             var surfaceNoiseSampler = GetOrCreateCacheSampler("SurfaceNoise", new Vector3Int(samplerX, 0, samplerZ));
             
-            var biome = SampleBiome(pos, out _);
+            var biome = SampleBiome(pos, out var sampleValues);
             var surfaceNoise = surfaceNoiseSampler.Sample(pos);
             var surfaceDepth = Mathf.FloorToInt(6 * surfaceNoise + 6);
             
             return new SurfaceContext
             {
                 biome = biome, 
+                humidity = sampleValues[3],
                 surfaceDepth = surfaceDepth,
                 waterHeight = int.MinValue,
                 stoneDepthAbove = 0

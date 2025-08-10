@@ -13,6 +13,7 @@ namespace RS.GMTool
     {
         public BiomeType biomeType;
         public string gameTime;
+        public float humidity;
     }
     
     public class GMToolWindow : MonoBehaviour
@@ -154,6 +155,7 @@ namespace RS.GMTool
                 GUILayout.EndHorizontal();
                 
                 GUILayout.Label("Biome:" + m_debugData.biomeType, m_labelStyle);
+                GUILayout.Label("Humidity:" + m_debugData.humidity, m_labelStyle);
                 
                 GUILayout.Label("RayCast Block:" + m_rayCastText, m_labelStyle);
             }
@@ -170,7 +172,8 @@ namespace RS.GMTool
         private void UpdateDebugData()
         {
             var pos = player.Position;
-            m_debugData.biomeType = NoiseManager.Instance.SampleBiome(pos, out _);
+            m_debugData.biomeType = NoiseManager.Instance.SampleBiome(pos, out var sampleValues);
+            m_debugData.humidity = sampleValues[3];
             m_debugData.gameTime = m_sceneManager.GetGameTime();
         }
     }

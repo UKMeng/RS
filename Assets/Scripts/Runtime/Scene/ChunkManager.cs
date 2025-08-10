@@ -1144,7 +1144,7 @@ namespace RS.Scene
             var topBlockHeights = chunks[3].topBlockHeights;
             var offsetX = chunkPos.x * 32;
             var offsetZ = chunkPos.z * 32;
-
+            
             var sampler = NoiseManager.Instance.GetOrCreateSampler("Tree");
             var sampleResult = sampler.SampleBatch(new Vector3(offsetX, 0, offsetZ), 32, 1, 32);
 
@@ -1170,7 +1170,7 @@ namespace RS.Scene
                     
                     // 测试概率，与噪声、biome设置相关
                     // 相关的还没做
-                    if (sampleResult[sx * 32 + sz] < 0.8f)
+                    if (contexts[sx * 32 + sz].humidity < 0f || sampleResult[sx * 32 + sz] < 0.8f)
                     {
                         sz++;
                         continue;
