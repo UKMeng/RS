@@ -15,13 +15,13 @@ namespace RS.GamePlay
 
         private GameObject m_outline;
         private Player m_player;
-        private SceneManager m_sceneManager;
+        private RsSceneManager m_sceneManager;
         
 
         private void Awake()
         {
             var sceneRoot = GameObject.Find("SceneRoot");
-            m_sceneManager = sceneRoot.GetComponent<SceneManager>();
+            m_sceneManager = sceneRoot.GetComponent<RsSceneManager>();
             m_player = GetComponent<Player>();
             m_outline = Instantiate(outlinePrefab, Vector3.down, Quaternion.identity);
             m_outline.SetActive(false);

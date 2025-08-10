@@ -25,7 +25,7 @@ namespace RS.GMTool
         
         private PlayerInput m_playerInput;
 
-        private SceneManager m_sceneManager;
+        private RsSceneManager m_sceneManager;
 
         private string m_commandLine;
         
@@ -41,7 +41,7 @@ namespace RS.GMTool
         private void Awake()
         {
             m_playerInput = GetComponent<PlayerInput>();
-            m_sceneManager = GetComponent<SceneManager>();
+            m_sceneManager = GetComponent<RsSceneManager>();
             m_debugData = new DebugData();
             
             
@@ -72,7 +72,7 @@ namespace RS.GMTool
                         {
                             var hour = uint.Parse(args[1]);
                             var minute = uint.Parse(args[2]);
-                            SceneManager.Instance.SetGameTime(hour, minute);
+                            RsSceneManager.Instance.SetGameTime(hour, minute);
                             break;
                         }
                         default:

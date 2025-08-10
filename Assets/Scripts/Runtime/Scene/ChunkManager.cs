@@ -694,7 +694,7 @@ namespace RS.Scene
                         chunk.go.SetActive(false);
                         chunk.status = ChunkStatus.MeshReady;
                         
-                        Debug.Log($"[SceneManager] 触发卸载Mesh {chunkPos}");
+                        Debug.Log($"[RsSceneManager] 触发卸载Mesh {chunkPos}");
                     }
                 }
             
@@ -707,7 +707,7 @@ namespace RS.Scene
                         Destroy(chunk.go);
                         chunk.status = ChunkStatus.DataReady;
                         
-                        Debug.Log($"[SceneManager] 触发删除Mesh {chunkPos}");
+                        Debug.Log($"[RsSceneManager] 触发删除Mesh {chunkPos}");
                     }
                 }
             }
@@ -747,7 +747,7 @@ namespace RS.Scene
                             else
                             {
                                 // 通知tick manager安排更新mesh
-                                SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                                RsSceneManager.Instance.UpdateChunkMeshOnTick(chunk);
                             }
                         }
                         else if (chunk.status == ChunkStatus.MeshReady)
@@ -1072,7 +1072,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Surface;
             
             // sw.Stop();
-            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[RsSceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
 
         private void GenerateSurface(Chunk chunk, SurfaceContext[] contexts, BlockType[] topBlocks, int[] topBlockHeights)
@@ -1148,7 +1148,7 @@ namespace RS.Scene
             NotifyNeighborUpdateMesh(chunk.chunkPos);
             
             sw.Stop();
-            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[RsSceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
         }
 
 
@@ -1255,7 +1255,7 @@ namespace RS.Scene
                 var chunk = GetChunk(chunkPos + dir);
                 if (chunk != null && chunk.status > ChunkStatus.DataReady)
                 {
-                    SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                    RsSceneManager.Instance.UpdateChunkMeshOnTick(chunk);
                 }
             }
         }
@@ -1364,7 +1364,7 @@ namespace RS.Scene
             chunk.ModifyBlock(blockLocalPos, blockType);
             if (delayUpdate)
             {
-                SceneManager.Instance.UpdateChunkMeshOnTick(chunk);
+                RsSceneManager.Instance.UpdateChunkMeshOnTick(chunk);
             }
             else
             {

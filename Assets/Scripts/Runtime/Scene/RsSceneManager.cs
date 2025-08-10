@@ -4,6 +4,7 @@ using System.Diagnostics;
 using RS.GamePlay;
 using RS.Item;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 using RS.GMTool;
@@ -13,11 +14,11 @@ using UnityEngine.UI;
 
 namespace RS.Scene
 {
-    public class SceneManager: MonoBehaviour
+    public class RsSceneManager: MonoBehaviour
     {
-        private static SceneManager s_instance;
+        private static RsSceneManager s_instance;
 
-        public static SceneManager Instance
+        public static RsSceneManager Instance
         {
             get
             {
@@ -52,7 +53,7 @@ namespace RS.Scene
         // 场景初始化与进度条相关
         private int m_mapSize;
         private bool m_isLoading = true;
-        private GameObject m_loadingUI;
+        [SerializeField] private GameObject m_loadingUI;
         private Slider m_loadingSlider;
         
         // 地图相关
@@ -61,6 +62,7 @@ namespace RS.Scene
         // 主城状态
         public bool InHome = true;
         private BlockModifyRecorder m_blockModifyRecorder;
+        private SaveData m_lastSaveData;
 
         public void Awake()
         {
@@ -80,18 +82,19 @@ namespace RS.Scene
                 m_mapSize = 512;
                 m_blockModifyRecorder = new BlockModifyRecorder();
                 var saveData = SaveSystem.LoadGame();
+                m_lastSaveData = saveData;
                 m_blockModifyRecorder.Init(saveData);
                 m_player.Load(saveData.playerData);
             }
             else
             {
                 var saveData = SaveSystem.LoadGame();
+                m_lastSaveData = saveData;
                 seed = GameSettingTransfer.seed;
                 m_mapSize = GameSettingTransfer.mapSize;
                 m_player.Load(saveData.playerData);
             }
             
-            m_loadingUI = GameObject.Find("LoadingUI");
             m_loadingSlider = m_loadingUI.GetComponentInChildren<Slider>();
             
             // 初始化Block UV
@@ -117,6 +120,20 @@ namespace RS.Scene
         public void ReturnHome(bool success = false)
         {
             Debug.Log($"返回主城 {success}");
+            if (success)
+            {
+                
+            }
+            else
+            {
+                SaveSystem.SaveGame(m_lastSaveData);
+                OpenHomeScene();
+            }
+        }
+
+        public void OpenHomeScene()
+        {
+            SceneManager.LoadScene("Scenes/Home", LoadSceneMode.Single);
         }
 
         public void SaveGame()
@@ -219,7 +236,7 @@ namespace RS.Scene
             m_map.SetMapTexture(mapTexture);
 
             sw.Stop();
-            Debug.Log($"[SceneManager]场景数据生成完毕，耗时: {sw.ElapsedMilliseconds} ms");
+            Debug.Log($"[RsSceneManager]场景数据生成完毕，耗时: {sw.ElapsedMilliseconds} ms");
             
             // 随机位置
             Vector3 playerPos;
@@ -238,9 +255,9 @@ namespace RS.Scene
                 chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
                 returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
             }
-            Debug.Log($"[SceneManager] 玩家初始位置: {playerPos}");
-            Debug.Log($"[SceneManager] 宝箱位置: {chestPos}");
-            Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
+            Debug.Log($"[RsSceneManager] 玩家初始位置: {playerPos}");
+            Debug.Log($"[RsSceneManager] 宝箱位置: {chestPos}");
+            Debug.Log($"[RsSceneManager] 返回点位置: {returnPos}");
             
             // 初始化物件
             if ((InHome && m_player.Status == PlayerStatus.FirstTime) || !InHome)
@@ -290,7 +307,7 @@ namespace RS.Scene
             m_isLoading = false;
             m_loadingUI.SetActive(false);
             Destroy(m_loadingUI);
-            Debug.Log($"[SceneManager]场景数据准备完毕");
+            Debug.Log($"[RsSceneManager]场景数据准备完毕");
         }
 
         private float GetRandomRotation()
@@ -304,9 +321,6 @@ namespace RS.Scene
         private void OnDestroy()
         {
             Debug.Log("开始销毁资源");
-            
-            // 保存
-            SaveGame();
             
             Block.UnInit();
             GetComponent<TickManager>().Unregister(m_time);

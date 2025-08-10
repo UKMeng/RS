@@ -61,12 +61,12 @@ namespace RS.Item
 
         private bool CheckLiquidFlow(Liquid liquid, Vector3Int direction, List<Liquid> newLiquids, bool isDown = false)
         {
-            var block = SceneManager.Instance.GetBlockType(direction);
+            var block = RsSceneManager.Instance.GetBlockType(direction);
             if (block == BlockType.Air)
             {
                 var newLiquid = liquid.Spread(direction, isDown ? liquid.Depth : (byte)(liquid.Depth + 1));
                 newLiquids.Add(newLiquid);
-                SceneManager.Instance.PlaceBlock(direction, liquid.Type);
+                RsSceneManager.Instance.PlaceBlock(direction, liquid.Type);
 
                 return isDown;
             }

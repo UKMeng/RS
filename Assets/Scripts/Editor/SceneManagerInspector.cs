@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace RS
 {
-    [CustomEditor(typeof(SceneManager))]
+    [CustomEditor(typeof(RsSceneManager))]
     public class SceneManagerInspector : Editor
     {
         public override void OnInspectorGUI()
@@ -13,8 +13,8 @@ namespace RS
             // 绘制默认Inspector
             DrawDefaultInspector();
             
-            // 获取当前 Inspector 选中的 SceneManager 实例
-            SceneManager sceneManager = (SceneManager)target;
+            // 获取当前 Inspector 选中的 RsSceneManager 实例
+            RsSceneManager sceneManager = (RsSceneManager)target;
 
             // 添加按钮
             // if (GUILayout.Button("Generate Scene"))

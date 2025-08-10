@@ -64,7 +64,7 @@ namespace RS.Scene
             var index = GetBlockIndex(localPos);
             blocks[index] = newBlockType;
             
-            SceneManager.Instance.BlockModifyRecord(chunkPos, index, newBlockType);
+            RsSceneManager.Instance.BlockModifyRecord(chunkPos, index, newBlockType);
         }
 
         public static Vector3Int BlockWorldPosToChunkPos(Vector3Int blockWorldPos)

@@ -143,7 +143,7 @@ namespace RS.GamePlay
         public void Start()
         {
             m_consumeStaminaEvent = new ConsumeStamina(this);
-            SceneManager.Instance.RegisterTickEvent(m_consumeStaminaEvent);
+            RsSceneManager.Instance.RegisterTickEvent(m_consumeStaminaEvent);
             OnHandItemIndexChanged?.Invoke();
         }
 
@@ -151,7 +151,7 @@ namespace RS.GamePlay
         {
             var pos = m_transform.position;
             // var blockPos = Chunk.WorldPosToBlockWorldPos(pos);
-            var onBlockType = SceneManager.Instance.GetBlockType(Chunk.WorldPosToBlockWorldPos(pos) + Vector3Int.up);
+            var onBlockType = RsSceneManager.Instance.GetBlockType(Chunk.WorldPosToBlockWorldPos(pos) + Vector3Int.up);
             if (onBlockType == BlockType.Water)
             {
                 m_isInWater = true;

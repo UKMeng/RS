@@ -35,7 +35,7 @@ namespace RS.UI
 
             if (m_playerInput == null)
             {
-                m_playerInput = SceneManager.Instance.PlayerInput;
+                m_playerInput = RsSceneManager.Instance.PlayerInput;
             }
             
             if (m_playerInput != null)

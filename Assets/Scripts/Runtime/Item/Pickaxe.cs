@@ -21,7 +21,7 @@ namespace RS.Item
                 Mathf.FloorToInt(blockPos.z / 32.0f));
 
             var blockWorldPos = Chunk.WorldPosToBlockWorldPos(blockPos);
-            var blockType = SceneManager.Instance.GetBlockType(blockWorldPos);
+            var blockType = RsSceneManager.Instance.GetBlockType(blockWorldPos);
 
             // 铲子只能用来铲泥土
             if (!IsBreakable(blockType))
@@ -38,7 +38,7 @@ namespace RS.Item
 
             // 破坏这个block
             // 首先获取chunk
-            var chunk = SceneManager.Instance.GetChunk(chunkPos);
+            var chunk = RsSceneManager.Instance.GetChunk(chunkPos);
             chunk.ModifyBlock(blockLocalPos, BlockType.Air);
             chunk.UpdateMesh();
 
@@ -55,51 +55,51 @@ namespace RS.Item
             // 如何y小于127，检查邻居是否有水
             if (blockLocalPos.y < 127)
             {
-                var upType = SceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.up);
+                var upType = RsSceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.up);
                 if (upType == BlockType.Water)
                 {
                     var water = new Water(blockWorldPos + Vector3Int.up);
                     var sub = new Flow(water);
-                    SceneManager.Instance.RegisterTickEvent(sub);
+                    RsSceneManager.Instance.RegisterTickEvent(sub);
                 }
 
-                var leftType = SceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.left);
+                var leftType = RsSceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.left);
                 if (leftType == BlockType.Water)
                 {
                     var water = new Water(blockWorldPos + Vector3Int.left);
                     var sub = new Flow(water);
-                    SceneManager.Instance.RegisterTickEvent(sub);
+                    RsSceneManager.Instance.RegisterTickEvent(sub);
                 }
 
-                var rightType = SceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.right);
+                var rightType = RsSceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.right);
                 if (rightType == BlockType.Water)
                 {
                     var water = new Water(blockWorldPos + Vector3Int.right);
                     var sub = new Flow(water);
-                    SceneManager.Instance.RegisterTickEvent(sub);
+                    RsSceneManager.Instance.RegisterTickEvent(sub);
                 }
 
-                var forwardType = SceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.forward);
+                var forwardType = RsSceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.forward);
                 if (forwardType == BlockType.Water)
                 {
                     var water = new Water(blockWorldPos + Vector3Int.forward);
                     var sub = new Flow(water);
-                    SceneManager.Instance.RegisterTickEvent(sub);
+                    RsSceneManager.Instance.RegisterTickEvent(sub);
                 }
 
-                var backType = SceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.back);
+                var backType = RsSceneManager.Instance.GetBlockType(blockWorldPos + Vector3Int.back);
                 if (backType == BlockType.Water)
                 {
                     var water = new Water(blockWorldPos + Vector3Int.back);
                     var sub = new Flow(water);
-                    SceneManager.Instance.RegisterTickEvent(sub);
+                    RsSceneManager.Instance.RegisterTickEvent(sub);
                 }
             }
 
             // 检查是否是边界是否需要更新邻居Chunk的mesh
             if (blockLocalPos.y == 0)
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.down);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.down);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
@@ -107,7 +107,7 @@ namespace RS.Item
             }
             else if (blockLocalPos.y == 31)
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.up);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.up);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
@@ -116,7 +116,7 @@ namespace RS.Item
 
             if (blockLocalPos.z == 0)
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.back);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.back);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
@@ -124,7 +124,7 @@ namespace RS.Item
             }
             else if (blockLocalPos.z == 31)
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.forward);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.forward);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
@@ -133,7 +133,7 @@ namespace RS.Item
 
             if (blockLocalPos.x == 0)
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.left);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.left);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();
@@ -141,7 +141,7 @@ namespace RS.Item
             }
             else
             {
-                var neighbor = SceneManager.Instance.GetChunk(chunkPos + Vector3Int.right);
+                var neighbor = RsSceneManager.Instance.GetChunk(chunkPos + Vector3Int.right);
                 if (neighbor != null)
                 {
                     neighbor.UpdateMesh();

@@ -37,7 +37,7 @@ namespace RS.UI
 
         private void DeathOnClick()
         {
-            SceneManager.Instance.ReturnHome(false);
+            RsSceneManager.Instance.ReturnHome(false);
         }
         
         public void SetStamina(int value)

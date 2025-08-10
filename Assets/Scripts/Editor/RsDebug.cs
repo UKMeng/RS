@@ -328,7 +328,7 @@ namespace RS.Scene
             chunk.status = ChunkStatus.Surface;
             
             sw.Stop();
-            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[RsSceneManager] 生成Chunk {chunk.chunkPos} Aquifer耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         private static void GenerateSurface(Chunk chunk, SurfaceContext[] contexts)
@@ -383,7 +383,7 @@ namespace RS.Scene
             // NotifyNeighborUpdateMesh(chunk.chunkPos);
             
             // sw.Stop();
-            // Debug.Log($"[SceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
+            // Debug.Log($"[RsSceneManager] 生成Chunk {chunk.chunkPos} Surface耗时 {sw.ElapsedMilliseconds} ms");
         }
         
         

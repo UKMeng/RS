@@ -78,7 +78,7 @@ namespace RS.Scene
                     //
                     // // 分帧生成，每次只处理距离最近的10个Chunk mesh
                     // // top k
-                    // var pos = SceneManager.Instance.GetPlayerPos();
+                    // var pos = RsSceneManager.Instance.GetPlayerPos();
                     // var k = 50;
                     // var maxHeap = new SortedList<float, Chunk>(new DescComparer());
                     //

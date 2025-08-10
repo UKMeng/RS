@@ -115,7 +115,7 @@ namespace RS.Item
             Debug.Log($"Block World Pos: {blockWorldPos}");
         
             
-            SceneManager.Instance.PlaceBlock(blockWorldPos, m_type);
+            RsSceneManager.Instance.PlaceBlock(blockWorldPos, m_type);
 
             m_count--;
             player.UseItem();
@@ -126,8 +126,8 @@ namespace RS.Item
                 player.DisposeItem(this);
             }
             // Debug.Log($"方块坐标: {blockPos}, Chunk坐标: {chunkPos}, 方块本地坐标: {blockLocalPos}");
-            // SceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
-            // SceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
+            // RsSceneManager.Instance.PlaceBlock(blockWorldPos, BlockType.Water);
+            // RsSceneManager.Instance.RegisterTickEvent(new Flow(new Water(blockWorldPos)));
 
             // 放置这个block
             // 首先获取chunk
