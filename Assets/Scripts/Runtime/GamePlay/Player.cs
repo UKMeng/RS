@@ -349,7 +349,16 @@ namespace RS.GamePlay
 
         public bool Floating
         {
-            get { return m_isInWater && m_transform.position.y < 62.49; }
+            get
+            {
+                var floating = m_isInWater && m_transform.position.y < 62.49;
+                if (m_firstWater && floating)
+                {
+                    InvokeTips("小心！在水中耐力耗尽会导致死亡！");
+                    m_firstWater = false;
+                }
+                return floating;
+            }
         }
 
         public bool Sprint
