@@ -91,6 +91,8 @@ namespace RS.Scene
             {
                 sampler.Dispose();
             }
+
+            s_instance = null;
         }
 
         private void InitNoiseManager()
