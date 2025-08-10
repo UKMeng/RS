@@ -54,6 +54,12 @@ namespace RS.GamePlay
         public event Action OnItemsChanged;
         public event Action OnHandItemIndexChanged;
 
+        public bool FirstNight
+        {
+            get => m_firstNight;
+            set => m_firstNight = value;
+        }
+
         public PlayerStatus Status
         {
             get => m_status;

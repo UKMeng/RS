@@ -492,6 +492,12 @@ namespace RS.Scene
                     RenderSettings.skybox = sunsetSkybox;
                     DynamicGI.UpdateEnvironment();
                 }
+
+                if (m_player.FirstNight)
+                {
+                    m_player.InvokeTips("天黑之后会开始掉血，速回！");
+                    m_player.FirstNight = false;
+                }
             }
             else if (hour == 18)
             {
