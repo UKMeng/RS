@@ -184,11 +184,11 @@ namespace RS.Scene
             var chestPos = m_chunkManager.ChooseChestPos(startChunkPos, playerPos, m_mapSize);
             Debug.Log($"[SceneManager] 宝箱位置: {chestPos}");
             // 先放置宝箱在面前
-            Instantiate(chestPrefab, chestPos, Quaternion.identity);
+            Instantiate(chestPrefab, chestPos, Quaternion.Euler(0, GetRandomRotation(), 0));
 
             var returnPos = m_chunkManager.ChooseChestPos(startChunkPos, chestPos, m_mapSize);
             Debug.Log($"[SceneManager] 返回点位置: {returnPos}");
-            Instantiate(returnRockPrefab, returnPos, Quaternion.identity);
+            Instantiate(returnRockPrefab, returnPos, Quaternion.Euler(0, GetRandomRotation(), 0));
             
             var chestMarkPos = new Vector2((chestPos.x - startChunkPos.x * 32) / m_mapSize,
                 (chestPos.z - startChunkPos.z * 32) / m_mapSize);
@@ -207,11 +207,17 @@ namespace RS.Scene
             
             // 放置Player
             m_player.Position = playerPos;
+            m_player.Rotation = Quaternion.Euler(0, GetRandomRotation(), 0);
             m_lastPosition = new Vector3(0, 0, 0);
             
             Debug.Log($"[SceneManager]场景数据准备完毕");
         }
 
+        private float GetRandomRotation()
+        {
+            return Random.Range(0, 180);
+        }
+        
         /// <summary>
         /// 统一销毁资源的位置
         /// </summary>

@@ -300,5 +300,13 @@ namespace RS.GamePlay
                 m_transform.position = value;
             }
         }
+
+        public Quaternion Rotation
+        {
+            set
+            {
+                m_transform.rotation = value;
+            }
+        }
     }
 }
