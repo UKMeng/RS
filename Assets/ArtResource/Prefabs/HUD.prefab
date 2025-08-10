@@ -3059,11 +3059,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_itemSprites:
-  - {fileID: 21300000, guid: 65edbaba3b7c9fb46a66652eed51f421, type: 3}
-  - {fileID: 21300000, guid: c35a417c3938edf479e39ebde7f126eb, type: 3}
+  - {fileID: 21300000, guid: 247564711e17aec458c72de4f695e541, type: 3}
+  - {fileID: 21300000, guid: 9ac890a2833554d4a8ff2f7e224973d2, type: 3}
+  - {fileID: 21300000, guid: 0386726e76cfbc344b81bf48227e616c, type: 3}
   m_blockSprites:
   - {fileID: 21300000, guid: ecaa35356a8391d48b6bc73c1f6cd717, type: 3}
   - {fileID: 21300000, guid: c4005524ce46370408e0126f7ea4d3f7, type: 3}
+  - {fileID: 21300000, guid: 26b9639b11c01f846b63f11f964497d2, type: 3}
+  - {fileID: 21300000, guid: dbf5ce15e2c5cc741a6c075edf0c45b4, type: 3}
   m_slots:
   - {fileID: 2317065420147417291}
   - {fileID: 6368344434315558156}

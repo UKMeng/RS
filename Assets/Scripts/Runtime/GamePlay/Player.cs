@@ -72,6 +72,8 @@ namespace RS.GamePlay
             m_items = new RsItem[8];
             m_handItemIndex = 0;
             m_items[0] = new Shovel();
+            m_items[1] = new Axe();
+            m_items[2] = new Pickaxe();
             m_handItem = m_items[0];
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
