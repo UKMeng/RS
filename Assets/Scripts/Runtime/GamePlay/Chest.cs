@@ -11,10 +11,14 @@ namespace RS.GamePlay
         [SerializeField] private TreasureMessage m_message;
 
         private Treasure m_treasure;
+        private bool m_isOpen;
 
+        public bool IsOpen => m_isOpen;
+        
         public void Start()
         {
             m_animator.Play("Idle");
+            m_isOpen = false;
         }
 
         public void SetTreasure(Treasure treasure)
@@ -24,6 +28,7 @@ namespace RS.GamePlay
 
         public void Open(bool noMessage = false, Player player = null)
         {
+            m_isOpen = true;
             m_openTimeline.Play();
             
             // 等半秒动画播完

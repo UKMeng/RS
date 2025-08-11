@@ -76,6 +76,11 @@ namespace RS.GamePlay
                 {
                     var chest = hitInfo.collider.transform.parent.gameObject.GetComponent<Chest>();
 
+                    if (chest.IsOpen)
+                    {
+                        return;
+                    }
+                    
                     if (m_player.Status == PlayerStatus.FirstTime)
                     {
                         m_player.InvokeTips("恭喜你找到第一个宝箱！获得了一把铲子,它能铲出泥块和沙块。接下去去找R标记的传送点。");
