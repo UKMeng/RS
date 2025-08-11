@@ -1210,6 +1210,8 @@ namespace RS.Scene
                         continue;
                     }
                     
+                    var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz], out var leafType);
+                    
                     // 测试通过，生成一棵树
                     // 更新黑名单
                     for (var ix = -2; ix <= 2; ix++)
@@ -1217,15 +1219,15 @@ namespace RS.Scene
                         for (var iz = -2; iz <= 2; iz++)
                         {
                             blackList[(sx + ix) * 32 + sz + iz] = true;
-                            topBlocks[(sx + ix) * 32 + sz + iz] = BlockType.Sakura;
+                            topBlocks[(sx + ix) * 32 + sz + iz] = leafType;
                         }
                     }
                     
                     var height = topBlockHeights[sx * 32 + sz];
                     var treePos = new Vector3Int(sx, height + 1, sz);
 
-                    var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz]);
-                    var changeList = Tree.GetTreeChangeList(1, 3, 1);
+                    
+                    var changeList = Tree.GetTreeChangeList(1, treeHeight, leafType);
 
                     // List<(Vector3Int, BlockType)> changeList;
                     //

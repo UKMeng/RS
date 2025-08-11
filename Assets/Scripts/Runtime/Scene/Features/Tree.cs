@@ -27,21 +27,10 @@ namespace RS.Scene
             m_height = height;
         }
 
-        public static List<(Vector3Int, BlockType)> GetTreeChangeList(int size, int height, int type)
+        public static List<(Vector3Int, BlockType)> GetTreeChangeList(int size, int height, BlockType leaf)
         {
             var list = new List<(Vector3Int, BlockType)>();
             var pos = new Vector3Int(0, 0, 0); // 相对位置
-
-            BlockType leaf;
-
-            if (type == 0)
-            {
-                leaf = BlockType.Leaf;
-            }
-            else
-            {
-                leaf = BlockType.Sakura;
-            }
 
             for (var i = 0; i < height + 2; i++)
             {
@@ -74,18 +63,21 @@ namespace RS.Scene
             return list;
         }
 
-        public static int GetTreeHeight(float value)
+        public static int GetTreeHeight(float value, out BlockType leaf)
         {
             if (value < 0.9f)
             {
+                leaf = BlockType.Leaf;
                 return 3;
             }
             
             if (value < 0.95f)
             {
+                leaf = BlockType.Sakura;
                 return 4;
             }
 
+            leaf = BlockType.Sakura;
             return 5;
         }
 
