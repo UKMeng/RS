@@ -155,6 +155,8 @@ namespace RS.Item
             {
                 case BlockType.Orc:
                 case BlockType.Leaf:
+                case BlockType.Cactus:
+                case BlockType.CactusTop:
                 {
                     return true;
                 }

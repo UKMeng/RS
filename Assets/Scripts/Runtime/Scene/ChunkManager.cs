@@ -1188,9 +1188,9 @@ namespace RS.Scene
                         sz++;
                         continue;
                     }
-                    
-                    // 目前树只能长在草块上
-                    if (topBlocks[sx * 32 + sz] != BlockType.Grass)
+
+                    // 目前树只能长在草块上，仙人掌只能长在沙漠的沙子上
+                    if (topBlocks[sx * 32 + sz] != BlockType.Grass) // || (contexts[sx * 32 + sz].biome == BiomeType.Desert && topBlocks[sx * 32 + sz] != BlockType.Sand))
                     {
                         sz++;
                         continue;
@@ -1198,7 +1198,13 @@ namespace RS.Scene
                     
                     // 测试概率，与噪声、biome设置相关
                     // 相关的还没做
-                    if (contexts[sx * 32 + sz].humidity < 0f || sampleResult[sx * 32 + sz] < 0.8f)
+                    // if (contexts[sx * 32 + sz].humidity < 0f || sampleResult[sx * 32 + sz] < 0.8f)
+                    // {
+                    //     sz++;
+                    //     continue;
+                    // }
+                    
+                    if (sampleResult[sx * 32 + sz] < 0.85f)
                     {
                         sz++;
                         continue;
@@ -1217,8 +1223,22 @@ namespace RS.Scene
                     
                     var height = topBlockHeights[sx * 32 + sz];
                     var treePos = new Vector3Int(sx, height + 1, sz);
-                    var changeList = Tree.GetChangeList(1, 3);
 
+                    var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz]);
+                    var changeList = Tree.GetTreeChangeList(1, 3);
+
+                    // List<(Vector3Int, BlockType)> changeList;
+                    //
+                    // // if (contexts[sx * 32 + sz].biome == BiomeType.Desert)
+                    // if (topBlocks[sx * 32 + sz] == BlockType.Sand)
+                    // {
+                    //     changeList = Tree.GetCactusChangeList(1, 3);
+                    // }
+                    // else
+                    // {
+                    //     changeList = Tree.GetTreeChangeList(1, 3);
+                    // }
+                    
                     foreach (var change in changeList)
                     {
                         var relativePos = change.Item1;

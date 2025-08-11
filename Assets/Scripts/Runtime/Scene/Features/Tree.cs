@@ -27,7 +27,7 @@ namespace RS.Scene
             m_height = height;
         }
 
-        public static List<(Vector3Int, BlockType)> GetChangeList(int size, int height)
+        public static List<(Vector3Int, BlockType)> GetTreeChangeList(int size, int height)
         {
             var list = new List<(Vector3Int, BlockType)>();
             var pos = new Vector3Int(0, 0, 0); // 相对位置
@@ -56,6 +56,44 @@ namespace RS.Scene
                     list.Add((pos, BlockType.Orc));
                     list.Add((pos + Vector3Int.up, BlockType.Orc));
                 }
+                
+                pos += Vector3Int.up * 2;
+            }
+
+            return list;
+        }
+
+        public static int GetTreeHeight(float value)
+        {
+            if (value < 0.9f)
+            {
+                return 3;
+            }
+            
+            if (value < 0.95f)
+            {
+                return 4;
+            }
+
+            return 5;
+        }
+
+        public static List<(Vector3Int, BlockType)> GetCactusChangeList(int size, int height)
+        {
+            var list = new List<(Vector3Int, BlockType)>();
+            var pos = new Vector3Int(0, 0, 0); // 相对位置
+
+            for (var i = 0; i < height; i++)
+            {
+                if (i == height - 1)
+                {
+                    list.Add((pos, BlockType.Cactus));
+                    list.Add((pos + Vector3Int.up, BlockType.CactusTop));
+                    break;
+                }
+                
+                list.Add((pos, BlockType.Cactus));
+                list.Add((pos + Vector3Int.up, BlockType.Cactus));
                 
                 pos += Vector3Int.up * 2;
             }
