@@ -437,7 +437,7 @@ namespace RS.Scene
                         }
                         
                         // leaf
-                        if (blocks[index] == BlockType.Leaf)
+                        if (blocks[index] == BlockType.Leaf || blocks[index] == BlockType.Sakura)
                         {
                             var pos = new Vector3(x, elevation, z);
                             AddMoreTris(new Vector3(-0.375f, 0.3625f, -0.625f), new Vector3(1.25f, 0.3625f, 1.3625f),
@@ -1034,7 +1034,7 @@ namespace RS.Scene
                             }
                             
                             // leaf
-                            if (blocks[index] == BlockType.Leaf)
+                            if (blocks[index] == BlockType.Leaf || blocks[index] == BlockType.Sakura)
                             {
                                 var pos = new Vector3(x, elevation, z);
                                 AddMoreTris(new Vector3(-0.375f, 0.3625f, -0.625f), new Vector3(1.25f, 0.3625f, 1.3625f), 

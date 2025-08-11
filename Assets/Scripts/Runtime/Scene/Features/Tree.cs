@@ -27,17 +27,28 @@ namespace RS.Scene
             m_height = height;
         }
 
-        public static List<(Vector3Int, BlockType)> GetTreeChangeList(int size, int height)
+        public static List<(Vector3Int, BlockType)> GetTreeChangeList(int size, int height, int type)
         {
             var list = new List<(Vector3Int, BlockType)>();
             var pos = new Vector3Int(0, 0, 0); // 相对位置
+
+            BlockType leaf;
+
+            if (type == 0)
+            {
+                leaf = BlockType.Leaf;
+            }
+            else
+            {
+                leaf = BlockType.Sakura;
+            }
 
             for (var i = 0; i < height + 2; i++)
             {
                 // 树顶加一个叶子
                 if (i == height + 1)
                 {
-                    list.Add((pos, BlockType.Leaf));
+                    list.Add((pos, leaf));
                     break;
                 }
                 
@@ -45,8 +56,8 @@ namespace RS.Scene
                 {
                     foreach (var dir in m_Directions)
                     {
-                        list.Add((pos + dir, BlockType.Leaf));
-                        list.Add((pos + Vector3Int.up + dir, BlockType.Leaf));
+                        list.Add((pos + dir, leaf));
+                        list.Add((pos + Vector3Int.up + dir, leaf));
                     }
                 }
 
@@ -78,27 +89,27 @@ namespace RS.Scene
             return 5;
         }
 
-        public static List<(Vector3Int, BlockType)> GetCactusChangeList(int size, int height)
-        {
-            var list = new List<(Vector3Int, BlockType)>();
-            var pos = new Vector3Int(0, 0, 0); // 相对位置
-
-            for (var i = 0; i < height; i++)
-            {
-                if (i == height - 1)
-                {
-                    list.Add((pos, BlockType.Cactus));
-                    list.Add((pos + Vector3Int.up, BlockType.CactusTop));
-                    break;
-                }
-                
-                list.Add((pos, BlockType.Cactus));
-                list.Add((pos + Vector3Int.up, BlockType.Cactus));
-                
-                pos += Vector3Int.up * 2;
-            }
-
-            return list;
-        }
+        // public static List<(Vector3Int, BlockType)> GetCactusChangeList(int size, int height)
+        // {
+        //     var list = new List<(Vector3Int, BlockType)>();
+        //     var pos = new Vector3Int(0, 0, 0); // 相对位置
+        //
+        //     for (var i = 0; i < height; i++)
+        //     {
+        //         if (i == height - 1)
+        //         {
+        //             list.Add((pos, BlockType.Cactus));
+        //             list.Add((pos + Vector3Int.up, BlockType.CactusTop));
+        //             break;
+        //         }
+        //         
+        //         list.Add((pos, BlockType.Cactus));
+        //         list.Add((pos + Vector3Int.up, BlockType.Cactus));
+        //         
+        //         pos += Vector3Int.up * 2;
+        //     }
+        //
+        //     return list;
+        // }
     }
 }

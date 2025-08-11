@@ -22,8 +22,9 @@ namespace RS.Item
         Sand,
         Water,
         BedRock,
-        Cactus,
-        CactusTop,
+        Sakura,
+        // Cactus,
+        // CactusTop,
     }
     
     public class Block : RsItem
@@ -65,8 +66,9 @@ namespace RS.Item
             RsColor.Sand,
             RsColor.Water,
             RsColor.BedRock,
-            RsColor.Cactus,
-            RsColor.Cactus,
+            RsColor.Sakura,
+            // RsColor.Cactus,
+            // RsColor.Cactus,
         };
         
         private BlockType m_type;
@@ -172,8 +174,9 @@ namespace RS.Item
             uvTable[(int)BlockType.Leaf] = CalUVs((0, 2), (0, 2), (0, 2));
             uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
             uvTable[(int)BlockType.BedRock] = CalUVs((2, 2), (2, 2), (2, 2));
-            uvTable[(int)BlockType.Cactus] = CalUVs((3, 2), (3, 2), (2, 3));
-            uvTable[(int)BlockType.CactusTop] = CalUVs((3, 3), (3, 2), (2, 3));
+            uvTable[(int)BlockType.Sakura] = CalUVs((1, 3), (1, 3), (1, 3));
+            // uvTable[(int)BlockType.Cactus] = CalUVs((3, 2), (3, 2), (2, 3));
+            // uvTable[(int)BlockType.CactusTop] = CalUVs((3, 3), (3, 2), (2, 3));
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);
 

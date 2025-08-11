@@ -155,6 +155,7 @@ namespace RS.Item
             {
                 case BlockType.Stone:
                 case BlockType.Leaf:
+                case BlockType.Sakura:
                 {
                     return true;
                 }

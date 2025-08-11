@@ -1217,7 +1217,7 @@ namespace RS.Scene
                         for (var iz = -2; iz <= 2; iz++)
                         {
                             blackList[(sx + ix) * 32 + sz + iz] = true;
-                            topBlocks[(sx + ix) * 32 + sz + iz] = BlockType.Leaf;
+                            topBlocks[(sx + ix) * 32 + sz + iz] = BlockType.Sakura;
                         }
                     }
                     
@@ -1225,7 +1225,7 @@ namespace RS.Scene
                     var treePos = new Vector3Int(sx, height + 1, sz);
 
                     var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz]);
-                    var changeList = Tree.GetTreeChangeList(1, 3);
+                    var changeList = Tree.GetTreeChangeList(1, 3, 1);
 
                     // List<(Vector3Int, BlockType)> changeList;
                     //

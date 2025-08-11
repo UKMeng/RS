@@ -158,6 +158,7 @@ namespace RS.Item
                 case BlockType.Leaf:
                 case BlockType.Sand:
                 case BlockType.Snow:
+                case BlockType.Sakura:
                 {
                     return true;
                 }
