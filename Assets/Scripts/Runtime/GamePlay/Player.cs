@@ -26,6 +26,8 @@ namespace RS.GamePlay
         private Animator m_animator;
         private int m_health; // 血条 0~100
         private int m_stamina; // 耐力值 0~100
+        private int m_maxHealth = 100;
+        private int m_maxStamina = 100;
         private int m_staminaRegainSpeed = 10;
         
         // 提示与存档相关
@@ -66,6 +68,11 @@ namespace RS.GamePlay
             get => m_status;
             set => m_status = value;
         }
+
+        public int MaxHealth => m_maxHealth;
+
+        public int MaxStamina => m_maxStamina;
+        
         public Vector3 BirthPosition => m_birthPosition;
         
         public void Load(PlayerData data)
@@ -120,7 +127,7 @@ namespace RS.GamePlay
                     stamina += m_player.StaminaRegainSpeed;
                 }
                 
-                m_player.Stamina = Mathf.Clamp(stamina, 0, 100);
+                m_player.Stamina = Mathf.Clamp(stamina, 0, m_player.m_maxStamina);
 
                 if (m_player.Stamina == 0 && m_player.Floating)
                 {
@@ -142,10 +149,12 @@ namespace RS.GamePlay
             
             public void OnTick()
             {
-                var health = m_player.Health;
-                health -= 1;
+                // var health = m_player.Health;
+                // health -= 1;
+
+                m_player.Health -= 1;
                 
-                m_player.Health = Mathf.Clamp(health, 0, 100);
+                // m_player.Health = Mathf.Clamp(health, 0, m_player.m_maxHealth);
 
                 if (m_player.Health == 0)
                 {
@@ -204,8 +213,8 @@ namespace RS.GamePlay
                 m_controller.Sprint = false;
             }
 
-            m_HUD.SetStamina(m_stamina);
-            m_HUD.SetHealth(m_health);
+            m_HUD.SetStamina((float)m_stamina / m_maxStamina);
+            m_HUD.SetHealth((float)m_health / m_maxHealth);
         }
 
         

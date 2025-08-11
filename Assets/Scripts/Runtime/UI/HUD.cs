@@ -42,9 +42,9 @@ namespace RS.UI
             RsSceneManager.Instance.ReturnHome(false);
         }
         
-        public void SetStamina(int value)
+        public void SetStamina(float value)
         {
-            if (value >= 100)
+            if (value > 0.99f)
             {
                 m_stamina.gameObject.SetActive(false);
                 return;
@@ -52,11 +52,11 @@ namespace RS.UI
 
             m_stamina.gameObject.SetActive(true);
             
-            if (value < 20)
+            if (value < 0.2f)
             {
                 m_staminaFill.color = Color.red;
             }
-            else if (value < 50)
+            else if (value < 0.5f)
             {
                 m_staminaFill.color = Color.yellow;
             }
@@ -65,12 +65,12 @@ namespace RS.UI
                 m_staminaFill.color = Color.green;
             }
 
-            m_stamina.value = value / 100.0f;
+            m_stamina.value = value;
         }
 
-        public void SetHealth(int value)
+        public void SetHealth(float value)
         {
-            if (value >= 100)
+            if (value > 0.99f)
             {
                 m_health.gameObject.SetActive(false);
                 return;
@@ -78,7 +78,7 @@ namespace RS.UI
 
             m_health.gameObject.SetActive(true);
 
-            m_health.value = value / 100.0f;
+            m_health.value = value;
         }
     }
 }
