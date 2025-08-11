@@ -223,15 +223,15 @@ namespace RS.Scene
                 var x = Random.Range(-10, 10);
                 var z = Random.Range(-10, 10);
                 var chunkStartPos = new Vector3Int(x * 32, 0, z * 32);
-                var offset = preloadSize / 5;
+                var offset = preloadSize / 6;
 
-                // 采样9个点的大陆性，如果大于5个点是大陆则返回
+                // 采样16个点的大陆性，如果大于个13点是大陆则返回
                 var sampler = NoiseManager.Instance.GetOrCreateCacheSampler("Continents", new Vector3Int(x, 0, z));
                 var count = 0;
 
-                for (var ix = 0; ix < 3; ix++)
+                for (var ix = 0; ix < 4; ix++)
                 {
-                    for (var iz = 0; iz < 3; iz++)
+                    for (var iz = 0; iz < 4; iz++)
                     {
                         var sampleValue =
                             sampler.Sample(new Vector3(x * 1024 + offset * ix, 0, z * 1024 + offset * iz));
@@ -242,7 +242,7 @@ namespace RS.Scene
                     }
                 }
 
-                if (count > 7)
+                if (count > 13)
                 {
                     return chunkStartPos;
                 }

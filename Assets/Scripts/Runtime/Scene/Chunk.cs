@@ -577,7 +577,7 @@ namespace RS.Scene
         /// <param name="chunks"></param>
         public static void BuildMeshUsingJobSystem(List<Chunk> chunks)
         {
-            var sw = Stopwatch.StartNew();
+            // var sw = Stopwatch.StartNew();
             var chunkCount = chunks.Count;
             var jobHandles = new NativeArray<JobHandle>(chunkCount, Allocator.Temp);
             var jobs = new NativeArray<BuildMeshJob>(chunkCount, Allocator.Temp);
@@ -699,8 +699,8 @@ namespace RS.Scene
             jobs.Dispose();
             jobHandles.Dispose();
             
-            sw.Stop();
-            Debug.Log($"{chunkCount} chunks meshes generated in {sw.ElapsedMilliseconds} ms");
+            // sw.Stop();
+            // Debug.Log($"{chunkCount} chunks meshes generated in {sw.ElapsedMilliseconds} ms");
         }
 
         private static bool IsTranslucent(BlockType type)
