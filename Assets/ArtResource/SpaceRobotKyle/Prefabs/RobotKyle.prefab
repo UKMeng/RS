@@ -1231,6 +1231,7 @@ GameObject:
   - component: {fileID: 6772080370674287517}
   - component: {fileID: 3167981201654048096}
   - component: {fileID: 9129162238845977001}
+  - component: {fileID: 9092256989003345962}
   m_Layer: 3
   m_Name: RobotKyle
   m_TagString: Player
@@ -1523,8 +1524,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_stamina: {fileID: 0}
   m_staminaFill: {fileID: 0}
+  m_health: {fileID: 0}
+  m_healthFill: {fileID: 0}
   m_normal: {fileID: 0}
   m_death: {fileID: 0}
+  m_deathReturnBtn: {fileID: 0}
 --- !u!114 &9129162238845977001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1544,6 +1548,20 @@ MonoBehaviour:
   - {fileID: 2114453113218626825, guid: b10aedad91e77b240ae76fbe1b364ec4, type: 3}
   m_blockPrefab: {fileID: 1525992211635647144, guid: 08a497819df83604f857840a41b6e822, type: 3}
   m_player: {fileID: 6772080370674287517}
+--- !u!114 &9092256989003345962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3862277631971027947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca168d0e00044f2aa2eda38280a37bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_treasurePrefabs:
+  - {fileID: 376482003362052620, guid: 97fbf707635b00b42b4154d73fc27f2e, type: 3}
 --- !u!1 &4072265639379859564
 GameObject:
   m_ObjectHideFlags: 0

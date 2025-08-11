@@ -36,7 +36,7 @@ namespace RS.GamePlay
         private void TriggerTreasureMessage()
         {
             m_message.Show(
-                $"{m_treasure.name} {m_treasure.desc}",
+                $"{m_treasure.desc}",
                 () =>
                 {
                     // 增加获得物品后处理

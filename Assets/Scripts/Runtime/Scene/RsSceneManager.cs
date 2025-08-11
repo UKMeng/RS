@@ -30,7 +30,6 @@ namespace RS.Scene
         public GameObject chunkPrefab;
         public GameObject chestPrefab;
         public GameObject returnRockPrefab;
-        public GameObject treasurePrefab;
         
         public Light dayLight;
         public Material daySkybox;
@@ -60,7 +59,6 @@ namespace RS.Scene
         
         // 地图相关
         private Map m_map;
-        
         private GameStart m_gameStart;
         
         // 主城状态
@@ -70,6 +68,7 @@ namespace RS.Scene
         private bool m_needSave = true;
         
         [SerializeField] private MenuUI m_menu;
+        [SerializeField] private TreasureManager m_treasureManager;
 
         public void Awake()
         {
@@ -368,12 +367,33 @@ namespace RS.Scene
             Debug.Log($"[RsSceneManager] 返回点位置: {returnPos}");
             
             // 初始化物件
-            if ((InHome && m_player.Status == PlayerStatus.FirstTime) || !InHome)
+            if (InHome && m_player.Status == PlayerStatus.FirstTime)
             {
-                // 第一次进入主城，放置宝箱 另外主游戏也要放置
+                // 第一次进入主城
+                Instantiate(chestPrefab, chestPos, InHome? Quaternion.identity : Quaternion.Euler(0, GetRandomRotation(), 0));
+            }
+            else if (!InHome)
+            {
                 var chest = Instantiate(chestPrefab, chestPos, InHome? Quaternion.identity : Quaternion.Euler(0, GetRandomRotation(), 0));
-                var treasure = new Treasure(treasurePrefab, "test name", "test desc");
+                var treasure = m_treasureManager.GetTreasure(m_player.TreasureCount % 3);
                 chest.GetComponent<Chest>().SetTreasure(treasure);
+            }
+
+            if (InHome)
+            {
+                // 放置Treasure
+                for (var i = 0; i < 3; i++)
+                {
+                    if (m_player.HaveTreasure(i))
+                    {
+                        var treasure = m_treasureManager.GetTreasure(i);
+                        Instantiate(treasure.treasurePrefab, new Vector3(-13632.5f, 68.513f, 52.63f),
+                            Quaternion.Euler(0, 180, 0));
+                        // (-13632.5, 68.513, 52.63)
+                        // (-13631.53, 69.011, 52.63)
+                        // (-13630.44, 68.563, 52.63)
+                    }
+                }
             }
             
             Instantiate(returnRockPrefab, returnPos, InHome? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, GetRandomRotation(), 0));

@@ -29,6 +29,7 @@ namespace RS.GamePlay
         private int m_maxHealth = 100;
         private int m_maxStamina = 100;
         private int m_staminaRegainSpeed = 10;
+        private int m_blockCapacity = 3;
         
         // 提示与存档相关
         private bool m_firstWater;
@@ -72,6 +73,8 @@ namespace RS.GamePlay
         public int MaxHealth => m_maxHealth;
 
         public int MaxStamina => m_maxStamina;
+
+        public int TreasureCount => m_treasure.Count;
         
         public Vector3 BirthPosition => m_birthPosition;
         
@@ -82,7 +85,37 @@ namespace RS.GamePlay
             m_treasure = data.treasure;
             m_birthPosition = data.birthPosition;
 
+            TreasureEffect();
             StatusChange(data.status);
+        }
+
+        public bool HaveTreasure(int id)
+        {
+            return m_treasure.Contains(id);
+        }
+        
+        private void TreasureEffect()
+        {
+            foreach (var id in m_treasure)
+            {
+                if (id == 0)
+                {
+                    m_maxStamina += 10;
+                    continue;
+                }
+
+                if (id == 1)
+                {
+                    m_maxHealth += 10;
+                    continue;
+                }
+
+                if (id == 2)
+                {
+                    m_blockCapacity += 2;
+                    continue;
+                }
+            }
         }
         
         public PlayerData Save()
@@ -397,7 +430,7 @@ namespace RS.GamePlay
                 }
             }
 
-            m_items[index] = new Block(blockType, 3);
+            m_items[index] = new Block(blockType, m_blockCapacity);
 
             OnItemsChanged?.Invoke();
         }
