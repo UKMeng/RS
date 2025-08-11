@@ -312,9 +312,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 0}
-  m_loadDistance: 10
-  m_deactivateDistance: 15
-  m_destroyDistance: 20
+  m_loadDistance: 6
+  m_deactivateDistance: 10
+  m_destroyDistance: 15
 --- !u!1 &70479256
 GameObject:
   m_ObjectHideFlags: 0

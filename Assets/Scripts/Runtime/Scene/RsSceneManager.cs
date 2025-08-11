@@ -335,7 +335,9 @@ namespace RS.Scene
             }
             else
             {
-                startChunkPos = preloadStartChunkPos;
+                var center = batchChunkSize * 4;
+                var dx = center - m_mapSize / 32 / 2;
+                startChunkPos = new Vector3Int(preloadStartChunkPos.x + dx, 0, preloadStartChunkPos.z + dx);
             }
             
             // 地图生成
