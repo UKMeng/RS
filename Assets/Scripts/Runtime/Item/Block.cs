@@ -21,6 +21,7 @@ namespace RS.Item
         Orc,
         Sand,
         Water,
+        BedRock,
     }
     
     public class Block : RsItem
@@ -61,7 +62,7 @@ namespace RS.Item
             RsColor.Orc,
             RsColor.Sand,
             RsColor.Water,
-            
+            RsColor.BedRock,
         };
         
         private BlockType m_type;
@@ -166,6 +167,7 @@ namespace RS.Item
             uvTable[(int)BlockType.Orc] = CalUVs((1, 2), (1, 2), (1, 1));
             uvTable[(int)BlockType.Leaf] = CalUVs((0, 2), (0, 2), (0, 2));
             uvTable[(int)BlockType.Sand] = CalUVs((0, 1), (0, 1),(0, 1));
+            uvTable[(int)BlockType.BedRock] = CalUVs((2, 2), (2, 2), (2, 2));
 
             uvTableArray = new NativeArray<Vector2>(uvTable.Length * 16, Allocator.Persistent);
 

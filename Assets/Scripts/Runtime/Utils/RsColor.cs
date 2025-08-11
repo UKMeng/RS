@@ -29,6 +29,7 @@ namespace RS.Utils
         public static Color Orc = Color.rosyBrown;
         public static Color Sand = new Color(0.8f, 0.8f, 0.6f);
         public static Color Water = new Color(0.0f, 0.0f, 1.0f);
+        public static Color BedRock = Color.black;
         
 
         public static Color GetColorFromString(string s)

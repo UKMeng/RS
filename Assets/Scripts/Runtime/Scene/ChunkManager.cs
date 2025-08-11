@@ -1097,6 +1097,16 @@ namespace RS.Scene
                     var index = Chunk.GetBlockIndex(sx, 31, sz);
                     for (var sy = 31; sy >= 0; sy--)
                     {
+                        // 硬编码最后两层是无法破坏的基岩，可以增加一层噪声让其看着随机
+                        if (sy + offsetY < 98)
+                        {
+                            chunk.blocks[index] = BlockType.BedRock;
+                            context.stoneDepthAbove++;
+                            context.waterHeight++;
+                            index--;
+                            continue;
+                        }
+                        
                         if (chunk.blocks[index] == BlockType.Stone)
                         {
                             var type = JudgeSurfaceBlockType(ref context);
