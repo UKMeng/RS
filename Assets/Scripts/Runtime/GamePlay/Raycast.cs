@@ -100,7 +100,8 @@ namespace RS.GamePlay
                         return;
                     }
                     
-                    chest.Open();
+                    
+                    chest.Open(false, m_player);
                     // Debug.Log("Hit a Chest");
                 }
                 else if (hitInfo.collider.gameObject.name == "ReturnRock")

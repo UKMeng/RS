@@ -45,6 +45,11 @@ namespace RS.Item
             get => m_type.ToString();
         }
 
+        public void ExtentCapacity(int newCapacity)
+        {
+            m_capacity = newCapacity;
+        }
+
         public static readonly Color[] BlockColors =
         {
             RsColor.Unknown,

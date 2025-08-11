@@ -1562,6 +1562,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_treasurePrefabs:
   - {fileID: 376482003362052620, guid: 97fbf707635b00b42b4154d73fc27f2e, type: 3}
+  - {fileID: 376482003362052620, guid: 14a765e3f9f575f41a056e75b6e53043, type: 3}
+  - {fileID: 376482003362052620, guid: 8bed0e615bbf362409adbb8c4dfd451c, type: 3}
 --- !u!1 &4072265639379859564
 GameObject:
   m_ObjectHideFlags: 0

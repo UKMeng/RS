@@ -387,11 +387,8 @@ namespace RS.Scene
                     if (m_player.HaveTreasure(i))
                     {
                         var treasure = m_treasureManager.GetTreasure(i);
-                        Instantiate(treasure.treasurePrefab, new Vector3(-13632.5f, 68.513f, 52.63f),
+                        Instantiate(treasure.treasurePrefab, m_treasureManager.GetPosition(i),
                             Quaternion.Euler(0, 180, 0));
-                        // (-13632.5, 68.513, 52.63)
-                        // (-13631.53, 69.011, 52.63)
-                        // (-13630.44, 68.563, 52.63)
                     }
                 }
             }

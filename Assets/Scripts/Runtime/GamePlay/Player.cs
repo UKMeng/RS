@@ -84,7 +84,7 @@ namespace RS.GamePlay
             m_firstWater = data.firstWater;
             m_treasure = data.treasure;
             m_birthPosition = data.birthPosition;
-
+            
             TreasureEffect();
             StatusChange(data.status);
         }
@@ -93,27 +93,68 @@ namespace RS.GamePlay
         {
             return m_treasure.Contains(id);
         }
+
+        public void GetTreasure(int id)
+        {
+            m_treasure.Add(id);
+            // 打开宝箱后用
+            if (id == 0)
+            {
+                m_maxStamina += 10;
+                m_stamina = m_maxStamina;
+                return;
+            }
+
+            if (id == 1)
+            {
+                m_maxHealth += 10;
+                m_health = m_maxHealth;
+                return;
+            }
+
+            if (id == 2)
+            {
+                m_blockCapacity += 2;
+                if (m_items != null)
+                {
+                    foreach (var item in m_items)
+                    {
+                        if (item != null)
+                        {
+                            if (item is Block block)
+                            {
+                                block.ExtentCapacity(block.Capacity + 2);
+                            }
+                        }
+                    }
+                }
+
+                return;
+            }
+        }
         
         private void TreasureEffect()
         {
+            // 开局触发存档用
             foreach (var id in m_treasure)
             {
                 if (id == 0)
                 {
                     m_maxStamina += 10;
+                    m_stamina = m_maxStamina;
                     continue;
                 }
 
                 if (id == 1)
                 {
                     m_maxHealth += 10;
+                    m_health = m_maxHealth;
                     continue;
                 }
 
                 if (id == 2)
                 {
                     m_blockCapacity += 2;
-                    continue;
                 }
             }
         }
@@ -198,8 +239,8 @@ namespace RS.GamePlay
         
         public void Awake()
         {
-            m_health = 100;
-            m_stamina = 100; ;
+            m_health = m_maxHealth;
+            m_stamina = m_maxStamina;
             m_transform = gameObject.transform;
             m_playerInput = GetComponent<PlayerInput>();
             m_controller = GetComponent<ThirdPersonController>();

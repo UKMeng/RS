@@ -22,13 +22,14 @@ namespace RS.GamePlay
             m_treasure = treasure;
         }
 
-        public void Open(bool noMessage = false)
+        public void Open(bool noMessage = false, Player player = null)
         {
             m_openTimeline.Play();
             
             // 等半秒动画播完
             if (!noMessage)
             {
+                player?.GetTreasure(m_treasure.id);
                 Invoke("TriggerTreasureMessage", 0.5f);
             }
         }
