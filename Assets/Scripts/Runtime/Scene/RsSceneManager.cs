@@ -518,6 +518,17 @@ namespace RS.Scene
             }
 
             // 以x正轴（y = -90）为东
+            
+            // 86-94 太阳直射有阴影bug，跳过
+            if (sunAngle > 86.0f && sunAngle < 90.0f)
+            {
+                sunAngle = 85.9f;
+            }
+            else if (sunAngle >= 90.0f && sunAngle < 94.0f)
+            {
+                sunAngle = 94.1f;
+            }
+            
             dayLight.transform.rotation = Quaternion.Euler(sunAngle, -90.0f, 0.0f);
             
             // 更换skybox
@@ -536,7 +547,7 @@ namespace RS.Scene
                 if (RenderSettings.skybox != daySkybox)
                 {
                     dayLight.colorTemperature = 5000;
-                    dayLight.intensity = 2.0f;
+                    dayLight.intensity = 2.5f;
                     RenderSettings.skybox = daySkybox;
                     DynamicGI.UpdateEnvironment();
                 }

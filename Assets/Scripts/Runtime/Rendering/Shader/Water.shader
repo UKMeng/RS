@@ -184,7 +184,7 @@
                 float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.positionWS);
 
                 float3 lightDir = normalize(_MainLightPosition.xyz);
-                float3 diffuse = max(0, dot(normal, lightDir));
+                float3 diffuse = max(0.2, dot(normal, lightDir));
 
                 float viewDistance = length(_WorldSpaceCameraPos.xyz - i.positionWS);
 

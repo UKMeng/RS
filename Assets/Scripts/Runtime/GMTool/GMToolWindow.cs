@@ -127,7 +127,7 @@ namespace RS.GMTool
             m_labelStyle.fontSize = 30;
             m_textFieldStyle = new GUIStyle(GUI.skin.textField);
             m_textFieldStyle.fontSize = 30;
-            var windowSize = new Rect(10, 10, 500, 500);
+            var windowSize = new Rect(10, 10, 500, 600);
             GUI.Window(0, windowSize, DrawWindow, "GM Tool Window");
         }
 
