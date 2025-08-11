@@ -590,6 +590,7 @@ namespace RS.Scene
 
                 if (Mathf.Abs(chunkX - playerChunkPos.x) + Mathf.Abs(chunkZ - playerChunkPos.z) < minChunkDistance)
                 {
+                    totalChance--;
                     continue;
                 }
                 

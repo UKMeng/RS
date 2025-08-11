@@ -147,12 +147,12 @@ namespace RS.Scene
             {
                 case 0:
                 {
-                    GameSettingTransfer.mapSize = 64;
+                    GameSettingTransfer.mapSize = 128;
                     break;
                 }
                 case 1:
                 {
-                    GameSettingTransfer.mapSize = 128;
+                    GameSettingTransfer.mapSize = 192;
                     break;
                 }
                 case 2:
