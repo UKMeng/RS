@@ -63,21 +63,27 @@ namespace RS.Scene
             return list;
         }
 
-        public static int GetTreeHeight(float value, out BlockType leaf)
+        public static int GetTreeHeight(float value, float humidity, out BlockType leaf)
         {
-            if (value < 0.9f)
+            if (humidity > 0.2f && humidity < 0.23f)
+            {
+                leaf = BlockType.Sakura;
+            }
+            else
             {
                 leaf = BlockType.Leaf;
+            }
+            
+            if (value < 0.9f)
+            {
                 return 3;
             }
             
             if (value < 0.95f)
             {
-                leaf = BlockType.Sakura;
                 return 4;
             }
-
-            leaf = BlockType.Sakura;
+            
             return 5;
         }
 

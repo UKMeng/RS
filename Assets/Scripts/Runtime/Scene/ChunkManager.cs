@@ -1210,7 +1210,7 @@ namespace RS.Scene
                         continue;
                     }
                     
-                    var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz], out var leafType);
+                    var treeHeight = Tree.GetTreeHeight(sampleResult[sx * 32 + sz], contexts[sx * 32 + sz].humidity, out var leafType);
                     
                     // 测试通过，生成一棵树
                     // 更新黑名单
