@@ -242,7 +242,7 @@ namespace RS.Scene
                     }
                 }
 
-                if (count > 13)
+                if (count > 14)
                 {
                     return chunkStartPos;
                 }
