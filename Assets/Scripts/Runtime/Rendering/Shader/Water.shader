@@ -12,6 +12,12 @@
         _WavePersistence("Wave Persistence", Range(0, 2)) = 1.0
         _WaveLacunarity("Wave Lacunarity", Range(0, 2)) = 1.0
         _WaveIterations("Wave Iterations", Range(1, 8)) = 3
+        
+        _SSR_MaxDistance("SSR Max Distance", Float) = 50
+        _SSR_StepSize("SSR Step Size", Float) = 0.8
+        _SSR_Thickness("SSR Thickness", Range(0, 1)) = 0.05
+        _ReflectionStrength("Reflection Strength", Range(0, 1)) = 1.0
+        _FresnelPower("Fresnel Power", Range(0.1, 20)) = 5.0
     }
 
     SubShader
@@ -55,6 +61,10 @@
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 positionWS : TEXCOORD1;
+                float4 positionOS : TEXCOORD2;
+                float4 positionCS : TEXCOORD3;
+                float3 vsRay : TEXCOORD4;
+                
                 // float3 normalWS : TEXCOORD1;
                 // float3 tangentWS : TEXCOORD2;
                 // float3 bitangentWS : TEXCOORD3;
@@ -72,6 +82,22 @@
             float _WaveLacunarity;
             int _WaveIterations;
             float4 _NoiseTex_ST;
+
+            // ssr
+            #define SSR_MAX_STEPS_CONST 32
+            #define SSR_MAX_BINARY_CONST 8
+            
+            TEXTURE2D(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
+            TEXTURE2D(_CameraDepthTexture);
+            SAMPLER(sampler_CameraDepthTexture);
+            TEXTURECUBE(_SkyBoxCubeMap);
+            SAMPLER(sampler_SkyBoxCubeMap);
+            float _SSR_MaxDistance;
+            float _SSR_StepSize;
+            float _SSR_Thickness;
+            float _ReflectionStrength;
+            float _FresnelPower;
 
             /// Water Wave
             /// https://github.com/sixthsurge/photon/blob/iris-stable/shaders/include/surface/water_normal.glsl
@@ -149,6 +175,61 @@
                 return normalize(float3(wave1 - wave0, wave2 - wave0, h));
             }
 
+
+            /// SSR
+            float2 ViewPosToCS(float3 vpos)
+            {
+                float4 clipPos = mul(unity_CameraProjection, float4(vpos, 1));
+                float3 screenPos = clipPos.xyz / clipPos.w;
+                return float2(screenPos.x, screenPos.y) * 0.5 + 0.5;
+            }
+            
+            float CompareWithDepth(float3 vpos)
+            {
+                float2 uv = ViewPosToCS(vpos);
+                float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, uv);
+                depth = LinearEyeDepth(depth, _ZBufferParams);
+                int isInside = uv.x > 0 && uv.x < 1 && uv.y > 0 && uv.y < 1;
+                return lerp(0, vpos.z + depth, isInside);
+            }
+            
+            bool RayMarching(float3 o, float3 r, out float2 hitUV)
+            {
+                float3 end = o;
+                float stepSize = 0.15;
+                float thickness = 0.1;
+                float travelled = 0;
+                int maxMarching = 256;
+                float maxDistance = 500;
+
+                UNITY_LOOP
+                for (int i = 0; i < maxMarching; i++)
+                {
+                    end += r * stepSize;
+                    travelled += stepSize;
+
+                    if (travelled > maxDistance)
+                    {
+                        return false;
+                    }
+
+                    float collide = CompareWithDepth(end);
+                    if (collide < 0)
+                    {
+                        if (abs(collide) < thickness)
+                        {
+                            hitUV = ViewPosToCS(end);
+                            return true;
+                        }
+
+                        end -= r * stepSize;
+                        travelled -= stepSize;
+                        stepSize *= 0.5;
+                    }
+                }
+
+                return false;
+            }
             
             Varyings vert(Attributes v)
             {
@@ -160,9 +241,25 @@
                 // o.normalWS = TransformObjectToWorldNormal(v.normalOS);
                 // o.tangentWS = TransformObjectToWorldDir(v.tangentOS.xyz);
                 // o.bitangentWS = cross(o.normalWS, o.tangentWS) * v.tangentOS.w;
+
+                o.positionOS = v.positionOS;
+
+                float4 screenPos = o.positionHCS;
+                screenPos.xyz /= screenPos.w;
+                screenPos.xy = screenPos.xy * 0.5 + 0.5;
+                o.positionCS = screenPos;
+#if UNITY_UV_STARTS_AT_TOP
+                o.positionCS.y = 1 - o.positionCS.y;
+#endif
+
+                float zFar = _ProjectionParams.z;
+                float4 vsRay = float4(float3(o.positionCS.xy * 2.0 - 1.0, 1) * zFar, zFar);
+                vsRay = mul(unity_CameraInvProjection, vsRay);
+                o.vsRay = vsRay;
                 
                 return o;
             }
+
             
 
             half4 frag(Varyings i) : SV_Target
@@ -179,25 +276,54 @@
 		            0.0, 1.0, 0.0
 	            );
 
-                float3 normal = normalize(mul(normalTS, tbn));
+                float3 waveNormal = normalize(mul(normalTS, tbn));
 
                 float3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.positionWS);
 
                 float3 lightDir = normalize(_MainLightPosition.xyz);
-                float3 diffuse = max(0.2, dot(normal, lightDir));
+                float3 diffuse = max(0.2, dot(waveNormal, lightDir));
 
                 float viewDistance = length(_WorldSpaceCameraPos.xyz - i.positionWS);
 
                 float fogFactor = 1 - exp(-_FogDensity * viewDistance);
 
                 float3 h = normalize(viewDir + lightDir);
-                float specular = pow(max(0, dot(normal, h)), _Shininess);
+                float specular = pow(max(0, dot(waveNormal, h)), _Shininess);
                 half3 specularColor = half3(1, 1, 1) * specular;
-
+                
                 half3 color = lerp(_BaseColor.rgb, _FogColor.rgb, fogFactor) * diffuse + specularColor;
                 half alpha = lerp(_BaseColor.a, _FogColor.a, fogFactor);
-            
-                return half4(color, alpha);
+
+                // ssr
+                float4 screenPos = i.positionCS;
+                float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, screenPos.xy);
+                depth = Linear01Depth(depth, _ZBufferParams);
+                
+                float3 wsNormal = normalize(float3(0, 1, 0));;
+                float3 vsNormal = TransformWorldToViewDir(wsNormal);
+                
+                float3 vsRayOrigin = i.vsRay * depth;
+                float3 reflectionDir = normalize(reflect(vsRayOrigin, vsNormal));
+                
+                float2 hitUV = 0;
+                float3 hitCol = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, screenPos.xy).xyz;
+                
+                if (RayMarching(vsRayOrigin, reflectionDir, hitUV))
+                {
+                    hitCol += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, hitUV);
+                }
+                else
+                {
+                    float3 viewPosToWorld = normalize(i.positionWS.xyz - _WorldSpaceCameraPos.xyz);
+                    float3 reflectDir = reflect(viewPosToWorld, wsNormal);
+                    hitCol = SAMPLE_TEXTURECUBE(_SkyBoxCubeMap, sampler_SkyBoxCubeMap, reflectDir);
+                }
+
+                return half4(hitCol, 1.0);
+
+                // half3 finalColor = lerp(color, hitCol.rgb, _ReflectionStrength);
+                // return half4(finalColor, alpha);
+
             }
             ENDHLSL
         }
