@@ -61,9 +61,9 @@
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 positionWS : TEXCOORD1;
-                float4 positionOS : TEXCOORD2;
-                float4 positionCS : TEXCOORD3;
-                float3 vsRay : TEXCOORD4;
+                // float4 positionOS : TEXCOORD2;
+                // float4 positionCS : TEXCOORD3;
+                // float3 vsRay : TEXCOORD4;
                 
                 // float3 normalWS : TEXCOORD1;
                 // float3 tangentWS : TEXCOORD2;
@@ -177,57 +177,45 @@
 
 
             /// SSR
-            float2 ViewPosToCS(float3 vpos)
+            float2 ViewPosToSS(float3 viewPos)
             {
-                float4 clipPos = mul(unity_CameraProjection, float4(vpos, 1));
-                float3 screenPos = clipPos.xyz / clipPos.w;
-                return float2(screenPos.x, screenPos.y) * 0.5 + 0.5;
-            }
-            
-            float CompareWithDepth(float3 vpos)
-            {
-                float2 uv = ViewPosToCS(vpos);
-                float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, uv);
-                depth = LinearEyeDepth(depth, _ZBufferParams);
-                int isInside = uv.x > 0 && uv.x < 1 && uv.y > 0 && uv.y < 1;
-                return lerp(0, vpos.z + depth, isInside);
-            }
-            
-            bool RayMarching(float3 o, float3 r, out float2 hitUV)
-            {
-                float3 end = o;
-                float stepSize = 0.15;
-                float thickness = 0.1;
-                float travelled = 0;
-                int maxMarching = 256;
-                float maxDistance = 500;
+                // 返回NDC下的uv
+                float4 hcs = mul(UNITY_MATRIX_P, float4(viewPos, 1));
+                float3 cs = hcs.xyz / hcs.w;
 
+                float2 uv = float2(cs.x, cs.y) * 0.5 + 0.5;
+#if UNITY_UV_STARTS_AT_TOP
+                uv.y = 1 - uv.y;
+#endif
+                return uv;
+            }
+            
+            bool RayMarching(float3 ori, float3 dir, out float2 hitUV)
+            {
+                // 统一采用View Space下的坐标系
                 UNITY_LOOP
-                for (int i = 0; i < maxMarching; i++)
+                for (int step = 0; step < SSR_MAX_STEPS_CONST; step++)
                 {
-                    end += r * stepSize;
-                    travelled += stepSize;
-
-                    if (travelled > maxDistance)
+                    float3 p = ori + dir * step * _SSR_StepSize;
+                    float2 uv = ViewPosToSS(p);
+                    if (uv.x > 1 || uv.x < 0 || uv.y > 1 || uv.y < 0)
                     {
-                        return false;
+                        // 超出屏幕范围，结束
+                        break;
                     }
-
-                    float collide = CompareWithDepth(end);
-                    if (collide < 0)
+                    
+                    float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, uv);
+                    // 采样纹理的深度是非线性的，LinearEyeDepth可以将采样结果转换到视角空间下的正值z深度
+                    // 而所有能被相机看见的点的z深度都是负值
+                    depth = LinearEyeDepth(depth, _ZBufferParams);
+                    if (depth + p.z < 0 && depth + p.z > -_SSR_Thickness)
                     {
-                        if (abs(collide) < thickness)
-                        {
-                            hitUV = ViewPosToCS(end);
-                            return true;
-                        }
-
-                        end -= r * stepSize;
-                        travelled -= stepSize;
-                        stepSize *= 0.5;
+                        // p点在物体之中，算作命中
+                        hitUV = uv;
+                        return true;
                     }
                 }
-
+                
                 return false;
             }
             
@@ -242,20 +230,20 @@
                 // o.tangentWS = TransformObjectToWorldDir(v.tangentOS.xyz);
                 // o.bitangentWS = cross(o.normalWS, o.tangentWS) * v.tangentOS.w;
 
-                o.positionOS = v.positionOS;
-
-                float4 screenPos = o.positionHCS;
-                screenPos.xyz /= screenPos.w;
-                screenPos.xy = screenPos.xy * 0.5 + 0.5;
-                o.positionCS = screenPos;
-#if UNITY_UV_STARTS_AT_TOP
-                o.positionCS.y = 1 - o.positionCS.y;
-#endif
-
-                float zFar = _ProjectionParams.z;
-                float4 vsRay = float4(float3(o.positionCS.xy * 2.0 - 1.0, 1) * zFar, zFar);
-                vsRay = mul(unity_CameraInvProjection, vsRay);
-                o.vsRay = vsRay;
+//                 o.positionOS = v.positionOS;
+//
+//                 float4 screenPos = o.positionHCS;
+//                 screenPos.xyz /= screenPos.w;
+//                 screenPos.xy = screenPos.xy * 0.5 + 0.5;
+//                 o.positionCS = screenPos;
+// #if UNITY_UV_STARTS_AT_TOP
+//                 o.positionCS.y = 1 - o.positionCS.y;
+// #endif
+//
+//                 float zFar = _ProjectionParams.z;
+//                 float4 vsRay = float4(float3(o.positionCS.xy * 2.0 - 1.0, 1) * zFar, zFar);
+//                 vsRay = mul(unity_CameraInvProjection, vsRay);
+//                 o.vsRay = vsRay;
                 
                 return o;
             }
@@ -295,31 +283,25 @@
                 half alpha = lerp(_BaseColor.a, _FogColor.a, fogFactor);
 
                 // ssr
-                float4 screenPos = i.positionCS;
-                float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, screenPos.xy);
-                depth = Linear01Depth(depth, _ZBufferParams);
-                
-                float3 wsNormal = normalize(float3(0, 1, 0));;
-                float3 vsNormal = TransformWorldToViewDir(wsNormal);
-                
-                float3 vsRayOrigin = i.vsRay * depth;
-                float3 reflectionDir = normalize(reflect(vsRayOrigin, vsNormal));
-                
+                // 需要View Space下的ori和dir作RayMarching
+                float3 wsNormal = normalize(float3(0, 1, 0));
+                float3 wsReflectionDir = reflect(-viewDir, wsNormal);
+
+
+                float3 dir = normalize(TransformWorldToViewDir(wsReflectionDir));
+                float3 ori = TransformWorldToView(i.positionWS);
+
+
                 float2 hitUV = 0;
-                float3 hitCol = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, screenPos.xy).xyz;
-                
-                if (RayMarching(vsRayOrigin, reflectionDir, hitUV))
+                float3 hitCol = 0;
+                if (RayMarching(ori, dir, hitUV))
                 {
-                    hitCol += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, hitUV);
-                }
-                else
-                {
-                    float3 viewPosToWorld = normalize(i.positionWS.xyz - _WorldSpaceCameraPos.xyz);
-                    float3 reflectDir = reflect(viewPosToWorld, wsNormal);
-                    hitCol = SAMPLE_TEXTURECUBE(_SkyBoxCubeMap, sampler_SkyBoxCubeMap, reflectDir);
+                    // RayMarcing命中
+                    hitCol = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, hitUV);
                 }
 
                 return half4(hitCol, 1.0);
+
 
                 // half3 finalColor = lerp(color, hitCol.rgb, _ReflectionStrength);
                 // return half4(finalColor, alpha);
